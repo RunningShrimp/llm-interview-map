@@ -1,0 +1,94 @@
+{
+  "id": "e2-react-loop",
+  "title": "ReAct 循环",
+  "definition": "ReAct = Reasoning（推理）+ Acting（行动）交替进行：模型先『思考』该做什么，再『行动』调用工具，然后『观察』结果，循环往复直到得出答案。《AI Agent 面试 Top50》第 1 题，Agent 的基本运行节拍。",
+  "analogies": [
+    {
+      "icon": "🔍",
+      "name": "侦探查案",
+      "text": "ReAct 就是侦探的破案节奏：思考（『死者接触过谁？先查访客记录』）→ 行动（调出访客名单）→ 观察（『名单里有三个可疑人员』）→ 再思考（『查第一个人的行踪』）→ 再行动……一边推理一边行动、用行动的结果修正下一步推理。只思考不行动是纸上谈兵，只行动不思考是无头苍蝇——ReAct 的精髓是交替。"
+    },
+    {
+      "icon": "🍳",
+      "name": "照菜谱做新菜",
+      "text": "做一道没做过的菜：想一步（『现在应该焯水』）→ 做一步（真的焯水）→ 看一眼（水变色了，说明血水去掉了）→ 再想下一步……菜谱（提示词）只给大方向，具体每一步怎么调整靠边看边想。让 LLM 把思考写出来（Thought）再行动（Action），就是给模型装了这个做菜节奏。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：ReAct 三拍循环",
+    "description": "点击『下一步』，看一个完整 ReAct 轨迹如何回答『特斯拉当前市值是多少亿美元？』",
+    "html": "<div class=\"d-steps\" id=\"e2-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 拍：Thought（思考）</div><div class=\"d-card\" style=\"max-width:480px;margin:0 auto;border-color:#8b5cf6;background:#faf5ff\">我的知识有截止日期，市值是实时数据，我应该调用搜索工具查询最新值。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 拍：Action（行动）</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber\">调用工具：web_search</span><span class=\"d-token hot d-pulse\">参数：{ \"query\": \"特斯拉 最新 市值\" }</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 拍：Observation（观察）</div><div class=\"d-card\" style=\"max-width:480px;margin:0 auto\">搜索返回：特斯拉市值约 1.1 万亿美元（今日收盘）。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 拍：再次思考 → 得出答案</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-card\">Thought：信息足够且来源明确，可以作答</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">Final Answer：约 1.1 万亿美元（注明查询时间）</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#e2-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#e2-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#e2-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#e2-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🔁", "name": "三拍节奏", "text": "Thought（推理下一步）→ Action（调用工具）→ Observation（获取结果），循环至 Final Answer——每拍都是一次 LLM 调用或工具执行。" },
+    { "icon": "📝", "name": "提示词格式", "text": "经典模板把轨迹结构化：Thought/Action/Action Input/Observation 固定字段，让模型模仿这个格式输出——few-shot 示例 + 停止符（Observation 由系统填入）。" },
+    { "icon": "🧠", "name": "为什么有效", "text": "把 CoT 的『脑内推理』外化成『与环境的对话』：推理决定行动，行动结果反馈修正推理——弥补模型知识过时与不会算数的短板。" },
+    { "icon": "🛑", "name": "终止条件", "text": "三种停止：得出 Final Answer、达到最大步数上限、触发人工介入——没有终止条件的循环就是事故（详见 E4）。" },
+    { "icon": "🧩", "name": "实现要点", "text": "轨迹历史要裁剪（窗口有限）、Observation 太长要摘要、工具描述要清晰（选错工具多半是描述烂）、失败结果要喂回去让模型换路。" },
+    { "icon": "🧬", "name": "演化方向", "text": "Plan-and-Execute（先规划后执行，E6）、Reflexion（失败后自我反思重试）、多 Agent 分工（E7）——都是 ReAct 这套节拍的编排升级。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】ReAct 中 Thought、Action、Observation 分别对应什么？",
+      "options": [
+        "分别对应：LLM 推理、调用工具/执行动作、工具返回的结果",
+        "分别对应：用户输入、模型输出、用户反馈",
+        "分别对应：提示词、模型、数据库",
+        "分别对应：训练、微调、推理三个阶段"
+      ],
+      "answer": 0,
+      "explain": "选 A。Thought 是 LLM 的推理步骤，Action 是选择并调用工具，Observation 是工具执行结果回填轨迹——三拍循环是 Agent 的心跳。"
+    },
+    {
+      "type": "choice",
+      "q": "ReAct 循环缺少最大步数限制会导致什么？",
+      "options": [
+        "回答更快",
+        "模型可能在失败动作上无限循环，烧掉大量 token 与费用（死循环事故）",
+        "模型自动升级",
+        "没有影响"
+      ],
+      "answer": 1,
+      "explain": "选 1。步数上限是最基本的安全阀：达到上限强制终止并转人工/降级回复。实际生产中死循环烧掉巨额 API 费用是真实发生过的事故类型（详见 E4）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『让你基于 ReAct 实现一个「差旅助手 Agent」（查航班、比价、订票），请写出提示词的关键设计与循环控制要点。』请作答。",
+      "reference": "提示词关键设计：第一，角色与目标——你是差旅助手，目标是以最优性价比完成出行预订；第二，工具清单——每个工具（search_flights、get_price_calendar、book_ticket、ask_user）写清功能、参数 Schema、适用场景与返回示例，工具描述越准模型选错率越低；第三，轨迹格式——固定 Thought/Action/Action Input/Observation 结构，附 1~2 个完整示例（few-shot），并声明『Observation 由系统填充，不要自己编造工具结果』（防止幻觉 Observation）；第四，约束——预算上限、偏好（直飞优先）写进系统提示。循环控制要点：设置最大步数（如 10 步）与最大 token 预算，双阀值任一触发即终止并汇总当前进展转人工；工具连续失败 2 次则强制换策略或询问用户；book_ticket 这类不可逆动作前必须让用户确认（人类在环）；每轮把 Observation 做摘要压缩控制上下文长度；结束后写入记忆（用户常选的航司/时段偏好）。",
+      "keyPoints": [
+        { "point": "工具清单设计：功能/Schema/适用场景/返回示例，描述质量决定选择准确率", "kw": ["工具", "schema", "描述", "示例"] },
+        { "point": "轨迹格式：Thought/Action/Observation 固定结构 + few-shot + 禁止编造 Observation", "kw": ["thought", "observation", "few-shot", "编造", "格式"] },
+        { "point": "循环控制：最大步数/预算双阈值 + 连续失败换策略", "kw": ["最大步数", "预算", "终止", "失败", "上限"] },
+        { "point": "人类在环：不可逆动作（订票）先确认", "kw": ["确认", "人工", "不可逆", "book"] },
+        { "point": "上下文与记忆：Observation 摘要、偏好沉淀", "kw": ["摘要", "压缩", "记忆", "偏好"] }
+      ],
+      "explain": "加分项：防幻觉 Observation（系统回填）、不可逆动作人类确认；失分点：只画 Thought→Action 循环图没有工程约束。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：ReAct 是什么？为什么 Agent 要『想一步做一步』而不是想好全部再做？",
+    "hint": "提示：侦探查案类比；再讲讲『行动结果会改变下一步判断』。",
+    "modelAnswer": "ReAct 就是让 AI 像侦探破案一样干活：想一步（先查什么）、动一步（真的去查）、看一眼结果（拿到了什么新线索），再决定下一步——推理和行动交替进行。不能一次全想好，因为后面的路取决于前面的结果：查完访客名单才知道该跟踪谁。同时逼它把思考写出来还有个好处——每一步为什么这么干都有据可查，错了能定位是哪一步想岔了。"
+  },
+  "links": [
+    { "to": "e1-agent-anatomy", "text": "ReAct 是 Agent 四件套协同运转的节拍器——规划、记忆、工具都在这个循环里出场" },
+    { "to": "c2-chain-of-thought", "text": "Thought 字段就是 CoT：ReAct = 思维链从『脑内推演』升级为『边想边做』" },
+    { "to": "e4-tool-error-loops", "text": "循环虽好，失控就是事故——异常与死循环防护是 ReAct 的安全带" }
+  ],
+  "interview": [
+    {
+      "q": "什么是 ReAct？它的工作流程是怎样的？",
+      "stars": 5,
+      "source": "牛客网·AI Agent 面试 Top50 必刷题（第 1 题）/ 牛客·真实面经「面试官真问了 ReAct」",
+      "tip": "定义 + 三拍循环 + 一个具体轨迹例子，这是 Agent 方向的敲门题。"
+    },
+    {
+      "q": "ReAct 循环的终止条件有哪些？轨迹太长怎么办？",
+      "stars": 4,
+      "source": "牛客网·Top50（延伸追问）",
+      "tip": "答案/步数上限/人工介入三终止；轨迹摘要压缩与关键状态提取。"
+    }
+  ],
+  "summary": "Q：ReAct 三拍是什么？（答：Thought 推理 → Action 调工具 → Observation 看结果，循环至 Final Answer）\nQ：为什么边想边做优于先想完再做？（答：行动结果决定后续判断，动态修正路径）\nQ：Observation 由谁填？为什么？（答：由系统回填工具真实结果——让模型自己编就是幻觉事故）"
+}

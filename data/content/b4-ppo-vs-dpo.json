@@ -1,0 +1,93 @@
+{
+  "id": "b4-ppo-vs-dpo",
+  "title": "PPO 与 DPO 对比",
+  "definition": "PPO 是经典强化学习：奖励模型打分 + 复杂的在线采样优化，稳定但工程重。DPO（直接偏好优化）数学上证明可跳过 RM 和 RL 循环，直接用偏好对微调——简单、稳、便宜，成为开源界主流。",
+  "analogies": [
+    {
+      "icon": "🎯",
+      "name": "请教练 vs 看范例自学",
+      "text": "PPO 像请私人教练训练：每次练习（生成回答）教练当场打分（奖励模型），你根据分数调整动作（PPO 更新），还要防着你动作变形（KL 惩罚）——体系科学但教练费、设备贵、流程复杂。DPO 像看优秀范例自学：直接摆两组对照（好答案 vs 坏答案），告诉你『向左边这种靠，离右边那种远』，一次反向传播就完成学习——省掉教练和实时打分，简单高效，绝大多数场景够用。"
+    },
+    {
+      "icon": "🌡️",
+      "name": "闭环温控 vs 定值调节",
+      "text": "PPO 是闭环控制：每一步都采样、打分、更新，反馈及时但每个环节都可能出噪声，调参像调精密仪器。DPO 是把『偏好』直接编译进损失函数的定值调节：离线数据一次训练，几乎没有可调环节，稳得很——代价是数据定了上限，不能像 PPO 那样随训练进程持续生成新反馈。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：同一次偏好学习，两条技术路线",
+    "description": "切换 PPO / DPO，对比流程复杂度、在显存模型数与工程难度上的差异。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"b4g\" data-tab=\"p\">PPO（强化学习路线）</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"b4g\" data-tab=\"d\">DPO（直接偏好路线）</button></div><div data-pane=\"p\" data-group=\"b4g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">① 策略模型生成回答</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">② 奖励模型打分</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">③ 价值模型估计优势</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">④ PPO 更新</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:10px\"><span class=\"d-tag amber\">显存同时驻留 4 个模型：策略/参考/奖励/价值</span></div><div class=\"d-note\">✔ 在线持续采样、上限高；✘ 流程复杂、超参敏感、训练不稳定、算力开销大（InstructGPT/ChatGPT 采用）。</div></div><div data-pane=\"d\" data-group=\"b4g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">① 准备偏好对（好回答 y_w，坏回答 y_l）</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">② DPO 损失直接微调</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:10px\"><span class=\"d-tag green\">显存只需 2 个模型：策略 + 参考</span></div><div class=\"d-note\">✔ 无需 RM、无 RL 循环，简单稳定成本低（Zephyr、Llama-3 采用）；✘ 离线数据封顶、分布外泛化弱于在线探索。</div></div>"
+  },
+  "keyPoints": [
+    { "icon": "🧠", "name": "PPO 核心", "text": "策略-奖励-价值闭环：RM 打分、价值模型估基线、clip 机制限制单步更新幅度；在线采样让模型能持续探索新回答空间。" },
+    { "icon": "⚡", "name": "DPO 洞察", "text": "数学上可把『奖励最大化 + KL 约束』的最优解闭式解反代回来——偏好数据可直接变成损失函数：提高好答案相对坏答案的概率差。" },
+    { "icon": "⚖️", "name": "取舍总表", "text": "效果上限：PPO 略优（在线探索）；工程复杂度：DPO 完胜；算力：DPO 约省一半以上（无 RM/价值模型、无在线采样）；稳定性：DPO 几乎不失稳。" },
+    { "icon": "🏭", "name": "工业界现状", "text": "头部闭源多用 PPO 系（追求上限）；开源与多数公司选 DPO（Llama-3、Zephyr）——『简单可靠先上线』。" },
+    { "icon": "🧮", "name": "面试必背对比", "text": "五个维度：是否需要 RM、在线 vs 离线、显存模型数（4 vs 2）、稳定性、效果上限——表格化答题。" },
+    { "icon": "🔬", "name": "延伸族谱", "text": "IPO/KTO 修 DPO 的缺点，GRPO 改 PPO 的价值模型（见 B7）——对齐算法仍在快速演进，答到趋势是加分项。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】DPO 相比 PPO 的核心简化是？",
+      "options": [
+        "不再需要人类偏好数据",
+        "跳过奖励模型训练与 RL 采样循环，用偏好对直接构造损失微调",
+        "不再需要 SFT 初始化",
+        "把模型参数量减半"
+      ],
+      "answer": 1,
+      "explain": "选 B。DPO 的洞察是把 KL 约束的奖励最大化改写为对偏好对的分类式损失，直接训练策略。A 错：偏好数据恰恰是 DPO 的输入；C 错：仍需 SFT 起点或至少参考模型；D 与参数量无关。"
+    },
+    {
+      "type": "choice",
+      "q": "什么场景下更应选 PPO 而非 DPO？",
+      "options": [
+        "算力极度有限、追求快速上线",
+        "需要模型在训练中持续探索新回答空间、追求对齐效果上限",
+        "只有少量离线偏好数据",
+        "团队没有强化学习工程经验"
+      ],
+      "answer": 1,
+      "explain": "选 B。PPO 的在线采样-反馈闭环能持续发现并强化新行为，上限更高，适合头部团队冲极致效果。A、C、D 恰恰是选 DPO 的典型理由。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你们要给 7B 模型做偏好对齐，团队 2 人、单机 8×A100，选 PPO 还是 DPO？为什么？如果老板要求对齐效果天花板最高呢？』请作答。",
+      "reference": "在当前资源下我会选 DPO：理由是团队 2 人、单机 8 卡的约束下，PPO 需要同时驻留策略、参考、奖励、价值四个模型（显存占用翻倍），还有在线采样流水线与大量超参（clip 范围、KL 系数、价值损失权重）要调，工程复杂、训练不稳定的风险高；DPO 只需策略加参考两个模型、偏好对直接训练，几乎不失败，两三天就能出第一版对齐模型，性价比压倒性。做 DPO 时我会注意：偏好数据质量与分布要覆盖业务场景、用参考模型控制偏移、配合小学习率跑 1-2 个 epoch。如果老板追求天花板：升级到 PPO 路线——先用 DPO 数据训练奖励模型，再搭在线采样与 PPO 训练集群，投入更多算力与调参人力去换上限；或者折中走迭代式 DPO（在线迭代收集偏好再训）逼近在线方法的效果。",
+      "keyPoints": [
+        { "point": "结论选 DPO 并给出资源约束理由（4 模型 vs 2 模型）", "kw": ["dpo", "模型", "显存", "资源"] },
+        { "point": "指出 PPO 工程复杂：在线采样、超参敏感、不稳定", "kw": ["采样", "超参", "不稳定", "复杂"] },
+        { "point": "给出 DPO 落地要点：数据覆盖/参考模型/小学习率", "kw": ["数据", "参考", "学习率"] },
+        { "point": "冲上限方案：PPO 或迭代式 DPO 折中", "kw": ["ppo", "迭代", "上限", "奖励模型"] }
+      ],
+      "explain": "加分项：算力与人力维度的权衡、迭代 DPO/在线 DPO 等新进展；失分点：只会背概念，无法落地到资源约束做决策。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：DPO 为什么能『免教练』就把模型对齐好？",
+    "hint": "提示：PPO 是教练实时打分纠偏，DPO 是直接看好坏范例自学——关键在『把偏好写进了作业批改规则』。",
+    "modelAnswer": "PPO 训练像请教练：模型每答一次，奖励模型打一次分，再按分数小心翼翼地调整，设备贵流程繁琐。DPO 的聪明之处是数学上证明了：不用实时打分，直接拿一堆『好答案、坏答案』成对的例子，训练时拉开好答案和坏答案的概率差距，效果等价于按奖励优化——相当于把人类偏好直接编进了批改规则，一道反向传播搞定，简单稳定还省钱。"
+  },
+  "links": [
+    { "to": "b3-rlhf-three-stages", "text": "PPO 就是 RLHF 第三阶段的原班人马，DPO 是它的极简化替身" },
+    { "to": "b5-lora-qlora", "text": "算力紧张时，DPO 还能再叠加 LoRA——对齐训练也能低成本化" },
+    { "to": "b7-grpo-rlvr", "text": "GRPO 从 PPO 阵营继续演化：用可验证奖励替代人类偏好，专攻推理能力" }
+  ],
+  "interview": [
+    {
+      "q": "PPO 和 DPO 的区别？各自适用什么场景？",
+      "stars": 5,
+      "source": "牛客网·26届校招 PPO vs DPO 专项 / 知乎·秋招必考题",
+      "tip": "五维表格答题：RM 依赖/在线离线/显存模型数/稳定性/上限，最后落到场景选择。"
+    },
+    {
+      "q": "DPO 的损失在优化什么？它有什么缺点？",
+      "stars": 4,
+      "source": "知乎·秋招必考题（延伸追问）",
+      "tip": "拉大偏好对的概率差（等价于 KL 约束的奖励最大化）；缺点：离线封顶、分布外弱。"
+    }
+  ],
+  "summary": "Q：DPO 省掉了 RLHF 里的哪两样东西？（答：显式奖励模型与 PPO 在线采样循环）\nQ：显存里各跑几个模型？（答：PPO 四个——策略/参考/奖励/价值；DPO 两个——策略/参考）\nQ：追求上限选谁、追求稳定上线选谁？（答：上限 PPO（在线探索），稳定与成本 DPO——工业界开源主流）"
+}

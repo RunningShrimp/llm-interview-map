@@ -1,0 +1,84 @@
+{
+  "id": "a3-multi-head-attention",
+  "title": "Multi-Head Attention 多头注意力",
+  "definition": "多头注意力（MHA）是把一次注意力拆成 h 组并行的『小注意力』（每个头维度更低），各头独立算 QKV（Query/Key/Value，查询-键-值三组向量），最后拼接融合。目的：让模型同时从多个角度看句子。",
+  "analogies": [
+    {
+      "icon": "🩺",
+      "name": "多专科会诊",
+      "text": "一位全科医生看病历（单头注意力）只能给一个综合判断；医院改成多专科会诊（多头）：外科看伤口、内科看指标、影像科看片子，各写各的意见，最后主任把所有意见汇总成诊断报告（拼接 + 输出线性变换 W_O）。不同『专科』=不同的头，各自关注句中不同类型的关联（语法搭配、指代、语义相似）。"
+    },
+    {
+      "icon": "🎥",
+      "name": "多机位直播",
+      "text": "单机位直播一场球赛只能跟一个画面，容易漏掉关键瞬间；多机位同时拍全景、特写、战术视角，导播（W_O 矩阵）再剪成一条成片。注意力也一样：一个头的『视角』有限，多个头并行才能同时捕捉长距离依赖和局部搭配。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：3 个头各自『看』哪里",
+    "description": "点击『下一步』切换不同注意力头的热力图，观察每个头关注的词对完全不同——这就是『多视角』。",
+    "html": "<div class=\"d-steps\" id=\"a3-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">头 1：主谓搭配视角</div><div class=\"d-row\" style=\"justify-content:center\"><div><div class=\"d-token\">猫</div><div class=\"d-token hot d-pulse\">追</div><div class=\"d-token\">老鼠</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag\">『追』重点看『猫』（谁发出的动作）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">头 2：动宾关系视角</div><div class=\"d-row\" style=\"justify-content:center\"><div><div class=\"d-token\">猫</div><div class=\"d-token hot d-pulse\">追</div><div class=\"d-token hot d-pulse\" style=\"animation-delay:.4s\">老鼠</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag green\">『追』同时看『老鼠』（动作对象）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">头 3：指代/共现视角</div><div class=\"d-row\" style=\"justify-content:center\"><div><div class=\"d-token hot d-pulse\">猫</div><div class=\"d-token\">追</div><div class=\"d-token hot d-pulse\" style=\"animation-delay:.6s\">老鼠</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag amber\">头 3 关注『猫↔老鼠』整体场景关联</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#a3-steps\" disabled>← 上一个头</button><span class=\"d-step-indicator\" data-steps-indicator=\"#a3-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#a3-steps\">下一个头 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#a3-steps\">🔄 重播脉冲</button></div><div class=\"d-note\">三个头的注意力模式不同 → 各自提取不同关系 → 拼接后信息互补。真实模型中 GPT-3 有 96 个头。</div>"
+  },
+  "keyPoints": [
+    { "icon": "✂️", "name": "怎么拆", "text": "把 d_model 维切成 h 份，每个头 d_head = d_model/h（如 512 维 8 头，每头 64 维），各头独立做线性投影得到自己的 Q、K、V。" },
+    { "icon": "🧵", "name": "怎么拼", "text": "h 个头的输出（各 d_head 维）拼接回 d_model 维，再过输出矩阵 W_O 做一次线性融合——会诊意见统一成报告。" },
+    { "icon": "👁️", "name": "为什么有效", "text": "单头注意力对齐模式会被平均，多个头允许模型在不同位置、不同关系子空间并行关注，表达力显著更强（原论文消融证实）。" },
+    { "icon": "⚖️", "name": "头数取舍", "text": "头数多→视角多但每头维度太低、算力分散；头数少→每头表达强但视角少。常见 d_head=64，是效果与算力的经验平衡点。" },
+    { "icon": "💻", "name": "手撕要点", "text": "核心是形状变换：Q 线性投影 → reshape 成 (seq, h, d_head) → 每头 QKᵀ/√d_head → softmax 加权 V → 转置拼接 → 过 W_O。" },
+    { "icon": "🔗", "name": "后续演化", "text": "为省 KV Cache，业界把『每头独立 KV』改成共享（MQA）或分组共享（GQA）——是对多头结构的推理侧改造（详见 F2）。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】d_model=512、8 个头的多头注意力中，每个头的维度 d_head 是多少？输出拼接后（过 W_O 前）的维度是多少？",
+      "options": ["d_head=64，拼接后 512 维", "d_head=512，拼接后 4096 维", "d_head=64，拼接后 64 维", "d_head=128，拼接后 1024 维"],
+      "answer": 0,
+      "explain": "选 A。d_head = d_model/h = 512/8 = 64；8 个头各输出 64 维，拼接得 8×64=512 维，再过 W_O（512×512）保持 512 维。B 错：是切分不是复制；C 错：拼接不是取平均；D 错：512/8=64 不是 128。"
+    },
+    {
+      "type": "choice",
+      "q": "相比『一个 512 维的单头注意力』，多头注意力（8×64）的核心优势是？",
+      "options": ["参数量大幅减少", "计算量变成原来的 1/8", "允许模型在多个表示子空间并行关注不同位置/关系", "可以完全消除梯度消失"],
+      "answer": 2,
+      "explain": "选 C。多头的价值是『多视角』：不同头学习不同关系模式。A 错：QKV 投影参数基本相同；B 错：计算量近似相当；D 错：解决梯度消失主要靠残差连接。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官说：『请手撕多头注意力，并同步说明每一步的张量形状变化。』请写出你的实现思路与形状标注。",
+      "reference": "我按五步写：1）输入 X 形状为 (batch, seq, d_model)，分别乘 W_Q、W_K、W_V 三个线性层，得到 Q、K、V，形状仍是 (batch, seq, d_model)；2）reshape/切分多头：变成 (batch, h, seq, d_head)，注意要把 seq 维与头维转置到位；3）每个头算注意力：scores = Q @ K 转置 / sqrt(d_head)，形状 (batch, h, seq, seq)，softmax 后加权 V，得到 (batch, h, seq, d_head)；4）把头维与 seq 维转置回来并 reshape 拼接成 (batch, seq, h*d_head) 即 (batch, seq, d_model)；5）过输出矩阵 W_O 得最终输出，形状不变。最后补一句：除以 sqrt(d_head) 是防止点积过大导致 softmax 梯度消失。",
+      "keyPoints": [
+        { "point": "输入先做 QKV 线性投影", "kw": ["线性", "w_q"] },
+        { "point": "分头 reshape，头维与 seq 维转置", "kw": ["reshape", "转置"] },
+        { "point": "缩放点积注意力：除以 sqrt(d_head) 后 softmax 加权 V", "kw": ["sqrt", "softmax"] },
+        { "point": "多头输出拼接（转置回去再 reshape）", "kw": ["拼接", "reshape"] },
+        { "point": "最后过输出矩阵 W_O 融合", "kw": ["w_o", "输出矩阵"] }
+      ],
+      "explain": "加分项：主动说出 sqrt 缩放的原因、mask 的位置（softmax 前）、以及 GQA/MQA 的推理侧演化；失分点：说不出形状变化、忘记除以 sqrt(d_head)、把拼接说成求和。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么要拆成『多个头』？一个头不行吗？",
+    "hint": "提示：用一个『看东西只有一条线索 vs 多条线索』的类比，再提一句『最后要有人把线索汇总』。",
+    "modelAnswer": "一句话里的关系有很多种——谁做动作、谁是对象、哪些词意思相近。一个头只有一双眼睛，只能抓一种关系；拆成多个头相当于派出多双眼睛，每双专门盯一种关系，而且每双眼睛看小一点（维度低）反而看得更专注。最后把所有眼睛看到的信息拼在一起、再统一加工一遍，模型对句子的理解就更立体。"
+  },
+  "links": [
+    { "to": "a2-self-attention-qkv", "text": "多头注意力就是把『单头 Self-Attention』并行复制 h 份再融合，QKV 本体机制完全一样" },
+    { "to": "a10-attention-optimization", "text": "头数越多 KV Cache 越大，注意力复杂度与显存优化正是从『头』上下手的" },
+    { "to": "f2-kv-cache-pagedattention", "text": "推理加速里的 MQA/GQA，本质是多头注意力在部署场景的省钱改造" }
+  ],
+  "interview": [
+    {
+      "q": "手撕多头注意力（Multi-Head Attention），并解释每一步的 shape 变化。",
+      "stars": 5,
+      "source": "知乎·LLM手撕代码合集 / CSDN·手撕多头注意力",
+      "tip": "背熟五步：投影→切头→缩放点积→拼接→W_O；边写边标注形状，结尾主动提 sqrt 缩放原因。"
+    },
+    {
+      "q": "为什么需要多头？一个注意力头不行吗？",
+      "stars": 5,
+      "source": "牛客网·大模型常考面试题100道（第5题）",
+      "tip": "答『多子空间多视角』并举例：有的头学语法搭配、有的学指代；可引原论文消融实验佐证。"
+    }
+  ],
+  "summary": "Q：多头注意力的『拆』和『拼』分别发生在哪？（答：拆在 QKV 线性投影后按 d_head 切分；拼在各头输出 concat 后过 W_O）\nQ：为什么每个头的维度要变低，而不是 8 个 512 维的头？（答：总计算量与参数量需保持与单头同量级，多头换的是视角数量而非算力规模）\nQ：推理侧对多头做过什么改造？（答：MQA 所有头共享一份 KV、GQA 分组共享，牺牲少量效果换 KV Cache 显存与带宽）"
+}

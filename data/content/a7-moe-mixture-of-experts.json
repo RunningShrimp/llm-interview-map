@@ -1,0 +1,93 @@
+{
+  "id": "a7-moe-mixture-of-experts",
+  "title": "MoE 混合专家（Router/Top-K/负载均衡）",
+  "definition": "MoE 把 Transformer 块里的 FFN（前馈网络：逐词全连接加工层，常配 SwiGLU 激活）换成多个并联『专家』，由 Router 为每个 token 只选 Top-K 个专家计算——总参数巨大、每次激活很少。",
+  "analogies": [
+    {
+      "icon": "🏥",
+      "name": "挂号分诊台",
+      "text": "普通 FFN 像全科大诊室：每个病人（token）都把所有科室的全部医生走一遍，人多时医院挤爆。MoE 医院在门口设分诊台（Router）：根据病情把病人分给最对口的 2 位专家（Top-K），其他专家继续歇着。全院医生总数（总参数）可以极多，但同一时刻接诊的只有少数（激活参数少）——既扩了医院规模，又没增加单个病人的等待成本。"
+    },
+    {
+      "icon": "🏢",
+      "name": "外包公司项目组",
+      "text": "公司有一千名工程师（总参数），但一个项目（token）只拉一个 5 人小队（Top-K 专家）干活，按项目需求选人（路由）。想接更多项目不用所有人上，只要再招人扩专家池即可——产能（模型容量）扩张与单项目成本（推理算力）解耦，这正是 DeepSeek-V3（671B 总参/37B 激活）的思路。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：Router 怎么给 token 派单",
+    "description": "点击『下一步』，看三个 token 各自被路由到哪些专家，以及专家负载不均时会发生什么。",
+    "html": "<div class=\"d-steps\" id=\"a7-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第一步：Router 给 token 打分</div><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-token\">『猫』</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">专家A 0.7</span><span class=\"d-tag\">专家B 0.2</span><span class=\"d-tag amber\">专家C 0.1</span></div><div class=\"d-row\"><span class=\"d-token\">『代码』</span><span class=\"d-arrow\">→</span><span class=\"d-tag amber\">专家A 0.1</span><span class=\"d-tag\">专家B 0.8</span><span class=\"d-tag\">专家C 0.1</span></div><div class=\"d-row\"><span class=\"d-token\">『公式』</span><span class=\"d-arrow\">→</span><span class=\"d-tag amber\">专家A 0.2</span><span class=\"d-tag amber\">专家B 0.1</span><span class=\"d-tag\">专家C 0.7</span></div></div><div class=\"d-note\">Router 是一个小网络，输出每个 token 对各专家的匹配分。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第二步：只激活 Top-K（K=1）个专家</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-token hot d-pulse\">『猫』→专家A</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">『代码』→专家B</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.6s\">『公式』→专家C</span></div><div class=\"d-note\">其余专家本轮不计算 → 算力只花在 1/K 上，这就是『稀疏激活』。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第三步：负载不均的麻烦与解法</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag red\">所有人都找专家A → 排队！</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">负载均衡辅助损失（aux loss）</span></div><div class=\"d-note\">训练时加一项『均衡惩罚』，逼着 Router 把任务摊匀，避免个别专家过载而其他专家闲置。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#a7-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#a7-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#a7-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#a7-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🧱", "name": "替换的是 FFN", "text": "注意力层保持不变，只把块里的 FFN（逐词两层全连接+GeLU/SwiGLU 激活）换成 N 个并联专家 FFN。" },
+    { "icon": "🧭", "name": "Router 路由", "text": "一个小型门控网络为每个 token 打分，选出得分最高的 Top-K 个专家（DeepSeek-V3 用 K=8 共 256 专家，另配共享专家）。" },
+    { "icon": "⚡", "name": "稀疏激活", "text": "总参数大（容量大）但每 token 只算 K/N 的参数——DeepSeek-V3 总参 671B、激活仅 37B，训练与推理成本远低于同容量稠密模型。" },
+    { "icon": "⚖️", "name": "负载均衡", "text": "训练加 aux loss 惩罚『扎堆』，防止 Router 把 token 都塞给少数专家造成算力浪费与训练不稳。" },
+    { "icon": "💾", "name": "代价", "text": "显存装得下全部专家（参数都要驻留），路由还带来通信开销与微调新课题（ experts 的显存压力）——省算力但费显存。" },
+    { "icon": "🏭", "name": "代表模型", "text": "Mixtral 8×7B、DeepSeek-V3/R1、Qwen 系列 MoE 版；『为什么大厂都用 MoE』已成为新晋必考题。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】一个 MoE 模型总参数 671B，每个 token 激活 8/256 的专家（约 37B）。它相比同效果稠密模型的核心优势是？",
+      "options": [
+        "推理时显存占用更小",
+        "单位 token 的计算量小得多，同等算力可承载更大容量",
+        "训练不需要 GPU",
+        "完全消除了幻觉问题"
+      ],
+      "answer": 1,
+      "explain": "选 1。MoE 省的是『每次要算的参数』（激活参数 37B vs 总参 671B），算力与通信成本大幅下降。A 错：全部专家都要驻留显存，显存反而更高；C、D 明显错误。"
+    },
+    {
+      "type": "choice",
+      "q": "MoE 训练中加入『负载均衡辅助损失（aux loss）』的目的是？",
+      "options": [
+        "让 Router 把 token 均匀分给各专家，防止少数专家过载、多数闲置",
+        "让模型输出更符合人类偏好",
+        "减少注意力计算量",
+        "替代学习率调度器"
+      ],
+      "answer": 0,
+      "explain": "选 A。若不加约束，Router 容易扎堆：个别专家被打爆（瓶颈），其余专家学不到东西。均衡损失鼓励路由摊匀，是 MoE 稳定训练的关键组件。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『介绍一下 MoE 的原理。为什么 DeepSeek-V3 能做到 671B 总参数但推理只用 37B 的算力？』请作答。",
+      "reference": "MoE 即混合专家：保持注意力不变，把 Transformer 块中的 FFN（前馈网络，即逐词的两层全连接加 SwiGLU 激活）替换成大量并联的专家 FFN，并由一个 Router 门控网络为每个 token 打分，只挑 Top-K 个最匹配的专家参与计算，其余专家本 token 不激活。DeepSeek-V3 有 256 个路由专家加若干共享专家，每 token 激活 8 个，所以 671B 总参数中每次只计算约 37B——容量（知识存储）来自全体专家，算力开销只与激活部分相关，这就是『总参数大、激活参数小』。代价是所有专家需常驻显存、路由引入通信开销，训练时还需负载均衡辅助损失防止专家扎堆。",
+      "keyPoints": [
+        { "point": "说明替换对象是块内 FFN（前馈网络）", "kw": ["ffn", "前馈"] },
+        { "point": "说明 Router 打分选 Top-K 专家", "kw": ["router", "top-k", "路由"] },
+        { "point": "解释总参数与激活参数解耦：容量来自全部专家、算力只算激活部分", "kw": ["激活", "总参数"] },
+        { "point": "提到代价：显存驻留/通信开销/负载均衡", "kw": ["显存", "通信", "负载均衡"] }
+      ],
+      "explain": "加分项：说出 DeepSeek-V3 的 256 选 8、共享专家设计；失分点：把 MoE 说成『多个大模型投票』——专家是块内 FFN 的并联，不是独立模型。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：MoE 模型『参数很多但不卡』是怎么回事？",
+    "hint": "提示：用医院分诊台类比——医生总数 vs 同时接诊人数。",
+    "modelAnswer": "想象一家医院有一千个专科医生，但每个病人来了，分诊台只把他带去看最对口的两个医生，其他医生不用动。这家医院规模巨大（总参数多、能治的病种多），但每个病人实际占用的医疗资源很小（每次只激活少量专家）。大模型的 MoE 就是这样：很多个专家网络待命，路由器为每个词挑最合适的几个干活，所以模型容量大、跑起来却不那么费算力。"
+  },
+  "links": [
+    { "to": "a1-transformer-architecture", "text": "MoE 只换了块里的 FFN 部件，整体架构仍是你在 A1 学的 Transformer" },
+    { "to": "b9-distributed-training", "text": "专家分布在多卡上带来 All-to-All 通信，MoE 训练是分布式技术的进阶考场" },
+    { "to": "f5-gpu-capacity-planning", "text": "『省算力费显存』的 MoE 在做 GPU 选型和容量规划时是必须单独建模的变量" }
+  ],
+  "interview": [
+    {
+      "q": "什么是 MoE（混合专家）？为什么 DeepSeek 用 MoE 能又大又便宜？",
+      "stars": 4,
+      "source": "小林笔记·MoE / 知乎·Transformer/BERT/GPT 必问考点",
+      "tip": "抓住『Router 打分 → Top-K 激活 → 总参大激活小』主线，用 671B/37B 数字佐证。"
+    },
+    {
+      "q": "MoE 的负载均衡是做什么的？不平衡会怎样？",
+      "stars": 3,
+      "source": "小林笔记·MoE（延伸追问）",
+      "tip": "aux loss 防扎堆；不平衡导致个别专家过载成瓶颈、其余专家浪费。"
+    }
+  ],
+  "summary": "Q：MoE 替换的是 Transformer 的哪个部件？（答：块内的 FFN 前馈层，换成多个并联专家 FFN）\nQ：Router 和 Top-K 各干什么？（答：Router 为 token 对各专家打分，Top-K 只让得分最高的 K 个专家参与计算）\nQ：MoE 省什么、费什么？（答：省每 token 算力与训练 FLOPs；费显存（全专家常驻）与路由通信，还需均衡损失防扎堆）"
+}

@@ -1,0 +1,93 @@
+{
+  "id": "f7-llm-app-observability",
+  "title": "LLM 应用可观测性与线上评估",
+  "definition": "LLM 应用可观测性 = 给『不确定的输出』装仪表盘：全链路追踪（每次调用的输入/输出/token/延迟/成本）、质量指标（拒绝率/满意度/幻觉抽样）、回归测试与 A/B 实验。没有可观测性，LLM 应用调优全靠猜。",
+  "analogies": [
+    {
+      "icon": "✈️",
+      "name": "驾驶舱仪表盘",
+      "text": "传统应用像老式火车：看速度和准点率就够。LLM 应用像飞机驾驶舱：除了速度（延迟）、油量（成本 token），还要盯一堆『软指标』——回答质量 drifting 没有？幻觉率升了吗？用户在哪个环节弃用？飞行数据记录仪（全链路 Trace）把每次调用的完整轨迹存下来，出事能逐帧回放。"
+    },
+    {
+      "icon": "🏥",
+      "name": "体检与复查",
+      "text": "上线后的 LLM 应用像慢性病管理：日常看体检指标（监控面板：延迟 P99、token 消耗、错误率），定期复查（抽样评估：每周抽 100 条人工或 LLM 裁判打质量分），换药要做对照实验（A/B 测试新提示词/新模型），病历本（golden set 回归测试）保证病情不复发。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：一次 LLM 调用的全链路追踪",
+    "description": "点击『下一步』，看一条 Trace 里都记了什么、能定位什么问题。",
+    "html": "<div class=\"d-steps\" id=\"f7-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">Trace 视角：用户问题 → 最终回答</div><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><span class=\"d-tag\">① 检索：耗时 180ms，召回 5 块，Top1 相关分 0.82</span><span class=\"d-tag\">② 提示拼装：输入 3,420 token（含 2,900 系统提示+资料）</span><span class=\"d-tag\">③ LLM 调用：TTFT 620ms，总 2.1s，输出 480 token，成本 ¥0.03</span><span class=\"d-tag\">④ 输出校验：格式 ✓ / 引用 ✓ / DLP ✓</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">它能定位什么问题？</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">回答慢 → ③ LLM 2.1s 是大头，还是 ① 检索拖了后腿？</span><span class=\"d-tag amber\">成本超支 → ② 输入 3,420 token，系统提示该缓存了</span><span class=\"d-tag amber\">质量差 → ① 召回相关分低，该修检索而非换模型</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">三块仪表盘 + 两道工序</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">性能：延迟分位/吞吐</span><span class=\"d-tag green\">成本：token/请求/日预算</span><span class=\"d-tag green\">质量：差评率/幻觉抽样/转人工率</span><span class=\"d-tag amber\">回归测试：golden set 每次变更必跑</span><span class=\"d-tag amber\">A/B：新旧版本分流对比</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#f7-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#f7-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#f7-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#f7-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🛰️", "name": "全链路追踪 Trace", "text": "每次请求记录完整链路：检索命中、提示拼装、LLM 输入输出、工具调用、耗时与 token——LangSmith/LangFuse/OpenTelemetry 是主流载体。" },
+    { "icon": "📊", "name": "三类核心指标", "text": "性能（TTFT/TPOT/P99 延迟/吞吐）、成本（token 用量/单次成本/日预算燃尽）、质量（差评率、转人工率、幻觉抽样命中率、格式合规率）。" },
+    { "icon": "🧪", "name": "线上评估", "text": "抽样人评 + LLM-as-Judge 批量打分 + 用户显隐式反馈（点赞/复制/弃用）三源合成质量分——纯看延迟成本会掩盖质量退化。" },
+    { "icon": "🔁", "name": "回归测试闸门", "text": "golden set（业务评测集）在每次变更（提示词/模型/检索参数）时自动跑批，指标劣化即阻断发布——呼应 B8/D6 的评测体系。" },
+    { "icon": "🧮", "name": "A/B 与灰度", "text": "新版本先 5~10% 流量灰度，对比解决率、满意度、成本后逐步放量；LLM 输出有随机性，A/B 要看分布不能看单例。" },
+    { "icon": "🚨", "name": "告警与预案", "text": "预算燃尽告警、失败率/延迟异常告警、质量指标突降告警；配套预案：降级模型、切换供应商、关闭非核心功能。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】LLM 应用相比传统应用，可观测性最需要额外关注的是？",
+      "options": [
+        "CPU 使用率",
+        "输出质量类指标（幻觉抽样、满意度、格式合规率）与 token 成本维度",
+        "数据库连接池",
+        "CDN 命中率"
+      ],
+      "answer": 1,
+      "explain": "选 B。LLM 输出是概率性的，『服务正常返回』不等于『回答正确』——质量指标与 token 成本是传统 APM 不覆盖、LLM 应用必须新增的两个观测维度。"
+    },
+    {
+      "type": "choice",
+      "q": "修改了 RAG 提示词后，发布前最应执行的工序是？",
+      "options": [
+        "直接全量上线，看用户反馈",
+        "在 golden set 上自动跑回归评测，指标不劣化再灰度放量对比线上指标",
+        "把 temperature 调低再上线",
+        "换一个更大的模型抵消影响"
+      ],
+      "answer": 1,
+      "explain": "选 B。回归测试闸门 + 灰度 A/B 是变更管理标准流程；A 把用户当测试员；C、D 是未验证的盲改。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你们的 AI 客服上线两个月，老板问「效果怎么样、钱花得值不值」，你答不上来。请设计一套可观测性与评估体系。』请作答。",
+      "reference": "分三层搭建：第一层基础 Trace——接入 LangFuse 全链路记录：每次会话的检索命中、提示内容、模型输入输出、工具调用、TTFT/总延迟、token 与成本，按会话聚合可回放；第二层指标面板——性能面板（P50/P99 延迟、错误率）、成本面板（日 token、单会话成本、预算燃尽进度）、质量面板（用户差评率、转人工率、会话完成率、每周 100 条抽样的 LLM 裁判质量分+人工复核）、业务面板（问题解决率、满意度 CSAT）；第三层评估流程——建 300 条客服 golden set 作为回归闸门，任何变更（提示词、模型、检索参数）先跑回归再 10% 灰度，对比解决率与成本两周后放量；告警三条设阈值：日预算超 80%、P99 超 5s、差评率环比涨 30% 即通知值班。落地两周后就能向老板汇报：解决率从 x% 到 y%、单会话成本 z 元、主要质量短板在检索命中率——并给出下一步优化优先级。核心思想：可观测性不是装工具，是把『效果』和『成本』变成可以回答老板问题的数字。",
+      "keyPoints": [
+        { "point": "Trace 层：全链路记录可回放（LangFuse 等）", "kw": ["trace", "链路", "回放", "langfuse"] },
+        { "point": "四面板：性能/成本/质量/业务指标", "kw": ["延迟", "token", "差评率", "解决率", "成本"] },
+        { "point": "评估流程：golden set 回归 + 灰度对比 + 放量", "kw": ["golden", "回归", "灰度", "对比"] },
+        { "point": "告警与结论输出：预算/延迟/质量阈值，向老板汇报的数字", "kw": ["告警", "阈值", "预算", "汇报"] }
+      ],
+      "explain": "加分项：四面板分维度、『回答老板问题』的结果导向、抽样人评与裁判结合；失分点：只说『接个 LangSmith』无指标体系。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么 LLM 应用比普通网站更需要『仪表盘』？全链路追踪记了什么？",
+    "hint": "提示：飞机驾驶舱类比；传统应用看『通没通』，LLM 应用还要看『答得好不好』。",
+    "modelAnswer": "普通网站像老式火车，看准点率就行；LLM 应用像飞机——除了速度和油耗，还得盯一堆软指标：回答质量有没有漂移、幻觉多不多、钱烧得快不快。全链路追踪就是飞行记录仪：每一次 AI 回答，它把检索了什么资料、喂给模型的完整输入、吐出的回答、花了多少时间和 token 全部存档。出了问题逐帧回放，能分清是资料找错了、还是模型答偏了；平时靠回归测试和 A/B 实验保证每次改动都不退步。"
+  },
+  "links": [
+    { "to": "b8-evaluation-benchmarks", "text": "线上评估的裁判方法（人评/LLM 裁判）承袭 B8——离线评测与线上观测是同一套方法论的两端" },
+    { "to": "d6-rag-evaluation", "text": "RAG 应用的质量面板直接复用 D6 的分层指标（忠实度/相关性/Recall）" },
+    { "to": "g2-agent-system-design", "text": "G2 系统设计题的『上线与治理』环节，答案骨架就是本页的三层体系" }
+  ],
+  "interview": [
+    {
+      "q": "LLM 应用上线后怎么监控和评估？",
+      "stars": 3,
+      "source": "CSDN·1000道算法工程师面试题（19）/ 阿里云·AI Agent 全栈开发面试宝典",
+      "tip": "Trace+三类指标+回归灰度三层作答，强调质量指标是 LLM 特有的新增项。"
+    },
+    {
+      "q": "怎么做 LLM 应用的 A/B 测试？要注意什么？",
+      "stars": 3,
+      "source": "博客园·大模型面试题（延伸追问）",
+      "tip": "输出随机性要看分布、样本量要够、指标选解决率/满意度而非仅延迟成本。"
+    }
+  ],
+  "summary": "Q：三类核心指标？（答：性能（延迟分位）、成本（token/预算）、质量（差评/幻觉抽样/转人工））\nQ：变更管理的两道闸？（答：golden set 回归测试 + 灰度 A/B 对比）\nQ：为什么质量指标是 LLM 特有的？（答：输出概率性——正常返回≠正确回答）"
+}

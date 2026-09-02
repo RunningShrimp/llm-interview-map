@@ -1,0 +1,90 @@
+{
+  "id": "a1-transformer-architecture",
+  "title": "Transformer 整体架构",
+  "definition": "Transformer（变换器）是一种完全靠『注意力机制』处理文字序列的神经网络架构。注意力=让每个词自动判断『该重点看句中哪些词』。它抛弃了旧模型逐词循环的做法，可以并行计算，是 GPT 等大模型的地基。",
+  "analogies": [
+    {
+      "icon": "🏭",
+      "name": "流水线工厂",
+      "text": "把 Transformer 的一层想象成一条流水线：原材料（词向量）进来，先过『质检台』——注意力机制，全句扫描判断哪些零件相互关联；再进『加工车间』——前馈网络 FFN（对每个词独立做深度加工）；每道工序都系着『安全绳』——残差连接（保证信息不丢失），并有『稳定器』——LayerNorm（让数据分布稳定）。这样的流水线首尾相接堆 N 条，就是完整的 Transformer。"
+    },
+    {
+      "icon": "📖",
+      "name": "会议纪要员",
+      "text": "RNN 像一个只能顺着念稿子的记录员，听到第 100 句时早就忘了第 1 句；Transformer 像拿到全场会议记录的纪要员：写每个要点时可以同时回看全场记录，把相关内容一次性关联起来——这就是『并行+全局视野』。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：数据怎么流过 Transformer",
+    "description": "点击『下一步』，看一句话从进模型到出结果，依次经过哪些组件、每个组件干什么。",
+    "html": "<div class=\"d-steps\" id=\"a1-steps\"><div class=\"d-step active\"><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber\">输入：『猫 追 老鼠』</span><span class=\"d-arrow\">→</span><span class=\"d-card d-anim\">分词器<br><small>切成 token</small></span><span class=\"d-arrow\">→</span><span class=\"d-card d-anim-late\">Embedding + 位置编码<br><small>token 变向量，并标注词序</small></span></div><div class=\"d-note\">💡 注意：注意力本身不分先后，所以必须由『位置编码』补上词序信息（详见 A4）。</div></div><div class=\"d-step\"><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-card d-pulse\" style=\"border-color:#4f6ef7\">🔍 多头自注意力<br><small>每个词环顾全句，收集相关信息</small></span><span class=\"d-arrow\">→</span><span class=\"d-card\">➕ 残差 + LayerNorm<br><small>保底通道 + 稳定分布</small></span></div><div class=\"d-note\">💡 这一步是 Transformer 的灵魂：『追』会重点关联『猫』和『老鼠』（谁追谁）。</div></div><div class=\"d-step\"><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-card d-pulse\" style=\"border-color:#8b5cf6\">🏭 前馈网络 FFN<br><small>对每个词独立做深度加工</small></span><span class=\"d-arrow\">→</span><span class=\"d-card\">➕ 残差 + LayerNorm</span></div><div class=\"d-note\">💡 『注意力负责交流，FFN 负责加工』——两层各司其职，组成一个完整块（Block）。</div></div><div class=\"d-step\"><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-card\">📦 上述块 × N 层（GPT-3 为 96 层）</span><span class=\"d-arrow\">→</span><span class=\"d-card d-pulse\" style=\"border-color:#10b981\">🎯 输出层<br><small>预测下一个词的概率</small></span></div><div class=\"d-note\">💡 层数越深，模型能表达的『概念层级』越丰富——从词法到语法再到语义。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#a1-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#a1-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#a1-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#a1-steps\">🔄 重播动画</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🧩", "name": "三大件", "text": "输入处理（Embedding+位置编码）、N 层堆叠的编码块（注意力+FFN）、输出层（预测概率），这是最小完整集。" },
+    { "icon": "🔍", "name": "注意力是灵魂", "text": "Self-Attention 让每个词直接与句中任意词建立联系，替代了 RNN 的逐步传递，解决长距离依赖。" },
+    { "icon": "⚡", "name": "并行训练", "text": "整句所有位置同时计算（RNN 必须逐词串行），这是 Transformer 能扩到超大模型的关键工程原因。" },
+    { "icon": "🛡️", "name": "两大稳定器", "text": "残差连接防『信息与梯度丢失』，LayerNorm 防『数值分布漂移』，二者让百层网络也能稳定训练。" },
+    { "icon": "📦", "name": "堆叠出智能", "text": "单层能力有限，N 层堆叠形成层级抽象：底层抓词法、中层抓语法、高层抓语义。" },
+    { "icon": "🔀", "name": "两种角色", "text": "编码器负责『理解输入』，解码器负责『生成输出』；GPT 只用解码器，BERT 只用编码器（详见 A9）。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】与 RNN 相比，Transformer 最核心的优势是？",
+      "options": [
+        "参数量更少，训练成本更低",
+        "可以并行计算整个序列，且注意力直接建模任意距离的依赖",
+        "不需要任何超参数调优",
+        "只能处理英文，中文效果差"
+      ],
+      "answer": 1,
+      "explain": "选 B。Transformer 抛弃循环结构后，整句所有位置可同时计算（并行），且 Self-Attention 让任意两个词一步直达（全局依赖）。A 错：Transformer 参数量通常更大；C 错：层数、头数等超参依然关键；D 错：与语言无关，多语言模型普遍基于 Transformer。"
+    },
+    {
+      "type": "choice",
+      "q": "『猫追老鼠』进入 Transformer 后，『追』这个词能同时关联『猫』和『老鼠』，这主要归功于哪个组件？",
+      "options": ["前馈网络 FFN", "残差连接", "Self-Attention 自注意力", "LayerNorm"],
+      "answer": 2,
+      "explain": "选 C。Self-Attention 的职责就是让每个词『环顾全句』并按相关性加权收集信息。FFN 是对单个词的独立加工；残差与 LayerNorm 是稳定性组件，都不负责词间关联。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官说：『假设我是完全不懂深度学习的产品经理，请你在 3 分钟内讲清楚 Transformer 的整体架构，并说明它为什么比老方法强。』请写出你的回答提纲。",
+      "reference": "我会分四步讲：1）输入：先把文字切成 token，转成向量（Embedding），并加上位置编码，让模型知道每个词的位置；2）主体：堆叠 N 层相同的块，每块做两件事——自注意力让每个词环顾全句收集相关信息，前馈网络 FFN 对每个词做深度加工；每步都配残差连接和 LayerNorm 保证训练稳定；3）输出：最后一层输出每个候选词的概率，逐词生成回答；4）优势：相比 RNN 逐词串行，Transformer 全句并行计算、训练快，且任意两个词一步建立联系、长句不健忘。若时间允许再补充：解码器生成时会遮住未来词（因果掩码），保证不能偷看答案。",
+      "keyPoints": [
+        { "point": "提到输入端：Embedding 与位置编码", "kw": ["embedding", "位置编码"] },
+        { "point": "提到自注意力的作用（全句关联）", "kw": ["自注意力", "注意力"] },
+        { "point": "提到 FFN 前馈网络的加工角色", "kw": ["ffn", "前馈"] },
+        { "point": "提到残差连接与 LayerNorm 的稳定作用", "kw": ["残差", "layernorm"] },
+        { "point": "提到逐层堆叠（N 层）", "kw": ["堆叠", "n 层"] },
+        { "point": "提到并行 / 全局依赖的优势（对比 RNN）", "kw": ["并行", "rnn"] }
+      ],
+      "explain": "加分项：主动提到因果掩码、层数与能力的层级抽象、或用类比开场；失分点：只背组件名却说不清各自作用，或漏掉『为什么强』的对比。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向完全不懂 AI 的室友解释：Transformer 是怎么『读懂』一句话的？为什么它能同时看到整句话？",
+    "hint": "提示：抓住三个关键词——注意力（该看哪）、并行（一起算）、堆叠（反复加工）。",
+    "modelAnswer": "它先把句子拆成一个个词并转成数字向量；然后每一层里，每个词都会『环顾整句』，把跟自己相关的词的信息按重要程度吸收进来——这一步叫注意力，因为是一起算的，所以再长的句子也不会像老模型那样念到后面忘了前面；这样的层叠上几十层，反复加工，模型就逐层理解了从字面到含义的全部信息。"
+  },
+  "links": [
+    { "to": "a2-self-attention-qkv", "text": "刚才演示里的『环顾全句』就是 Self-Attention 在工作，它的 QKV 机制是整个架构的核心引擎" },
+    { "to": "a4-positional-encoding", "text": "并行计算丢掉了天然词序，位置编码正是用来补上这一块的拼图" },
+    { "to": "a9-model-family", "text": "同样的积木，按『只用编码器/只用解码器/两者都用』拼法不同，就分化出 BERT、GPT、T5 三大家族" }
+  ],
+  "interview": [
+    {
+      "q": "介绍/手画一下 Transformer 的整体架构，每个模块的作用是什么？",
+      "stars": 5,
+      "source": "牛客网·大模型常考面试题100道",
+      "tip": "按『输入→块内两件事（注意力+FFN）→残差与归一化→输出』的顺序讲，最后一定落到『并行+全局依赖』的优势上。"
+    },
+    {
+      "q": "Transformer 为什么比 RNN 训练更快？深层的稳定靠什么保证？",
+      "stars": 4,
+      "source": "知乎·Transformer/BERT/GPT 必问考点",
+      "tip": "并行（无时序依赖）+ 注意力一步直达；稳定靠残差连接与 LayerNorm。"
+    }
+  ],
+  "summary": "Q：Transformer 抛弃循环结构后，靠什么补回词序信息？（答：位置编码——没有它，『猫追狗』和『狗追猫』会无法区分）\nQ：一个标准块里两个核心组件的分工是什么？（答：Self-Attention 负责词间信息交流，FFN 负责对每个词独立加工）\nQ：它相比 RNN 的两大根本优势是什么？（答：全句并行计算带来的训练效率，以及注意力一步直达带来的长程依赖建模）"
+}

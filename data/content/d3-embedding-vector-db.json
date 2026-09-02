@@ -1,0 +1,93 @@
+{
+  "id": "d3-embedding-vector-db",
+  "title": "Embedding 与向量数据库",
+  "definition": "Embedding 把文本映射成语义向量：意思越近的文本向量越接近。向量数据库存这些向量并用近似最近邻索引（ANN，如 HNSW/IVF）实现毫秒级『语义检索』。它是 RAG 检索环节的发动机。",
+  "analogies": [
+    {
+      "icon": "🗺️",
+      "name": "语义地图",
+      "text": "Embedding 模型像给每句话在一张『语义地图』上标坐标：『猫追老鼠』和『小猫捕猎』落在相邻街区（向量距离近），『今天天气好』落在城市另一头（距离远）。检索就是在地图上以问题为圆心画圈，把圈里的邻居都找出来——所以用户问『怎么退货』，也能找到写着『退换货流程』的那块内容，关键词不同也没关系。"
+    },
+    {
+      "icon": "📇",
+      "name": "图书馆智能索引",
+      "text": "百万本书按内容相似度编成一张多维索引网（HNSW 图）：查书时不用翻遍全馆（暴力搜索），而是顺着『最像目标的楼层指引』跳着找，看几十次索引就锁定目标——牺牲一点点精度（近似），换来百倍速度，这就是 ANN（近似最近邻）。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：HNSW 跳跃式检索 vs 暴力扫描",
+    "description": "对比两种索引在 100 万文档中找 Top-3 的方式。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"d3g\" data-tab=\"m1\">暴力扫描（精确）</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"d3g\" data-tab=\"m2\">HNSW 图索引（近似）</button></div><div data-pane=\"m1\" data-group=\"d3g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">#1</span><span class=\"d-token\">#2</span><span class=\"d-token d-blink\">#3 正在比较…</span><span class=\"d-token\">…</span><span class=\"d-token\">#1,000,000</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag red\">100 万次比较，秒级~分钟级 ❌</span></div></div><div data-pane=\"m2\" data-group=\"d3g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">顶层入口</span><span class=\"d-arrow\">↓ 贪心跳跃</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">中层邻域</span><span class=\"d-arrow\">↓ 逐层细化</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.6s\">底层精准 Top-3 ✅</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag green\">几十~几百次比较，毫秒级返回（召回 95%+）</span></div></div><div class=\"d-note\">💡 HNSW = 分层可导航小世界图：高层稀疏负责远跳、低层稠密负责精找；IVF 则是先聚类分桶、只搜最近的几个桶。</div>"
+  },
+  "keyPoints": [
+    { "icon": "🧲", "name": "语义相似度", "text": "Embedding 向量的余弦相似度代表语义接近程度——同义不同词也能命中，这是与传统关键词检索的本质区别。" },
+    { "icon": "🎯", "name": "模型选型影响召回", "text": "Embedding 模型（BGE/M3E/text-embedding 系列）的领域适配性决定召回上限；垂直领域可用领域语料微调 embedding 模型。" },
+    { "icon": "🕸️", "name": "HNSW", "text": "分层小世界图：查询快（毫秒级）、召回率高，代价是内存占用大、建图慢——内存充足时的默认选择。" },
+    { "icon": "🪣", "name": "IVF", "text": "先聚类成桶（倒排文件），查询只搜最近的 nprobe 个桶：内存省、可配合 PQ 量化压缩，精度略低、适合超大规模。" },
+    { "icon": "🗄️", "name": "向量库选型", "text": "专业向量库 Milvus/Qdrant/Weaviate；pgvector 复用 Postgres 生态；云上托管省运维——按数据量、过滤需求、团队栈选。" },
+    { "icon": "🏷️", "name": "混合查询", "text": "生产检索常常是『向量相似 + 元数据过滤』（部门、时间、权限），选库时要支持属性过滤——这正是 RAG 权限管控的基础。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】HNSW 和 IVF 的核心区别是？",
+      "options": [
+        "HNSW 建分层图跳跃搜索，IVF 先聚类分桶只搜最近的桶",
+        "HNSW 是精确搜索，IVF 是模糊搜索",
+        "HNSW 只能存文本，IVF 只能存图片",
+        "两者没有区别，只是名字不同"
+      ],
+      "answer": 0,
+      "explain": "选 A。HNSW 用多层邻域图从粗到细贪心跳跃；IVF 用聚类把空间分桶，查询只扫 nprobe 个最近桶。两者都是 ANN（近似最近邻）索引。"
+    },
+    {
+      "type": "choice",
+      "q": "用户问『怎么把钱退回来』，向量检索命中了题为『退款流程说明』的文档。这体现了？",
+      "options": [
+        "Embedding 捕捉语义相似，不依赖字面关键词重合",
+        "向量数据库做了同义词典扩展",
+        "检索引擎自动改写了问题",
+        "命中属于巧合"
+      ],
+      "answer": 0,
+      "explain": "选 A。语义向量把『退钱』与『退款』映射到相近坐标，实现跨措辞检索——这正是向量检索相对关键词检索的核心价值。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『公司知识库要扩到 5000 万段文档，检索延迟要从 200ms 降到 50ms 以内，还要支持按部门过滤。你怎么设计向量检索层？』请作答。",
+      "reference": "我的方案分四步：第一步选库与索引——5000 万向量规模选 Milvus 这类分布式向量库，索引用 HNSW（M=16~32、efConstruction 200+），内存不够可上 IVF-PQ 混合：IVF 聚类分桶加 PQ 量化压缩向量，把内存压到十分之一；第二步调参压延迟——HNSW 查询参数 efSearch 从默认降到与召回率平衡的点（如 64→32，用 Recall@10 压测校准），配合标量分区（按部门 partition）先过滤后搜索，减少每次查询的扫描范围；第三步过滤架构——部门权限用分区级预过滤而不是查后过滤，既满足权限又缩小候选集，天然降延迟；第四步工程配套——向量量化（SQ8）降内存换速度、热点查询加缓存、检索与重排分离部署，最后用真实查询集压测 P99 延迟与召回率曲线，确认 50ms 之下召回率没有明显滑坡。核心思路：先分区过滤缩小候选、再调索引参数平衡召回与延迟，用压测数据驱动调参。",
+      "keyPoints": [
+        { "point": "选型：分布式向量库 + HNSW/IVF-PQ 索引", "kw": ["milvus", "hnsw", "ivf", "pq", "索引"] },
+        { "point": "参数平衡：efSearch/召回率压测校准", "kw": ["efsearch", "召回", "压测", "参数"] },
+        { "point": "部门过滤用分区预过滤（权限+缩小候选）", "kw": ["分区", "过滤", "权限", "预过滤"] },
+        { "point": "配套：量化/缓存/分离部署 + P99 验证", "kw": ["量化", "缓存", "p99", "延迟"] }
+      ],
+      "explain": "加分项：预过滤 vs 后过滤、Recall-P99 权衡曲线；失分点：只说『加机器』『换个库』。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：向量数据库为什么能『听懂人话』地找资料？HNSW 为什么快？",
+    "hint": "提示：语义地图坐标类比 + 图书馆智能索引类比。",
+    "modelAnswer": "每段文字都被换算成地图上的一个坐标，意思相近的话坐标就挨着——你问『怎么退钱』，它找的是坐标最近的『退款流程』，哪怕一个字都不一样。要在千万个坐标里找邻居，一张张比太慢，HNSW 的办法是把坐标组织成一张多层导航图：先在粗层大步跳到大致区域，再逐层细找，几十步就锁定目标——用『近似』换来快一百倍，跟老司机导航不走全城而是走主干道一个道理。"
+  },
+  "links": [
+    { "to": "d1-rag-pipeline", "text": "向量库是 RAG 在线检索环节的发动机，离线入库的正是 D2 切好的块" },
+    { "to": "e5-agent-memory", "text": "Agent 的长期记忆也是用向量库存的——同一套技术在记忆场景复用" },
+    { "to": "a8-tokenization-embedding", "text": "『把文本变向量』的思想在 A8 的词向量处已经埋下伏笔，这里是句子/段落级的应用" }
+  ],
+  "interview": [
+    {
+      "q": "HNSW 和 IVF 的原理与区别？各适合什么场景？",
+      "stars": 4,
+      "source": "面试鸭·HNSW vs IVF / 腾讯云·一文讲透 IVF/HNSW/PQ",
+      "tip": "图索引 vs 聚类分桶；内存换速度 vs 压缩省内存，配规模选型结论。"
+    },
+    {
+      "q": "向量数据库怎么选型？Embedding 模型怎么选？",
+      "stars": 4,
+      "source": "卡码笔记·向量库怎么选/Embedding 选型",
+      "tip": "库按规模/过滤/生态三轴选；模型按语言、维度、领域效果选，可领域微调。"
+    }
+  ],
+  "summary": "Q：向量检索为什么能跨措辞命中？（答：语义向量距离代表语义相似度，不依赖字面重合）\nQ：HNSW 与 IVF 的取舍？（答：HNSW 快且准但吃内存，IVF-PQ 省内存可扩展但精度略降）\nQ：生产检索的标配能力？（答：向量相似 + 元数据/分区预过滤——权限与性能双受益）"
+}

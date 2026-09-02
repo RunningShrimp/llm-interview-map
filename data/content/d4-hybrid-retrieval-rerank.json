@@ -1,0 +1,93 @@
+{
+  "id": "d4-hybrid-retrieval-rerank",
+  "title": "混合检索与重排",
+  "definition": "混合检索 = 向量语义召回 + BM25 关键词召回双路并行，用 RRF 融合，弥补单一召回的盲区；重排（Rerank）再用 Cross-Encoder 精排模型对候选细打分，取 Top-N 进入生成。召回求全、精排求准。",
+  "analogies": [
+    {
+      "icon": "🎣",
+      "name": "两张网一起撒",
+      "text": "向量检索是『大意网』：捞得起语义相近的鱼（换词也命中），但会漏掉专有名词这种精确目标；BM25 关键词检索是『密眼网』：型号、编号、人名一抓一个准，但换个说法就漏。混合检索就是两张网同时撒，再用 RRF 规则把两网渔获合并排名——召回率显著提升。"
+    },
+    {
+      "icon": "👔",
+      "name": "海选 vs 终面",
+      "text": "召回阶段像海选：快速从 10 万份简历里挑出 100 份（向量+BM25 双通道），看的是大致匹配；重排像终面：面试官（Cross-Encoder）把问题与每份简历放在一起逐字细读、深度评估相关度，挑出最终 5 人。海选求快求全（Bi-Encoder 各自编码），终面求准（Cross-Encoder 联合编码，贵但准）。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：双路召回如何互补",
+    "description": "看同一个问题，两种检索各自命中什么、融合后发生什么。",
+    "html": "<div class=\"d-steps\" id=\"d4-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">问题：「QW-350X 型号的保修期多久？」</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\">向量召回</span><span class=\"d-token\">『售后保修政策概述』</span><span class=\"d-tag red\">精确型号没命中 ✗</span></div><div class=\"d-row\"><span class=\"d-tag\">BM25 召回</span><span class=\"d-token hot d-pulse\">『QW-350X 专属保修 24 个月』</span><span class=\"d-tag green\">精确命中 ✓</span></div></div><div class=\"d-note\">型号/编号/人名类查询：关键词检索完胜——这就是为什么要双路。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">反例：换个说法问</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag amber\">问题：「机器坏了怎么让厂家免费修？」</span></div><div class=\"d-row\"><span class=\"d-tag green\">向量召回命中『保修政策』✓</span><span class=\"d-tag red\">BM25 无关键词重合 ✗</span></div></div><div class=\"d-note\">口语化、同义改写的查询：语义检索占优。两路互补才稳。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">融合 + 重排</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">双路候选 50 条</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">RRF 融合排名</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">Cross-Encoder 精排</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">Top-3 进提示词</span></div><div class=\"d-note\">为什么还要 Rerank：BM25 只算词频、向量只算粗粒度相似，Cross-Encoder 把「问题+文档」放一起逐 token 交互打分，相关性判断最准。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#d4-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#d4-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#d4-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#d4-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🕸️", "name": "向量召回", "text": "语义相似、抗同义改写；短板：专有名词/编号/生僻词容易漂移漏召。" },
+    { "icon": "🔤", "name": "BM25 召回", "text": "基于词频与逆文档频率的关键词打分：精确词命中强、零成本可解释；短板：不懂同义词与语序。" },
+    { "icon": "🧮", "name": "RRF 融合", "text": "倒数排名融合：每路结果按排名贡献分数相加，无需统一两路分数量纲——简单稳健的融合标配。" },
+    { "icon": "🔍", "name": "Rerank 精排", "text": "Cross-Encoder（如 bge-reranker）把问题与候选拼接后联合编码打分，相关性精度远超 Bi-Encoder；代价是计算贵，所以只精排 Top 20~50。" },
+    { "icon": "🏗️", "name": "两段式架构", "text": "粗召回（快、宽，向量+BM25 双路取 Top 50）→ 精排（准、窄，Rerank 取 Top 3~5）——搜索领域『召回-排序』范式的 RAG 落地。" },
+    { "icon": "🧪", "name": "收益量化", "text": "消融实验顺序：纯向量 → +BM25 混合（Recall@K 上升）→ +Rerank（Precision 上升）；每步都应报命中率提升数据。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】已经有了向量检索，为什么还要加 BM25 做混合检索？",
+      "options": [
+        "BM25 更省 GPU",
+        "弥补向量检索对专有名词、编号、生僻词等精确匹配的短板，提升整体召回",
+        "BM25 的结果更准，可以直接替代向量",
+        "为了兼容老系统"
+      ],
+      "answer": 1,
+      "explain": "选 B。向量检索在语义改写上强、在精确标识符上弱，BM25 恰好互补；两者 RRF 融合后整体召回显著上升。A 是附带好处但非目的；C 与事实相反。"
+    },
+    {
+      "type": "choice",
+      "q": "Rerank 模型（Cross-Encoder）比向量召回（Bi-Encoder）更准的原因是？",
+      "options": [
+        "它参数量一定更大",
+        "它把问题与文档拼接后联合编码，能捕捉词级交互，相关性判断更细",
+        "它使用了更大的上下文窗口",
+        "它训练数据更多"
+      ],
+      "answer": 1,
+      "explain": "选 B。Bi-Encoder 各自独立编码再算距离，交互信息丢失；Cross-Encoder 让问题与文档的 token 在注意力里充分交互，精度高但每对都要跑一次模型，所以只用于小候选集精排。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你们的 RAG 召回不准：口语化问题命中的资料不对，而带产品型号的问题又总漏。请设计检索优化方案。』请作答。",
+      "reference": "两类失败恰好对应单一召回的互补盲区，方案分四层：第一层双路混合召回——向量检索负责口语化语义命中，BM25 负责型号/编号类精确命中，各取 Top-25 用 RRF 融合成候选 50 条，解决两头漏的问题；第二层查询预处理——口语化问题先做改写补全（多轮对话补指代、口语转术语表映射，如『让厂家免费修』映射到『保修』），提升两路的原始命中率；第三层精排——用 Cross-Encoder 重排模型对 50 条候选细打分取 Top-3，保证进提示词的资料相关性最高；第四层效果闭环——构建带标注的评测集，报 Recall@20 与 MRR 两个指标分别监控召回与排序质量，混合检索上线前与纯向量基线做消融对比。参数上 BM25 的 k1/b、RRF 的 k、rerank 的候选条数都可调，但先用默认值跑通基线再优化。",
+      "keyPoints": [
+        { "point": "双路混合：向量（语义）+BM25（精确）+RRF 融合", "kw": ["bm25", "向量", "rrf", "混合"] },
+        { "point": "查询改写与术语映射预处理", "kw": ["改写", "补全", "映射", "术语"] },
+        { "point": "Cross-Encoder 精排取 Top-N", "kw": ["rerank", "重排", "cross", "精排"] },
+        { "point": "Recall@K/MRR 指标与消融对比", "kw": ["recall", "mrr", "消融", "评测"] }
+      ],
+      "explain": "加分项：两类失败与两路互补的对位分析、先基线后调参的工程节奏；失分点：只说『加个 rerank』不谈召回层。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么查资料要『两张网一起撒』，捞上来之后还要『再面试一轮』？",
+    "hint": "提示：渔网类比讲混合召回，海选 vs 终面类比讲重排。",
+    "modelAnswer": "因为一种检索总有一类找不到：语义检索听得懂『换个说法』，但产品编号这种精确词容易漂；关键词检索抓编号一抓一个准，但换个口语说法就抓瞎。所以两张网一起撒，把两边的收获合并排名，谁也不漏。捞上来的五六十条里还是鱼龙混杂，再请一位『终面考官』——重排模型把问题和每条资料放在一起逐字细读，挑出真正最相关的三五条交给 AI 作答。粗筛求全，终面求准。"
+  },
+  "links": [
+    { "to": "d3-embedding-vector-db", "text": "混合检索中的向量路就是 D3 的 ANN 检索，双路互补才稳" },
+    { "to": "d7-advanced-rag", "text": "混合+重排是标准 RAG 的检索天花板，再往上就是 D7 的自反思与纠错架构" },
+    { "to": "d8-rag-troubleshooting", "text": "检索不准排查时，混合召回与重排是最常用的两剂药方" }
+  ],
+  "interview": [
+    {
+      "q": "为什么 RAG 要做混合检索？RRF 是怎么融合的？",
+      "stars": 4,
+      "source": "卡码笔记·RAG 题单 / 掘金·Rerank 重排序全面介绍",
+      "tip": "双路互补对位分析 + RRF 倒数排名融合公式思想，举型号查询的例子。"
+    },
+    {
+      "q": "Rerank 为什么比向量召回更准？为什么不直接对全库 Rerank？",
+      "stars": 4,
+      "source": "掘金·Rerank 全面介绍（延伸追问）",
+      "tip": "Bi 与 Cross 的编码方式差异；成本约束决定『先粗后精』两段式。"
+    }
+  ],
+  "summary": "Q：双路召回各自的长短板？（答：向量抗改写但怕精确标识符，BM25 精确但不懂同义）\nQ：RRF 的思想？（答：按各路排名的倒数累加融合，避免分数量纲问题）\nQ：两段式架构怎么分工？（答：粗召回求全（双路 Top-50），Cross-Encoder 精排求准（Top-3~5））"
+}

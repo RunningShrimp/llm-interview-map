@@ -1,0 +1,93 @@
+{
+  "id": "e7-multi-agent",
+  "title": "多智能体协作",
+  "definition": "多智能体（Multi-Agent）是多个角色化 Agent 分工协作：主管编排分发任务、专家各自处理、结果汇总质控。典型模式：主管-工人式编排、流水线接力、群聊辩论。用分工换来专业化与可控性，代价是通信与一致性成本。",
+  "analogies": [
+    {
+      "icon": "🏥",
+      "name": "会诊式分工",
+      "text": "单 Agent 像全科医生一个人看病历、开药、写报告——什么都懂一点，什么都未必精。多智能体像医院会诊：主治医生（主管 Agent）接诊后分派任务——影像科（检索 Agent）读片、检验科（分析 Agent）看数据、专科医生（专家 Agent）给方案，最后主治汇总意见、交叉核对（质控 Agent）、向病人输出统一结论。分工带来专业深度，也带来沟通成本——会诊不一定比一个高手快。"
+    },
+    {
+      "icon": "🏢",
+      "name": "创业公司 vs 流水线",
+      "text": "单 Agent 是全能创业者：啥都自己干，忙起来容易顾此失彼（长上下文里任务互相干扰）。多 Agent 是组织化分工：销售、研发、质检各司其职（角色提示词+专属工具），信息通过标准化交接（消息传递）流动。组织化的代价是开会（通信 token）和对齐（一致性），所以小团队够用就别扩编。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：主管-工人式协作的一次任务",
+    "description": "点击『下一步』，看『调研并写一份竞品分析』如何被三个 Agent 分工完成。",
+    "html": "<div class=\"d-steps\" id=\"e7-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：主管拆解与派单</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber d-pulse\">主管 Agent：拆成 2 个子任务</span><span class=\"d-arrow\">→</span><span class=\"d-token\">给研究员：收集 3 家竞品定价数据</span><span class=\"d-token\">给写手：等数据后起草报告</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：专家并行干活</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-card d-pulse\">🔍 研究员：调搜索工具 → 产出数据表</span><span class=\"d-card\" style=\"opacity:.6\">✍️ 写手：待命中</span></div><div class=\"d-note\">专家各自带专属工具与角色提示词——上下文干净、职责单一。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：交接与质控</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">数据表 → 交给写手</span><span class=\"d-arrow\">→</span><span class=\"d-card\">✍️ 起草报告</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">✅ 质控 Agent：核对数据一致性后定稿</span></div><div class=\"d-note\">主管只管编排与汇总，不亲自干活——各司其职是上下文管理的智慧。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#e7-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#e7-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#e7-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#e7-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🎯", "name": "为什么要拆", "text": "① 上下文隔离：每个 Agent 只带自己需要的提示词与工具，避免万能 Agent 的上下文臃肿与干扰；② 职责专业化：角色越纯效果越稳；③ 可控性：每个环节可独立测试与替换。" },
+    { "icon": "👔", "name": "主管-工人编排", "text": "Orchestrator 拆解分派、汇总质控，工人按专长执行——最常用、最可控的模式（LangGraph 的 supervisor、AutoGen 的 GroupChat Manager）。" },
+    { "icon": "🏃", "name": "流水线接力", "text": "Agent 按处理顺序接力（解析→分析→写作→审核），上游输出即下游输入——适合固定 SOP 流程，结构简单好调试。" },
+    { "icon": "💬", "name": "群聊/辩论模式", "text": "多个 Agent 同场对话互相质疑（Generator vs Critic），多轮辩论收敛出更优答案——质量高但 token 成倍，适合关键决策。" },
+    { "icon": "📡", "name": "通信协议", "text": "Agent 间传递的是结构化消息（任务卡/结果卡），共享状态存黑板（Blackboard）或由主管转发；A2A 协议正在标准化跨 Agent 通信。" },
+    { "icon": "⚖️", "name": "代价清单", "text": "通信 token 翻倍、错误会在交接链上传播放大、编排复杂度陡增、调试难度上升——能用单 Agent 解决就别上多 Agent。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】多智能体系统相比单 Agent 的核心收益是？",
+      "options": [
+        "总 token 消耗一定更低",
+        "上下文隔离与职责专业化：每个 Agent 上下文干净、角色纯粹、环节可独立测试",
+        "模型不需要工具调用",
+        "完全消除了幻觉"
+      ],
+      "answer": 1,
+      "explain": "选 B。分工的价值是每个 Agent 的提示词、工具、上下文各司其职，效果更稳且可独立迭代。A 恰恰相反（通信有成本）；D 不成立。"
+    },
+    {
+      "type": "choice",
+      "q": "『两个 Agent 互相辩论多轮后给出结论』的模式主要代价是？",
+      "options": [
+        "无法实现",
+        "多轮对话使 token 成本成倍增长，收敛时间不可控",
+        "只能用于图像任务",
+        "不需要 LLM"
+      ],
+      "answer": 1,
+      "explain": "选 B。辩论/群聊模式的质量收益是用多轮互相阅读对方发言换来的，成本高、轮数要封顶，适合关键决策而非日常任务。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『要不要把公司的客服 Agent 升级成多智能体（售前/售后/投诉/质检）？请给出决策框架与推荐架构。』请作答。",
+      "reference": "先给决策框架，不无脑升级：判断依据三条——① 升级门槛之一：当前单 Agent 的上下文是否已臃肿到互相干扰（工具超过 15 个、提示词超 3 千字、意图互相打架）；② 各职责是否需要差异化的工具与策略（投诉要情绪安抚策略，售前要商品知识库）；③ 质控是否需要独立环节。若三条命中两条，值得升级。推荐主管-工人架构：路由主管 Agent 负责意图识别与分派（轻量小模型即可），售前/售后/投诉三个专家 Agent 各自带专属知识库、工具与语气策略并行应答，质检 Agent 在每轮回复发出前做合规与 hallucination 抽查，危险操作（退款）统一经人工确认闸门。配套设计：Agent 间传递结构化会话卡（含用户画像与已办事项）避免重复询问；共享记忆层存用户统一视图；设定每轮最大交接次数上限防踢皮球；上线先灰度对比单 Agent 版的解决率与成本——若成本涨幅超过收益（解决率提升），说明该停在单 Agent 加提示词分区方案。核心态度：多智能体是组织成本换专业收益的权衡，不是技术炫技。",
+      "keyPoints": [
+        { "point": "先给升级判据（上下文干扰/差异化策略/独立质控）", "kw": ["上下文", "干扰", "判断", "依据", "门槛"] },
+        { "point": "主管-工人架构：路由+三专家+质检，危险操作人工闸门", "kw": ["主管", "路由", "专家", "质检", "人工"] },
+        { "point": "配套：结构化会话卡、共享记忆、最大交接次数", "kw": ["会话卡", "共享", "记忆", "交接", "上限"] },
+        { "point": "灰度对比成本与解决率，必要时停在单 Agent", "kw": ["灰度", "成本", "解决率", "对比", "单 agent"] }
+      ],
+      "explain": "加分项：反问『要不要升级』的权衡框架、失败回退方案；失分点：无脑画四个框说这就是多智能体。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：多智能体就是把 AI 公司化？什么时候值得『开分公司』？",
+    "hint": "提示：全科医生 vs 医院会诊；再想想开分公司要付哪些额外成本。",
+    "modelAnswer": "单 Agent 像全科医生一个人包圆看病开药；多智能体是开医院——主管医生分诊、各科专家看诊、最后质控汇总，每个人脑子里只装自己专科的知识，又专又不容易乱。但开医院要多付沟通成本：专家之间递病历要花时间和纸（token），交接多了还可能传话传歪。所以只有当一个人忙不过来、各项业务需要不同工具和话术、而且必须有独立质检时，才值得开这家『医院』；小诊所够用就别盲目扩编。"
+  },
+  "links": [
+    { "to": "e1-agent-anatomy", "text": "多智能体的每个成员都是 E1 那套四件套——先把单体做稳再谈编排" },
+    { "to": "e6-planning-reflection", "text": "主管 Agent 的拆解分派就是规划能力在组织维度的延伸" },
+    { "to": "e8-mcp-tools", "text": "跨团队 Agent 的工具共享与互操作靠协议标准化——MCP/A2A 在下一页" }
+  ],
+  "interview": [
+    {
+      "q": "多智能体协作有哪些模式？各自适用什么场景？",
+      "stars": 3,
+      "source": "多智能体专项检索超时（内置知识）",
+      "tip": "主管-工人（可控）、流水线（固定 SOP）、群聊辩论（关键决策）三模式+代价清单。"
+    },
+    {
+      "q": "什么时候该用多智能体？它的坑是什么？",
+      "stars": 3,
+      "source": "多智能体专项检索超时（延伸追问）",
+      "tip": "上下文干扰/职责差异化/独立质控三条判据；坑是通信成本与错误传播。"
+    }
+  ],
+  "summary": "Q：三大协作模式？（答：主管-工人编排、流水线接力、群聊辩论）\nQ：多 Agent 的核心收益与代价？（答：上下文隔离与专业化 vs 通信成本与错误传播）\nQ：升级多 Agent 的判据？（答：上下文干扰、职责需差异化策略、需要独立质控——命中两条再上）"
+}

@@ -1,0 +1,94 @@
+{
+  "id": "f9-cost-optimization",
+  "title": "成本优化（缓存/批处理/模型路由）",
+  "definition": "LLM 应用降本三板斧：缓存（相同/相似请求不重算：前缀缓存、语义缓存）、模型路由（简单任务小模型、难任务大模型）、批处理与压缩（Batch API 半价、上下文压缩、输出限制）。组合拳通常能省 50~80%。",
+  "analogies": [
+    {
+      "icon": "🍽️",
+      "name": "餐厅降本三招",
+      "text": "LLM 成本像餐厅食材成本：第一招缓存——招牌菜提前备好半成品（语义缓存：相似问题直接上现成答案），客人点『微辣』和『中辣』其实是同一锅底（前缀缓存：相同系统提示只算一次）；第二招模型路由——煎蛋用学徒（小模型），佛跳墙才请大厨（大模型），别让主厨煎一年鸡蛋；第三招压缩——菜单精简（上下文压缩）、团购预订（Batch API 半价）。三招齐下，成本腰斩。"
+    },
+    {
+      "icon": "🚦",
+      "name": "分诊台",
+      "text": "模型路由像医院分诊：感冒发烧去普通门诊（7B/小模型，快且便宜），疑难杂症才挂专家号（GPT-4 级大模型）。分诊护士（路由器：分类器或规则+置信度）先判断病情复杂度——80% 的常见问题根本不需要专家。省钱的关键不是让专家看便宜病，而是让大部分病人别挂专家号。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：三板斧各砍多少成本",
+    "description": "点击『下一步』，看 100% 基线成本如何被逐层削减。",
+    "html": "<div class=\"d-steps\" id=\"f9-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">基线：全部请求直打大模型</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-bar\"><div class=\"d-fill\" style=\"width:100%;background:#ef4444\"></div></div><span class=\"d-tag red\">月成本 100%（假设 ¥100,000）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第一斧：模型路由</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">70% 简单请求 → 小模型（成本 1/10）</span><span class=\"d-token\">30% 复杂 → 大模型</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag green\">成本 → 约 37%（省 63%）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第二斧：语义缓存</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">30% 请求命中语义缓存（相似问题直接返回）</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">成本 → 约 30%（再省两成）</span></div><div class=\"d-note\">命中率是关键：客服/FAQ 类场景常达 30~50%，开放创作类则很低。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第三斧：压缩与批处理</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">上下文压缩 -30% token</span><span class=\"d-token\">离线任务走 Batch 半价</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">最终成本 ≈ 20%（总省 80%）</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#f9-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#f9-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#f9-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#f9-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🗂️", "name": "前缀缓存", "text": "相同前缀（长系统提示/文档）只计算一次、多请求共享（Prompt Caching/Prefix Caching）——固定长系统提示的应用第一优先开启。" },
+    { "icon": "🧠", "name": "语义缓存", "text": "相似问题（向量相似度超阈值）直接返回缓存答案不调模型；要点：阈值调优、时效性内容不缓存、答案个性化冲突处理。" },
+    { "icon": "🚦", "name": "模型路由", "text": "按任务难度/类型分流：分类器、规则或小模型预判复杂度；简单任务到 7B 级小模型或轻量 API——最大的单笔省钱项，关键在路由准确率与兜底策略。" },
+    { "icon": "📦", "name": "批处理半价", "text": "非实时任务（离线摘要、数据清洗、评测跑批）走 Batch API 约 5 折，24h 内返回——把『不着急的钱省下来』。" },
+    { "icon": "🗜️", "name": "Token 瘦身", "text": "上下文压缩（历史摘要/滑窗）、提示词精简、输出 max_tokens 上限、结构化输出减少废话——输入输出双向减肥（呼应 C4/C6）。" },
+    { "icon": "📉", "name": "降本不降质的纪律", "text": "每项优化都要配质量评测（golden set 回归）——语义缓存的陈旧答案、路由的错误分流都是质量陷阱；成本与质量双指标看板（F7）。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】语义缓存（Semantic Caching）的工作原理是？",
+      "options": [
+        "把相同字符串的请求结果缓存",
+        "把请求向量化，与缓存中的历史问题算相似度，超过阈值直接返回对应答案而跳过模型调用",
+        "缓存模型的权重参数",
+        "把 KV Cache 存到内存复用"
+      ],
+      "answer": 1,
+      "explain": "选 B。语义缓存按『意思相似』命中（向量相似度阈值），即使措辞不同也能复用答案——与 A 的精确匹配缓存、D 的 KV Cache（推理内部机制，F2）都不同。"
+    },
+    {
+      "type": "choice",
+      "q": "关于模型路由（大小模型分流），下列说法错误的是？",
+      "options": [
+        "简单任务路由到小模型可大幅降低成本",
+        "路由器可以用规则、分类器或小模型实现",
+        "路由错了没有关系，小模型什么都能答好",
+        "需要为路由错误设计兜底策略（如置信度低时升级大模型）"
+      ],
+      "answer": 2,
+      "explain": "选 C。小模型能力有边界，路由错误会导致质量问题——所以必须有置信度评估与升级兜底（cascade：小模型先答，置信不足再大模型复核）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你们的客服 AI 月账单 50 万需要降一半，但服务质量不能降。请给出完整的成本优化方案与验证方法。』请作答。",
+      "reference": "先解剖账单：拉 Trace 数据看 50 万花在哪——通常结论是『大模型占 90%、其中输入 token 占大头、且大量请求高度重复』。然后按优先级组合四招：第一招语义缓存——客服场景重复率高，历史问答向量化建缓存，预计命中 30~40%，直接省 15~20 万；命中策略加时效控制（政策类答案 7 天过期）与置信阈值防错答；第二招模型路由——意图分类分流后，FAQ/物流查询等 60% 简单请求走微调的 7B 小模型（自建或低成本 API），复杂投诉与多轮推理才走大模型，预计再省 10~15 万；第三招 token 瘦身——系统提示精简 + 前缀缓存（固定部分共享计费）+ 历史摘要压缩，输入 token 砍 30%；第四招离线批处理——质检回放、评测跑批等不着急的任务全部转 Batch API 半价。质量保障：以上每项上线前过 golden set 回归 + 5% 灰度对比解决率与满意度，语义缓存与路由各设置信兜底（低置信回大模型）；上线后双指标看板（成本+质量）周度复盘。预期总降幅 50~65%，且质量指标不劣化才算达标。",
+      "keyPoints": [
+        { "point": "先解剖账单（Trace 定位大头）再开方", "kw": ["trace", "解剖", "大头", "账单"] },
+        { "point": "语义缓存：命中率+时效+置信阈值防错答", "kw": ["语义缓存", "命中", "时效", "阈值"] },
+        { "point": "模型路由：意图分流+置信兜底（cascade）", "kw": ["路由", "小模型", "兜底", "置信", "分流"] },
+        { "point": "瘦身与批处理：前缀缓存/压缩/Batch 半价", "kw": ["前缀缓存", "压缩", "batch", "半价"] },
+        { "point": "质量保障：回归+灰度+双指标看板", "kw": ["回归", "灰度", "双指标", "质量"] }
+      ],
+      "explain": "加分项：先解剖后开方、缓存的路由错误兜底（cascade）、成本质量双指标；失分点：只会说『换个便宜的模型』而丢质量。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：AI 服务的账单为什么能砍一半以上？三招分别像什么？",
+    "hint": "提示：餐厅备菜、医院分诊、团购三个类比。",
+    "modelAnswer": "因为大部分钱花在重复劳动和杀鸡用牛刀上。第一招缓存：常客点的菜提前备好半成品，相似的问题直接上现成答案，不劳大厨重做；第二招路由：像医院分诊，感冒去普通门诊、疑难杂症才挂专家号——八成问题小模型就够，别全挤大模型；第三招精打细算：菜单瘦身（上下文压缩）、不着急的活团购半价（批处理 API）。三招齐下能省一半以上，但每省一笔都要考试验证——省钱不能省掉回答质量。"
+  },
+  "links": [
+    { "to": "c4-llm-api-practice", "text": "C4 讲单次调用的省钱细节（参数/压缩），本页是系统级降本的全景图" },
+    { "to": "f4-inference-frameworks", "text": "自建推理时，引擎吞吐直接决定单位成本——选型与降本联动" },
+    { "to": "f7-llm-app-observability", "text": "省钱的每一步都要靠成本+质量双指标看板验证——优化与观测互为表里" }
+  ],
+  "interview": [
+    {
+      "q": "LLM 应用成本优化有哪些手段？",
+      "stars": 3,
+      "source": "牛客网·语义缓存/模型路由题面（检索核实）",
+      "tip": "缓存（前缀+语义）、路由、压缩、批处理四板斧，附各招适用场景与陷阱。"
+    },
+    {
+      "q": "怎么设计大小模型协同的路由策略？",
+      "stars": 3,
+      "source": "牛客网·Agent 模型路由策略题面（延伸追问）",
+      "tip": "分类器/置信度路由 + cascade 兜底（小模型低置信升级大模型）。"
+    }
+  ],
+  "summary": "Q：降本三板斧？（答：缓存（前缀+语义）、模型路由、压缩与批处理——组合省 50~80%）\nQ：语义缓存的最大风险？（答：相似但不同质的问题命中陈旧/错误答案——要阈值+时效+兜底）\nQ：降本不降质的纪律？（答：每项优化过回归与灰度，成本质量双指标看板）"
+}

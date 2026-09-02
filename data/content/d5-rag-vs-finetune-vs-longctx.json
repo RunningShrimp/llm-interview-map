@@ -1,0 +1,94 @@
+{
+  "id": "d5-rag-vs-finetune-vs-longctx",
+  "title": "RAG vs 微调 vs 长上下文选型",
+  "definition": "给模型注入知识/能力有三条路：RAG 外挂知识（实时、可溯源、便宜）、微调内化能力（风格/格式/领域行为，改了就不回来）、长上下文直接喂（一次性通读场景）。选型口诀：知识选 RAG，能力选微调，单篇选长文。",
+  "analogies": [
+    {
+      "icon": "👨‍💼",
+      "name": "外聘顾问 vs 内部培训 vs 给资料",
+      "text": "RAG = 给员工配一个随时可查的资料库（外挂知识）：资料天天更新都行，离职（换模型）知识不带走；微调 = 送员工去脱产培训（内化能力）：教会的是『做事的方式和口吻』，培训完就长在身上，但教新知识又贵又慢；长上下文 = 接到任务时把整摞文件拍在他桌上（一次性通读）：最直接，但每次都拍一大摞，又贵又容易看漏。"
+    },
+    {
+      "icon": "💊",
+      "name": "三种『进补』方式",
+      "text": "外部知识不足 → RAG 是输液（即插即补，随时换药）；能力/风格不对 → 微调是健身（改变体质，周期长见效持久）；单次信息量大 → 长上下文是大餐管饱（一顿吃完，吃完就完）。补错了方向：想靠健身（微调）解决营养（知识）问题，吃力不讨好还容易过期。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：需求 → 选型决策树",
+    "description": "点击『下一步』，按问题类型走一遍选型判断。",
+    "html": "<div class=\"d-steps\" id=\"d5-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">先问：模型缺的是知识还是能力？</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">知识=事实/文档/时效信息</span><span class=\"d-tag green\">能力=风格/格式/领域流程/技能</span></div><div class=\"d-note\">这是选型的第一刀：知识问题训练解决不了『更新快』，能力问题检索解决不了『学不会』。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">缺知识 → RAG（或 RAG+长文混合）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green d-pulse\">知识库问答 → RAG</span><span class=\"d-tag green\">单份长合同分析 → 长上下文</span><span class=\"d-tag amber\">海量文档 → RAG+重排</span></div><div class=\"d-note\">知识要实时、要溯源、要权限 → RAG 无可替代；一份文档读到底 → 长上下文更省事。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">缺能力 → 微调（LoRA 优先）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green d-pulse\">固定输出格式/口吻 → SFT</span><span class=\"d-tag green\">对齐业务偏好 → DPO</span><span class=\"d-tag amber\">领域术语理解 → 少量领域 SFT</span></div><div class=\"d-note\">常见误区：想用微调『灌知识』——贵、慢、易过时、还可能过拟合背答案。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">实战常见：组合拳</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">RAG（知识）+ SFT（格式与风格）</span><span class=\"d-tag green\">微调 embedding 模型（检索）</span></div><div class=\"d-note\">生产级方案通常 RAG 管知识新鲜度、微调管行为习惯，双管齐下。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#d5-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#d5-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#d5-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#d5-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "📚", "name": "RAG 的牌面", "text": "知识实时更新、答案可溯源、私有数据不出域、边际成本低；短板：检索错了全盘错、复杂推理仍靠模型本体、链路工程量大。" },
+    { "icon": "🏋️", "name": "微调的牌面", "text": "内化风格/格式/领域流程、推理时无需检索延迟、可蒸馏小模型降本；短板：知识更新要重训、成本高、有灾难性遗忘与过拟合风险、不可溯源。" },
+    { "icon": "📄", "name": "长上下文的牌面", "text": "零链路成本、一次通读全局信息、开发最快；短板：token 成本随长度线性涨、有效利用受 lost in the middle 限制、知识不沉淀。" },
+    { "icon": "🧭", "name": "选型第一刀", "text": "问自己：缺知识还是缺能力？知识时效性强 → RAG；行为风格不对 → 微调；一次性单篇深读 → 长上下文。" },
+    { "icon": "⚖️", "name": "成本视角", "text": "RAG：一次性搭建+每次检索生成费；微调：一次性训练费（LoRA 可大幅降低）+之后更便宜的推理；长上下文：每次都为长度付费——按查询量级算总账。" },
+    { "icon": "🤝", "name": "标准答案姿势", "text": "面试答『三者不是互斥而是组合』：RAG 管知识、SFT 管格式风格、长文兜底全局——再按业务约束（时效/合规/预算）定权重。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】相比微调，RAG 最不可替代的优势是？",
+      "options": [
+        "回答速度更快",
+        "知识可实时更新且答案可溯源，无需重新训练",
+        "不需要 LLM",
+        "一定能提升模型推理能力"
+      ],
+      "answer": 1,
+      "explain": "选 B。知识时效与可溯源是 RAG 的命门价值：改文档即生效、每句话有出处。微调注入的知识更新要重训、无法逐句溯源。A 通常相反（多了检索延迟）；D 推理能力靠模型本体与训练。"
+    },
+    {
+      "type": "choice",
+      "q": "公司想让模型『用固定的客服话术和 JSON 格式回复』，最合适的方案是？",
+      "options": [
+        "RAG 检索话术库",
+        "SFT 微调（LoRA），用话术与格式样本训练行为习惯",
+        "把话术全部塞进上下文窗口",
+        "提高 temperature"
+      ],
+      "answer": 1,
+      "explain": "选 B。固定的行为风格与格式是『能力/习惯』问题，属于微调的主场——训完内化，推理零额外开销。A 只能给参考料不能保证格式遵守；C 每次都占 token 且遵守不稳。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官追问：『有人说上下文窗口都到 1M token 了，RAG 要被淘汰了，你怎么看？另外给你三个需求——①企业知识库问答 ②让模型学会本公司报告写作风格 ③单份 300 页标书要点提取——分别怎么选？』请作答。",
+      "reference": "长窗口不会淘汰 RAG：第一，成本与延迟随长度线性甚至超线性增长，海量知识每次全文塞入在经济上不成立；第二，lost in the middle 决定了有效利用长度有限，塞得多不等于用得上；第三，企业知识需要权限管控、实时更新与答案溯源，这些是检索层的职责，模型窗口再大也提供不了；第四，知识要沉淀为资产，RAG 的库是可运营的，窗口里的内容是一次性的。三个需求的选型：① 知识库问答选 RAG——时效、溯源、权限三要素都命中；② 写作风格是行为能力选 SFT 微调（LoRA 即可），用风格样本训练，推理时无需检索；③ 单份 300 页标书选长上下文直接读（或长文+分段摘要混合），一次性任务不值得建索引。补充：①中如果文档总量只有几十页且更新不频繁，长上下文也可以是合理的轻量替代——选型永远看规模、时效与成本三要素。",
+      "keyPoints": [
+        { "point": "四点反驳：成本/有效长度/权限溯源/知识沉淀", "kw": ["成本", "lost in the middle", "权限", "溯源", "沉淀"] },
+        { "point": "① 知识库问答选 RAG（时效溯源权限）", "kw": ["rag", "知识库", "时效", "溯源"] },
+        { "point": "② 写作风格选 SFT 微调", "kw": ["微调", "sft", "lora", "风格"] },
+        { "point": "③ 单份长文档选长上下文（或摘要混合）", "kw": ["长上下文", "摘要", "单份"] },
+        { "point": "给出规模/时效/成本的选型依据", "kw": ["规模", "时效", "成本"] }
+      ],
+      "explain": "加分项：不把话说死、承认小规模场景长上下文可替代 RAG；失分点：单边站队说『RAG 必死』或『永远 RAG』。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：RAG、微调、长上下文分别像什么？遇到需求怎么选？",
+    "hint": "提示：外聘顾问的资料库、脱产培训、拍一摞文件三个类比；第一刀砍『缺知识还是缺能力』。",
+    "modelAnswer": "RAG 是给员工配一个随时更新的资料库，缺知识、知识常变就用它；微调是送员工去培训，改变的是做事风格和格式习惯，属于能力问题；长上下文是接任务时把整摞文件拍桌上，适合一次性读透一份大材料。选型第一刀先问缺什么：缺知识上 RAG，缺能力做微调，单篇深读直接喂长文；而且三者能组合——资料库管知识新鲜，培训管说话规矩，大文件偶尔拍一次。"
+  },
+  "links": [
+    { "to": "d1-rag-pipeline", "text": "选型中被选中的 RAG，完整流程在 D1 已拆解" },
+    { "to": "b5-lora-qlora", "text": "选型中『微调』一方的成本，被 LoRA 压到了单卡可承受——技术选型与工具演进互相成就" },
+    { "to": "c6-long-context", "text": "长上下文这条路线的『有效利用』陷阱（lost in the middle）在 C6 已有专页" }
+  ],
+  "interview": [
+    {
+      "q": "RAG、微调、长上下文怎么选？各自的优缺点？",
+      "stars": 5,
+      "source": "卡码笔记·第3题 / 知乎·851 道大模型面试题整理",
+      "tip": "先给『知识 vs 能力』第一刀，再三维对比（时效/成本/溯源），收尾强调组合拳。"
+    },
+    {
+      "q": "长上下文会不会取代 RAG？",
+      "stars": 5,
+      "source": "知乎·851 道大模型面试题整理（陷阱高频题）",
+      "tip": "从成本、有效长度、权限溯源、知识沉淀四点反驳，结论是互补而非替代。"
+    }
+  ],
+  "summary": "Q：选型的第一刀切什么？（答：缺知识选 RAG、缺能力选微调、单篇深读选长上下文）\nQ：微调解决不了什么？（答：知识时效——更新要重训，且答案不可溯源）\nQ：为什么三者是组合而非三选一？（答：RAG 管知识新鲜度、SFT 管行为格式、长文做全局兜底，按业务约束配权重）"
+}

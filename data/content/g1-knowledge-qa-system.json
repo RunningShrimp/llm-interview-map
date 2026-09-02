@@ -1,0 +1,94 @@
+{
+  "id": "g1-knowledge-qa-system",
+  "title": "企业知识库问答系统设计",
+  "definition": "本模块的终极综合题：面试官给一个模糊需求（『给公司搭个知识库问答』），考察你能否像架构师一样走完全程——需求澄清、RAG 架构、数据处理、效果与安全、评估上线。答案框架比细节更重要。",
+  "analogies": [
+    {
+      "icon": "🏗️",
+      "name": "盖一栋办公楼",
+      "text": "这道题像『盖一栋能容纳全公司的办公楼』：先问清楚需求（多少人办公？要不要会议室？预算多少？=需求澄清），再出图纸（RAG 架构选型），然后打地基（数据管线：解析/切分/索引），砌墙装电（检索与生成链路），消防验收（安全合规），竣工验收拿入住评估（评测与灰度）。面试官想听的不是一个零件，是『你心里有整张图纸』。"
+    },
+    {
+      "icon": "🧭",
+      "name": "答题即架构评审",
+      "text": "把它当成一场架构评审会：你是主讲人，按『目标用户与场景 → 总体架构 → 数据链路 → 关键挑战与对策 → 评估与迭代 → 成本与安全』的议程推进。每一节先给结论再给理由，主动暴露权衡（『这里我在 X 和 Y 之间选了 X，因为……』）——权衡意识是资深与初级的分水岭。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：知识库系统设计的六大板块",
+    "description": "点击『下一步』，按架构评审的顺序过一遍答题骨架。",
+    "html": "<div class=\"d-steps\" id=\"g1-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">板块 1：需求澄清（先问再答）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">用户是谁（全员/某部门）？</span><span class=\"d-tag\">文档量与更新频率？</span><span class=\"d-tag\">权限要求？</span><span class=\"d-tag\">准确率/延迟预期？</span></div><div class=\"d-note\">先澄清再设计——直接开讲的候选人会被追问到露馅。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">板块 2：总体架构（RAG 为主线）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">离线：文档接入 → 解析切分 → 向量化 → 索引（含更新流水线）</span><span class=\"d-tag green\">在线：改写 → 混合检索 → 重排 → 生成（引用）→ 安检</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">板块 3：数据与检索关键设计</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">切分按结构+元数据（部门/密级）</span><span class=\"d-tag\">权限在检索层过滤</span><span class=\"d-tag\">混合检索+Rerank 保命中率</span><span class=\"d-tag\">表格/流程图特殊处理</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">板块 4：效果与安全</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">防幻觉：仅依据资料+引用+拒答转人工</span><span class=\"d-tag\">注入防护：untrusted 分区</span><span class=\"d-tag\">敏感文档 DLP</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">板块 5&6：评估上线 + 成本迭代</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">golden set 回归 → 灰度 → 全量</span><span class=\"d-tag amber\">badcase 飞轮</span><span class=\"d-tag amber\">语义缓存/路由控成本</span><span class=\"d-tag amber\">Trace 全链路可观测</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#g1-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#g1-steps\">1 / 5</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#g1-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#g1-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "❓", "name": "以问开场", "text": "先澄清：用户范围、文档规模与格式、更新频率、权限模型、准确率与延迟 SLO、预算——需求边界决定架构选型，这一步本身就是采分点。" },
+    { "icon": "🏗️", "name": "架构主线", "text": "RAG 为主线（离线索引+在线检索生成），向量库+BM25 混合检索，Rerank 精排；是否叠加微调（术语/风格）按 D5 框架现场论证。" },
+    { "icon": "🗄️", "name": "数据链路设计", "text": "多格式解析（PDF/Word/Excel/Confluence）、结构感知切分、元数据（部门/密级/时效）、增量更新流水线——数据质量决定效果上限。" },
+    { "icon": "🔐", "name": "权限与安全", "text": "检索层按用户身份过滤（不能靠生成后隐藏）、注入防护（untrusted 分区）、DLP、拒答与转人工机制——权限泄漏是企业场景红线。" },
+    { "icon": "📈", "name": "评估与运营", "text": "建 golden set 分层评测（Recall@K/忠实度/相关性）、灰度发布、badcase 飞轮回流优化、Trace 可观测与成本看板——系统是养出来的不是上线即结束。" },
+    { "icon": "⚖️", "name": "主动谈权衡", "text": "自建 vs 用 SaaS、自研检索 vs 开箱框架、量化 vs 全精度、本地 vs 云 API——每处选择给出『为什么』，展示权衡而非堆砌名词。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】设计企业知识库问答系统时，权限控制（不同员工只能查自己有权看的文档）最应该在哪个环节实现？",
+      "options": [
+        "生成后由 LLM 判断并隐藏敏感内容",
+        "检索层：按用户身份对索引/检索做过滤，无权文档根本不进入候选",
+        "靠提示词要求模型不要泄露",
+        "靠用户自觉不问无权问题"
+      ],
+      "answer": 1,
+      "explain": "选 B。权限必须在检索层前置过滤：无权文档若进入上下文，模型可能复述（提示词约束不可靠），且引用会直接暴露。生成后隐藏（A）无法防止中间泄露。"
+    },
+    {
+      "type": "choice",
+      "q": "面试官问『知识库更新了，为什么答案还是旧的？』最可能的技术原因是？",
+      "options": [
+        "模型没有重新训练",
+        "增量索引流水线故障：文档更新后未触发重新解析/向量化/入库",
+        "温度参数太高",
+        "用户问了太快"
+      ],
+      "answer": 1,
+      "explain": "选 B。RAG 的知识时效取决于索引更新链路：文档→解析→切分→向量化→入库任一环断掉都会导致旧知识残留。这正是设计『更新流水线+监控』的原因。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官（腾讯风格）问：『公司有 10 万份文档（PDF/Word/Confluence），要让全员能问答，要求答案可信可溯源、部门隔离、新文档当天生效。请给出整体方案。』请作答。",
+      "reference": "我先澄清关键约束：并发量级、是否允许用云 API（数据合规）、准确率优先还是成本优先——以下按内部部署、准确率优先给方案。总体架构分离线与在线两段：离线数据链路——多格式解析（PDF 版式还原、Confluence API 拉取、表格转文本），结构感知切分（按章节，300~500 字，15% 重叠），元数据带部门/密级/生效时间/文档版本，向量化入 Milvus 并建 BM25 双索引；更新流水线由文档系统 webhook 触发增量重建，配监控保证当天生效。在线链路——用户问题指代补全与改写，混合检索（向量+BM25+RRF）取 Top-20，检索层按用户部门权限前置过滤，Rerank 模型重排精选取 Top-5，提示词模板要求『仅依据资料、逐条引用来源、资料不足明确拒答（说不知道并转人工）』，低温生成。安全：抓取与文档内容按 untrusted 分区防注入，输出过 DLP，全部调用留审计。评估与运营——从高频问题建 500 条 golden set，指标 Recall@10、忠实度、答案相关性周度回归；上线先 200 人灰度一个月，badcase 每周复盘回流优化切分与检索；成本上开启前缀缓存与语义缓存。最后给演进路线：MVP（现成框架 2 周）→ 补权限与评测（1 月）→ 语义缓存与高级 RAG 按需引入。",
+      "keyPoints": [
+        { "point": "先澄清约束（合规/并发/优先级）再给方案", "kw": ["澄清", "合规", "约束", "并发"] },
+        { "point": "离线链路：多格式解析+结构切分+元数据+增量更新当天生效", "kw": ["解析", "切分", "元数据", "增量", "流水线"] },
+        { "point": "在线链路：改写+混合检索+权限前置过滤+重排+引用生成+拒答", "kw": ["混合检索", "权限", "重排", "引用", "拒答"] },
+        { "point": "安全与评估：untrusted 分区+DLP+golden set 回归+灰度+badcase 飞轮", "kw": ["untrusted", "dlp", "golden", "灰度", "badcase"] },
+        { "point": "成本与演进：缓存/路由 + MVP 到完善的路线图", "kw": ["前缀缓存", "语义缓存", "mvp", "演进"] }
+      ],
+      "explain": "加分项：当天生效靠 webhook 触发增量流水线、权限前置过滤、给出演进路线图而非一步到位；失分点：没有需求澄清直接报技术栈、权限设计放在生成层。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：如果老板让你『下个月上线一个公司知识库问答』，你的第一步做什么？整体分几步走？",
+    "hint": "提示：盖楼类比——先问需求再画图纸；六板块（需求/架构/数据/安全/评估/成本）。",
+    "modelAnswer": "第一步不是埋头搭系统，而是问清楚：给谁用、有多少文档、能不能用外部服务、多准算准——需求边界决定一切。然后像盖楼一样分步：画图纸（RAG 架构：离线建索引、在线检索作答）、打地基（文档解析切分入库，配更新流水线保证新文档当天生效）、砌墙布线（混合检索加权限过滤，答案必须带出处、查不到就转人工）、消防验收（防注入、防泄露）、竣工验收（建测试集回归、先小范围灰度），最后持续运营：坏的回答每周复盘回流优化，开缓存控制成本。"
+  },
+  "links": [
+    { "to": "d1-rag-pipeline", "text": "本大题的骨架就是把 D1 的 RAG 流程放到企业约束（权限/规模/时效）下重新推导" },
+    { "to": "d8-rag-troubleshooting", "text": "面试官的追问多半来自 D8 的故障清单——每讲一个设计都要经得起『失效了怎么办』" },
+    { "to": "g3-system-design-template", "text": "本页的六大板块正是 G3 答题模板在知识库场景的具体化" }
+  ],
+  "interview": [
+    {
+      "q": "设计一个企业知识库问答系统，你会怎么做？",
+      "stars": 5,
+      "source": "知乎·腾讯面试真题 RAG 知识库构建 / 掘金·万字题库 RAG 篇",
+      "tip": "按六板块推进：需求澄清→架构→数据→安全→评估→成本，主动谈权衡。"
+    },
+    {
+      "q": "知识库的权限隔离和增量更新怎么设计？",
+      "stars": 4,
+      "source": "掘金·万字题库（高频追问）",
+      "tip": "权限在检索层前置过滤；增量靠 webhook 触发流水线+监控。"
+    }
+  ],
+  "summary": "Q：答题六板块？（答：需求澄清、总体架构、数据链路、效果与安全、评估上线、成本迭代）\nQ：权限设计的第一原则？（答：检索层按身份前置过滤——无权文档不进上下文）\nQ：『当天生效』靠什么？（答：文档系统 webhook 触发增量解析/向量化/入库流水线+监控）"
+}

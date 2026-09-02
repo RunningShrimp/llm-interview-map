@@ -1,0 +1,93 @@
+{
+  "id": "e4-tool-error-loops",
+  "title": "工具调用异常与死循环防护",
+  "definition": "Agent 生产环境三大事故源：工具调用失败（超时/参数错/接口挂）、错误处理不当引发的重试风暴、以及模型陷入同一动作的死循环。防护四件套：重试上限、步数/预算双阈值、失败语义回传、人工在环。",
+  "analogies": [
+    {
+      "icon": "🚨",
+      "name": "保险丝与刹车",
+      "text": "Agent 循环像一辆电车：工具偶发失败是正常颠簸（要挂保险丝——重试加退避）；模型反复撞同一堵墙是油门卡死（死循环——要装刹车：步数上限）；一边撞墙一边烧油是重试风暴（预算上限）。电车出厂必须带刹车和保险丝，Agent 上线必须带上限与熔断——没有安全件的 Agent 就是定时炸弹。"
+    },
+    {
+      "icon": "📞",
+      "name": "客服话术卡死",
+      "text": "客服 Agent 查订单失败后，模型可能连续 50 次重试同一个失败接口（重试风暴），或陷入『查订单失败→道歉→再查→再失败』的无限循环。聪明的接线员失败两三次就该换方法或升级人工——把这套常识写进系统：失败计数器、换路策略、人工兜底。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：一次险些失控的循环如何被截停",
+    "description": "点击『下一步』，看防护机制逐层生效。",
+    "html": "<div class=\"d-steps\" id=\"e4-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1~2 次：接口超时（瞬时故障）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag red d-shake\">search_flights 超时 ✗</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">指数退避自动重试：等 1s → 再试 ✓</span></div><div class=\"d-note\">瞬时错误自动重试是正常颠簸，退避节奏防止雪上加霜。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 次：仍然失败 → 熔断该工具</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\">第 3 次失败 ✗✗✗</span><span class=\"d-arrow\">→</span><span class=\"d-tag amber\">指纹熔断：本轮禁用 search_flights</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-card mono\" style=\"font-size:12px\">回传 Observation：{ \"code\": \"TIMEOUT\", \"reason\": \"航司接口不可用\", \"suggestion\": \"改用备用票源接口\" }</span></div><div class=\"d-note\">结构化错误让模型知道发生了什么、该换什么路。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 拍：模型换路成功</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">Action：backup_search ✓</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">拿到航班数据 → 继续任务</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">假如一直失败：硬阈值刹车</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">步数 12/12 或预算耗尽</span><span class=\"d-arrow\">→</span><span class=\"d-tag red\">强制终止</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">汇总进展 + 转人工/降级话术</span></div><div class=\"d-note\">刹车不依赖模型自觉——工程兜底才是生产可靠性的底气。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#e4-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#e4-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#e4-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#e4-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "1️⃣", "name": "重试有上限有退避", "text": "瞬时错误（超时/429）指数退避自动重试，同一工具连续失败 2~3 次即停止重试、换策略或上报——绝不让模型自主无限重试。" },
+    { "icon": "2️⃣", "name": "失败语义回传", "text": "工具失败要把结构化错误（错误码+原因+建议）作为 Observation 回传给模型，让它有机会换路（换工具/换参数/问用户）；严禁把空结果或异常堆栈直接甩给模型。" },
+    { "icon": "3️⃣", "name": "步数与预算双阈值", "text": "最大步数（如 10~15 步）+ 最大 token/费用预算，任一触达强制终止，汇总已有进展转人工或降级回复——这是防死循环的最后刹车。" },
+    { "icon": "4️⃣", "name": "重复检测", "text": "对（工具+参数）做指纹去重：同一调用出现 N 次即判定循环，注入系统提醒『请更换方法』或直接熔断。" },
+    { "icon": "🧯", "name": "降级与人工在环", "text": "不可逆动作（支付/删除）失败即停并人工介入；核心链路配置降级路径（换备用工具/缓存结果/道歉话术）——先保可用再保完美。" },
+    { "icon": "📡", "name": "可观测性", "text": "每次调用记录轨迹、耗时、失败率，告警规则（失败率>10%、步数 P99 异常）——事后能复盘才能持续加固。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】Agent 陷入『调用同一工具-失败-再调用』的死循环，最有效的工程防线是？",
+      "options": [
+        "给模型换更强的底座",
+        "设置最大步数/token 预算阈值 + 同一调用重复检测，触发即强制终止",
+        "在提示词里写『请不要循环』",
+        "提高工具的响应速度"
+      ],
+      "answer": 1,
+      "explain": "选 B。死循环要靠硬性熔断（步数/预算阈值 + 重复指纹检测）兜底，这是不依赖模型自觉的工程防线。A 降低概率但不杜绝；D 只是软约束；C 缓解不了失败引发的循环。"
+    },
+    {
+      "type": "choice",
+      "q": "工具调用抛出异常后，正确的处理是？",
+      "options": [
+        "把空字符串作为 Observation 回传",
+        "把结构化错误信息（错误码+原因+下一步建议）回传给模型，同时计数，超限熔断",
+        "直接终止整个 Agent 进程",
+        "让模型自己捕获异常"
+      ],
+      "answer": 1,
+      "explain": "选 B。结构化错误回传给模型换路的机会，计数熔断防重试风暴。A 会让模型幻觉出结果；C 过于粗暴；D 模型根本碰不到运行时异常。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你们的订票 Agent 曾在高峰期连续重试失败接口，一晚烧掉上万元 API 费用。请给出根因分析与完整防护方案。』请作答。",
+      "reference": "根因有三：一是工具失败被当成普通 Observation（甚至空串）回传，模型不知道失败了，继续原样重试；二是没有重试上限与重复检测，同一调用被无限放大；三是没有步数与预算硬阈值，成本失控无人刹车。防护方案分四层：第一层工具层——接口调用加超时与指数退避，同一（工具+参数）指纹连续失败 2 次即熔断该工具本轮，返回结构化错误（含错误码 code、原因 reason、建议 suggestion）；第二层循环层——全局最大步数 12 步、单会话 token 预算上限，同一调用指纹重复出现即注入提醒『该方法已失败，请更换策略』，再次重复直接强制终止；第三层业务层——不可逆动作（出票）失败即停转人工，核心链路准备降级（改用备用票源接口或话术兜底）；第四层监控层——每次会话记录完整轨迹与费用，配置告警（会话步数 P95 > 8、工具失败率 > 10%、单会话成本超阈值），事后轨迹回放定位坏 case。上线前用故障注入演练（故意挂掉接口）验证所有阈值真的会触发。",
+      "keyPoints": [
+        { "point": "根因：失败语义丢失 + 无重试上限 + 无预算阈值", "kw": ["observation", "空", "上限", "预算", "阈值"] },
+        { "point": "工具层：超时退避 + 指纹熔断 + 结构化错误回传", "kw": ["退避", "熔断", "指纹", "结构化", "错误码"] },
+        { "point": "循环层：步数/预算双阈值 + 重复提醒后强制终止", "kw": ["最大步数", "终止", "重复", "更换策略"] },
+        { "point": "业务与监控：不可逆转人工、降级、轨迹告警、故障注入演练", "kw": ["人工", "降级", "告警", "轨迹", "演练"] }
+      ],
+      "explain": "加分项：故障注入演练验证阈值、会话级费用告警；失分点：只说『加重试上限』单点，没有分层与演练意识。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：Agent 为什么会『死循环』？工程师给它装了哪些刹车？",
+    "hint": "提示：电车刹车与保险丝类比——重试上限、步数/预算阈值、重复检测、人工兜底。",
+    "modelAnswer": "Agent 靠『行动→看结果→再行动』的循环干活，一旦工具一直失败、或它认定某个没用的办法有效，就会原地打转——一边转一边烧 API 费用。工程师给它装了四重刹车：失败重试有次数和退避节奏，不许多撞；同一动作反复出现会被识别出来强制喊停；整个任务有步数和费用的硬上限，到线就熔断；熔断后汇总已有进展交给人工接手。刹车之外还有行车记录仪——每次运行留轨迹、异常就告警，坏 case 能复盘。"
+  },
+  "links": [
+    { "to": "e2-react-loop", "text": "死循环源于 ReAct 循环失去终止条件——循环的节拍与刹车要配套学" },
+    { "to": "e3-function-calling", "text": "参数校验失败是工具异常的常见来源——校验失败的语义回传就是 E4 的第一道防线" },
+    { "to": "f7-llm-app-observability", "text": "轨迹留痕与告警属于 LLM 应用可观测性体系——E4 的监控节在那里系统化展开" }
+  ],
+  "interview": [
+    {
+      "q": "Agent 工具调用失败怎么处理？如何防止死循环？",
+      "stars": 4,
+      "source": "牛客网·AI Agent 面试 Top50 必刷题",
+      "tip": "重试上限+退避、结构化错误回传、步数/预算阈值、重复指纹检测四层作答。"
+    },
+    {
+      "q": "生产环境 Agent 的可靠性怎么保障？",
+      "stars": 4,
+      "source": "牛客网·Top50（延伸追问）",
+      "tip": "降级路径、人工在环、轨迹可观测与告警，最好举一个真实事故场景。"
+    }
+  ],
+  "summary": "Q：防死循环的两条硬阈值？（答：最大步数 + token/费用预算，任一触达强制终止）\nQ：工具异常的正确回传姿势？（答：结构化错误（码+原因+建议）作为 Observation，配计数熔断）\nQ：为什么需要重复指纹检测？（答：识别『同一调用反复出现』的循环模式，提醒换路直至熔断）"
+}

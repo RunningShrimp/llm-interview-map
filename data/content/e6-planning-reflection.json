@@ -1,0 +1,93 @@
+{
+  "id": "e6-planning-reflection",
+  "title": "规划与反思（Plan-and-Execute/Reflection）",
+  "definition": "Plan-and-Execute：先让模型把目标拆成完整计划，再逐步执行、必要时重规划——先谋后动，省 token 且稳。Reflection：执行后自我复盘『哪里做错了』并带教训重试。两者让 Agent 从莽夫变成谋士。",
+  "analogies": [
+    {
+      "icon": "🗺️",
+      "name": "自驾游的两种玩法",
+      "text": "ReAct 是走一步看一步：到路口再想往哪拐——灵活但费神费油（每步都要 LLM 思考）。Plan-and-Execute 是出发前先用导航把全程路线排好（一次规划出完整步骤清单），路上按导航走（执行器逐步跑），遇到封路才重新规划（重规划）——大方向稳定、执行便宜。Reflection 则是每天行程结束写游记复盘：『今天绕远了，因为没查限行』——教训写进明天计划。"
+    },
+    {
+      "icon": "🛠️",
+      "name": "工匠的图纸与验收",
+      "text": "先画图纸（规划）再施工（执行），比边干边想专业；完工后对照图纸验收（反思），发现偏差返工时带着『错在哪』的信息——第二次往往一次到位。Reflection 的本质是把『失败的经历』变成『下一次尝试的上下文』。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：Plan-and-Execute 的三阶段",
+    "description": "点击『下一步』，看『组织一场线上发布会』如何被规划、执行与重规划。",
+    "html": "<div class=\"d-steps\" id=\"e6-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：Planner 一次性出计划</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-card\">① 定主题与议程 → ② 准备演示材料 → ③ 搭建直播间 → ④ 发邀请邮件 → ⑤ 彩排 → ⑥ 正式直播</span><span class=\"d-tag amber\">LLM 调用 1 次，替代 ReAct 的 6 次边想边做</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：Executor 逐步执行</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">步骤①✓</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.25s\">②✓</span><span class=\"d-token d-shake\">③ 直播间工具不支持 ✗</span></div><div class=\"d-note\">执行器可以是不带大脑的简单调用——便宜、稳定、可并行。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：Re-plan + Reflection</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-card d-pulse\">反思：③ 失败因工具能力边界 → 改用外部直播平台</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">更新计划：③' 注册平台并推流</span></div><div class=\"d-note\">失败教训（Reflection）喂给规划器，重规划只改动后续步骤——这就是谋士型 Agent。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#e6-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#e6-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#e6-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#e6-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "📋", "name": "Plan-and-Execute", "text": "Planner（强模型）一次产出完整计划 → Executor 逐步执行（可用便宜模型/纯代码）→ 动态重规划。长任务上比 ReAct 省 token、全局性更好。" },
+    { "icon": "⚖️", "name": "与 ReAct 取舍", "text": "ReAct：环境强反馈、路径不确定的任务占优（查证类）；Plan-Execute：步骤清晰的长链任务占优（流程类）——按任务形态选节拍。" },
+    { "icon": "🪞", "name": "Reflection 三步", "text": "执行失败/完成后 → 自我评审（错在哪、缺什么证据）→ 生成改进建议 → 带着教训重试（Reflexion 把教训存进记忆供下次使用）。" },
+    { "icon": "🧾", "name": "计划的数据结构", "text": "计划常表示为任务清单（步骤、依赖、状态、验收标准）；支持 DAG 依赖的执行器可以做并行调度。" },
+    { "icon": "🔁", "name": "反思的成本控制", "text": "反思也是 LLM 调用：设最大反思轮数（如 2 次）、只在失败或低置信时触发——反思不是越多越好。" },
+    { "icon": "🧪", "name": "何时用哪个", "text": "简单任务直接 ReAct/单次调用；长链路多依赖用 Plan-Execute；质量要求高、可多次尝试的场景叠 Reflection——面试按任务特征给组合方案。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】与 ReAct 相比，Plan-and-Execute 的主要优势是？",
+      "options": [
+        "不需要任何工具调用",
+        "长任务中减少 LLM 思考次数、整体规划全局最优，执行器可便宜可并行",
+        "永远不会失败",
+        "不需要大模型参与"
+      ],
+      "answer": 1,
+      "explain": "选 B。先谋后动把『N 次边想边做』压缩成『1 次规划+N 次机械执行』，省钱且全局视野好；环境不确定时仍需动态重规划。C、D 明显错误。"
+    },
+    {
+      "type": "choice",
+      "q": "Reflection 机制的正确打开方式是？",
+      "options": [
+        "每一步都反思，反思次数越多越好",
+        "失败或低置信时触发自我评审，把教训写入上下文/记忆后带改进方向重试，并设最大反思轮数",
+        "反思后直接把错误答案再提交一遍",
+        "让另一个更弱的模型来反思"
+      ],
+      "answer": 1,
+      "explain": "选 B。Reflection 的价值在『教训进入下一次尝试的上下文』；无限反思烧钱且可能越改越错，需设轮数上限。C 缺少改进信息等于浪费；D 方向反了。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『要做一个「自动生成本周产品周报」的 Agent：拉取 20 个需求单与群聊记录，输出结构化周报。你会选 ReAct 还是 Plan-and-Execute？如何保证周报质量？』请作答。",
+      "reference": "我选 Plan-and-Execute：这个任务步骤清晰（拉数据→清洗归类→按模块起草→核对→排版输出）、来源固定、不需要边查边改变路线，先谋后动比 ReAct 的逐拍决策省一半以上 token，且执行器可以并行拉取 20 个需求单。计划设计：Planner 一次生成任务清单（每步带输入来源、处理方式、验收标准），Executor 并行执行数据拉取，起草阶段按『本周进展/风险/下周计划』模板分模块生成。质量保障靠三层 Reflection：起草后自检——对照模板检查模块齐全、每条进展是否可溯源到具体需求单号；数据核对——周报中的数字与源数据自动比对（幻觉检查）；越界反思——发现两类信息冲突（需求单说完成、群聊说阻塞）时标记存疑并降级为『待确认』而不是二选一硬写。设最大重规划 2 次、失败转人工补写。评测上沉淀历史周报做 golden set，新版本跑格式合规率与信息覆盖率。",
+      "keyPoints": [
+        { "point": "选 Plan-and-Execute 并给出任务特征依据（步骤清晰、来源固定）", "kw": ["plan", "步骤清晰", "并行", "token"] },
+        { "point": "计划结构：任务清单带验收标准，执行器并行拉取", "kw": ["清单", "验收", "并行", "模板"] },
+        { "point": "三层质量保障：自检溯源/数字核对/冲突降级", "kw": ["溯源", "核对", "冲突", "待确认", "幻觉"] },
+        { "point": "成本与兜底：最大重规划次数、转人工、golden set 评测", "kw": ["重规划", "人工", "golden", "评测"] }
+      ],
+      "explain": "加分项：按任务特征论证选型而非背概念、冲突信息的降级处理；失分点：只答『用 ReAct 也行』无论证。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：『先谋后动』和『走一步看一步』分别适合什么任务？复盘反思为什么能让 AI 越干越好？",
+    "hint": "提示：自驾游导航 vs 路口现想；游记复盘写进明天的计划。",
+    "modelAnswer": "路线不确定的查证类任务适合走一步看一步（ReAct）——查完才知道下一步；步骤清楚的长流程适合先画好完整路线再出发（Plan-and-Execute），中途遇到封路才重规划，省心省钱。复盘反思则是每天行程结束写游记：哪里绕远了、为什么，把教训写进明天的计划里——同一件事第二次就一次到位。当然反思也费油，所以只在失败或没把握时触发，最多复盘两轮。"
+  },
+  "links": [
+    { "to": "e2-react-loop", "text": "Plan-and-Execute 是 ReAct 的『先谋后动』升级版——两种节拍的取舍是本页核心" },
+    { "to": "e5-agent-memory", "text": "Reflection 产生的教训要写进长期记忆才能持续生效——记忆是反思的存储层" },
+    { "to": "g2-agent-system-design", "text": "G2 的 Agent 系统设计题中，规划模块的选型论证是高频得分点" }
+  ],
+  "interview": [
+    {
+      "q": "Plan-and-Execute 和 ReAct 有什么区别？怎么选？",
+      "stars": 3,
+      "source": "多来源间接佐证 + 内置知识",
+      "tip": "按任务形态给判据：查证型走 ReAct、流程型走 Plan-Execute，举两个对比例子。"
+    },
+    {
+      "q": "Reflection 机制怎么落地？有什么代价？",
+      "stars": 3,
+      "source": "多来源间接佐证（延伸追问）",
+      "tip": "自评→教训入上下文→重试；代价是额外调用，要设触发条件与轮数上限。"
+    }
+  ],
+  "summary": "Q：Plan-and-Execute 三角色？（答：Planner 一次规划、Executor 逐步执行、必要时 Re-plan）\nQ：Reflection 的正确姿势？（答：失败/低置信触发，教训入上下文带改进重试，设轮数上限）\nQ：与 ReAct 的选择判据？（答：路径不确定的查证型选 ReAct；步骤清晰的流程型选 Plan-Execute）"
+}

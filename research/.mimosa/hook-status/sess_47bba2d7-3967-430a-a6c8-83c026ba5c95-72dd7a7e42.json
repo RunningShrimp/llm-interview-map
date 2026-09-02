@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "mimosa-hook-status/v1",
+  "recordedAt": "2026-09-02T14:17:55.643Z",
+  "sessionId": "sess_47bba2d7-3967-430a-a6c8-83c026ba5c95",
+  "event": "PostToolUse",
+  "toolName": "Edit",
+  "file": "/Users/didi/Desktop/project/knowledge/agent_knowledge/data/syllabus.js",
+  "outcome": "inconclusive",
+  "coverage": "partial",
+  "findingCount": 0,
+  "durationMs": 6,
+  "hostState": "hook_complete",
+  "reportHint": ".mimosa/reports/"
+}

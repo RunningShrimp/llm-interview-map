@@ -1,0 +1,93 @@
+{
+  "id": "f8-llm-security-compliance",
+  "title": "内容安全与合规（输出过滤/红队）",
+  "definition": "内容安全体系为 LLM 应用守住底线：输入侧过滤违规请求、输出侧拦截有害内容（DLP 防敏感数据泄露）、红队测试持续找漏洞、合规上满足数据隐私（脱敏/可删除）与生成内容标识等法规要求。",
+  "analogies": [
+    {
+      "icon": "🛃",
+      "name": "机场安检双层门",
+      "text": "LLM 应用像机场：旅客进站先过第一道安检（输入过滤：危险品——违规请求、提示注入拦在门外）；行李（AI 回答）出站还要过第二道（输出过滤：有害内容、敏感信息不得带出）；安全部门定期搞红蓝对抗（红队测试：雇『职业黑客』变着法带违禁品考验安检）；还要满足民航法规（合规：数据隐私、内容标识）。任何一道失守都是事故。"
+    },
+    {
+      "icon": "🏭",
+      "name": "出厂质检",
+      "text": "模型生成内容像工厂出货：即使生产线（模型对齐）再严格，也要做出厂质检（输出过滤器）——因为总有万分之一的次品（越狱生成有害内容），而互联网产品的量级会把万分之一放大成每天几百起。质检不能只靠产线自检（模型自律），必须独立质检岗（外部过滤器+人工抽检）。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：一次请求的安全流水线",
+    "description": "点击『下一步』，看内容在四个关卡的处理。",
+    "html": "<div class=\"d-steps\" id=\"f8-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">关卡 1：输入侧安检</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">用户输入</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">违规请求分类器（暴恐/违法/色情）</span><span class=\"d-arrow\">→</span><span class=\"d-tag red d-shake\">命中 → 固定话术拒答</span></div><div class=\"d-note\">同时做敏感信息识别：用户贴的身份证号先脱敏再进模型。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">关卡 2：模型侧护栏</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">系统提示安全红线 + 模型自身对齐</span><span class=\"d-tag amber\">温度适中防失控长文</span></div><div class=\"d-note\">模型自律是第一道软防线，但不能是唯一防线。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">关卡 3：输出侧质检</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">生成内容</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">有害内容分类器</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">DLP 敏感数据（密钥/内网地址/个人信息）</span><span class=\"d-arrow\">→</span><span class=\"d-tag red\">命中 → 拦截重写或兜底话术</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">关卡 4：红队与合规运营</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">红队语料库持续攻击测试</span><span class=\"d-tag amber\">日志留存审计</span><span class=\"d-tag green\">AI 生成内容标识（合规要求）</span><span class=\"d-tag green\">用户举报闭环</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#f8-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#f8-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#f8-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#f8-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🚧", "name": "输入侧过滤", "text": "违规请求分类器（涉政/暴恐/违法）、注入检测（F6）、用户敏感信息脱敏后再入模——入口先净化。" },
+    { "icon": "📤", "name": "输出侧过滤", "text": "有害内容分类器 + DLP（数据防泄漏：密钥/个人信息/内网信息）+ 事实性兜底话术；命中后拦截、重写或降级，全留痕。" },
+    { "icon": "🔴", "name": "红队测试", "text": "维护攻击语料库（越狱模板/注入变体/边界 case）持续自动化攻击自家系统，漏洞→加固→回归——安全是持续对抗不是一次性验收。" },
+    { "icon": "⚖️", "name": "合规要点", "text": "数据隐私（采集告知、脱敏、可删除）、生成内容标识（AI 生成需标注）、日志留存期限、行业特殊要求（医疗/金融更高门槛）——国内《生成式 AI 服务管理暂行办法》等是底线依据。" },
+    { "icon": "🧯", "name": "兜底设计", "text": "拒答话术库（统一、礼貌、可解释）、安全事件应急流程（熔断/下线/上报）、人工审核队列（高风险领域抽检）。" },
+    { "icon": "📊", "name": "度量", "text": "拦截率、误拦率（过严伤体验）、越狱成功率（红队指标）、事件响应时长——安全效果要可量化可复盘。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】DLP（数据防泄漏）在 LLM 应用中主要防什么？",
+      "options": [
+        "防止用户输入太长",
+        "防止模型输出中携带敏感数据（API 密钥、个人身份信息、内网地址等）",
+        "防止模型被DDoS攻击",
+        "防止模型文件被拷贝"
+      ],
+      "answer": 1,
+      "explain": "选 B。输出侧 DLP 扫描生成内容中的敏感模式（密钥格式、身份证号、内网 IP/URL），命中即拦截或脱敏——防止内部敏感数据经由 AI 回答泄露出去。"
+    },
+    {
+      "type": "choice",
+      "q": "关于红队测试，正确的理解是？",
+      "options": [
+        "上线前测一次通过即可",
+        "用持续更新的攻击语料（越狱/注入变体）自动化攻击自家系统，发现漏洞加固并回归，是持续对抗过程",
+        "红队就是让模型自己检查自己",
+        "红队测试只测模型厂商做，应用方不用做"
+      ],
+      "answer": 1,
+      "explain": "选 B。攻击手法持续进化，安全是对抗过程：红队语料库要持续更新、漏洞要闭环、修复要回归验证。C 是既当运动员又当裁判；D 恰恰相反——应用层的提示注入、业务越权只有应用方自己能测。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你们的 AI 助手要面向 C 端上线，涉及用户上传文档。请设计内容安全与合规方案，并说明如何量化安全效果。』请作答。",
+      "reference": "方案四层：入口层——用户实名与协议告知（数据用途、留存期），上传文档病毒扫描与格式校验，输入过违规请求分类器与注入检测，用户文档中的第三方个人信息（身份证/手机号）入库前自动脱敏；模型层——系统提示写入安全红线与拒答规范，对齐合规的底座模型，温度参数适中；输出层——有害内容分类器、DLP 扫描（防止把用户文档中的他人敏感信息复述出去）、AI 生成内容按法规加标识，命中拦截时用统一兜底话术并留痕；运营层——红队语料库（越狱模板、注入变体、隐私诱导）每周自动化回归，高风险输出抽人工抽检审核，建立举报-处置-复盘闭环，日志留存满足监管期限。量化安全效果：拦截准确率与误拦率（过严伤体验）、红队越狱成功率（目标随版本下降）、事件平均响应时长、合规审计通过情况。关键原则：安全不是功能是一次对抗性运营，误拦率与拦截率要一起看，防止防御变自杀。",
+      "keyPoints": [
+        { "point": "入口层：告知合规、扫描、违规分类、脱敏", "kw": ["告知", "扫描", "分类器", "脱敏"] },
+        { "point": "模型与输出层：红线提示+分类器+DLP+AI 标识", "kw": ["红线", "分类器", "dlp", "标识"] },
+        { "point": "运营层：红队回归、人工抽检、举报闭环、日志留存", "kw": ["红队", "回归", "抽检", "举报", "留存"] },
+        { "point": "量化：拦截率/误拦率/越狱成功率/响应时长", "kw": ["拦截率", "误拦", "成功率", "响应"] }
+      ],
+      "explain": "加分项：误拦率与拦截率并重、第三方个人信息脱敏（用户上传文档里可能有别人的隐私）；失分点：只答『接个内容安全 API』。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么 AI 应用要设『安检』？红队测试是什么？",
+    "hint": "提示：机场双层安检类比；红队=雇职业黑客定期搞攻防演习。",
+    "modelAnswer": "因为 AI 的输出无法保证百分之百靠谱，万一它生成了有害内容、或者把用户文档里别人的身份证号复述出去，就是安全事故。所以要设机场式安检：旅客进门先检（输入过滤+脱敏），行李出门再检（输出过滤+防泄漏）。红队测试就是雇一批『职业黑客』天天变着花样攻击自家 AI——用越狱话术、藏在文档里的指令——找到漏洞就加固，再回归验证。安全不是上线前的一次考试，而是天天进行的攻防演习，还要看误伤率，别把正常用户也拦在门外。"
+  },
+  "links": [
+    { "to": "f6-prompt-injection-defense", "text": "注入防护是内容安全的特化战场——攻击面与纵深思想一脉相承" },
+    { "to": "c3-hallucination", "text": "幻觉治理是内容正确性安全——本页是内容合规安全，双线并守" },
+    { "to": "f7-llm-app-observability", "text": "拦截率/误拦率等安全指标要进可观测面板持续盯——安全与可观测是一对搭档" }
+  ],
+  "interview": [
+    {
+      "q": "LLM 应用的内容安全方案怎么设计？",
+      "stars": 3,
+      "source": "安全内参·提示词注入检测 / Prompt Engineering Guide 中文版（相邻来源）",
+      "tip": "输入过滤/输出过滤+DLP/红队/合规四层，配一次请求的完整安检流水线。"
+    },
+    {
+      "q": "怎么衡量内容安全做得好不好？",
+      "stars": 3,
+      "source": "安全内参（延伸追问）",
+      "tip": "拦截率、误拦率、红队越狱成功率、事件响应时长四个量化指标。"
+    }
+  ],
+  "summary": "Q：安全流水线四关卡？（答：输入过滤脱敏 → 模型护栏 → 输出分类+DLP → 红队与合规运营）\nQ：DLP 防什么？（答：输出携带敏感数据——密钥/个人信息/内网信息）\nQ：安全效果的量化？（答：拦截率与误拦率并重、红队越狱成功率、事件响应时长）"
+}

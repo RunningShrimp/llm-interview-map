@@ -1,0 +1,93 @@
+{
+  "id": "d1-rag-pipeline",
+  "title": "RAG 总体流程",
+  "definition": "RAG（检索增强生成）= 先去知识库检索（找出最相关的资料片段），再把资料塞进提示词让模型开卷作答。三段式：离线建索引（切分→向量化→入库），在线检索→增强→生成。是企业落地的第一大架构。",
+  "analogies": [
+    {
+      "icon": "📖",
+      "name": "开卷考试",
+      "text": "闭卷考试（纯大模型）靠记忆作答，记岔了就是幻觉；RAG 是开卷考试：先翻书找到相关的那几页（检索），照着资料组织答案（生成），还要注明出自哪页（引用溯源）。模型从『全知的神』变成『会查资料的学霸』——不知道就去查，查不到就说不知道。"
+    },
+    {
+      "icon": "🍳",
+      "name": "备菜与出餐",
+      "text": "RAG 像餐厅后厨：离线索引阶段是备菜——把食材（文档）洗切配好装盒（切分→向量化→入库）；在线阶段是出餐——接到订单（用户问题）立刻找到对应的半成品（向量检索），按菜谱组合加工（拼提示词），由大厨 final 出餐（LLM 生成）。备菜做得好，出餐才能快而稳。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：RAG 在线链路全流程",
+    "description": "点击『下一步』，跟一个用户问题走完检索→增强→生成全程。",
+    "html": "<div class=\"d-steps\" id=\"d1-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：用户提问</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber\">「公司年假有几天？」</span></div><div class=\"d-note\">离线阶段已完成：员工手册 → 切块 → 向量化 → 存入向量库。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：向量化检索</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-token\">问题向量化</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">召回 Top-3：『年假 10~20 天…』</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">『入司满 1 年…』</span></div><div class=\"d-note\">在向量库里找语义最相近的知识块，而不是关键词匹配。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：增强（拼装提示词）</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-card\">系统：你是 HR 助手，仅依据以下资料回答…</span><span class=\"d-card\">资料1：年假 10~20 天（第 12 页）…</span><span class=\"d-card\">问题：公司年假有几天？</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 步：生成 + 引用</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag green d-pulse\">「年假 10~20 天，按司龄递增 [来源:手册 p12]」</span></div><div class=\"d-note\">带引用的答案可核查、可溯源——幻觉率大幅降低。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#d1-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#d1-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#d1-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#d1-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "🗂️", "name": "离线索引三步", "text": "文档解析（PDF/Word/网页）→ 切分成带元数据的块（chunk）→ Embedding 向量化后存入向量数据库。" },
+    { "icon": "🔍", "name": "在线检索", "text": "用户问题向量化，在向量库做相似度检索（Top-K），常再混合 BM25 关键词召回并用重排模型精排（详见 D4）。" },
+    { "icon": "🧩", "name": "增强拼装", "text": "把检索到的块 + 系统指令 + 用户问题组装成提示词；资料要带来源标记，指令要限定『仅依据资料回答』。" },
+    { "icon": "✨", "name": "生成与引用", "text": "LLM 基于资料作答并标注引用；无相关资料时明确说不知道——把『猜』变成『查』。" },
+    { "icon": "🎁", "name": "四大收益", "text": "知识实时更新（改文档即生效）、减少幻觉（有据可依）、可溯源（答案可信度可验证）、私有知识不出域（安全合规）。" },
+    { "icon": "🧭", "name": "为什么是第一大架构", "text": "成本低（不用训练）、上手快（两周可上线 demo）、效果可增量优化——企业知识场景的默认起点。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】RAG 离线阶段的正确顺序是？",
+      "options": [
+        "向量化 → 切分 → 入库",
+        "文档解析 → 切分（chunking）→ Embedding 向量化 → 存入向量库",
+        "检索 → 重排 → 入库",
+        "入库 → 解析 → 切分"
+      ],
+      "answer": 1,
+      "explain": "选 B。离线链路：原始文档先解析成文本，切成合适大小的块（可带 overlap 与元数据），每块向量化后连同元数据入库。A 顺序颠倒；C 是在线阶段动作。"
+    },
+    {
+      "type": "choice",
+      "q": "相比直接微调模型注入知识，RAG 的核心优势是？",
+      "options": [
+        "模型推理速度更快",
+        "知识更新只需改文档重建索引，实时生效且可溯源，无需重新训练",
+        "完全不消耗 GPU",
+        "生成的答案一定 100% 正确"
+      ],
+      "answer": 1,
+      "explain": "选 B。知识时效性与可溯源是 RAG 的命门优势：改文档立即生效、答案可核查。微调更新知识要重训/继续训练，成本高周期长。A、C 不成立；D 说太满，RAG 也可能检索错。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『让你给公司搭一个内部制度问答机器人，请描述 RAG 整体方案（离线+在线），并说明如何防止它胡说。』请作答。",
+      "reference": "离线侧：把员工手册、制度文档解析为纯文本（PDF 表格特殊处理），按章节语义切块，每块 300~500 字带 10~20% 重叠，附上文档名/章节/页码元数据；用 Embedding 模型向量化后存入向量库；制度更新走文档流水线自动重建索引。在线侧：用户问题先做改写补全（把代词还原），向量检索 Top-10 再用重排模型精选取 Top-3，拼装提示词：系统指令要求『仅依据资料回答，资料不足就回复转人工』，资料块带上来源标签，生成时要求答案标注引用；最后加一层输出校验（答案中的关键结论必须能在召回资料中找到相似句）。防胡说的四道保险：仅依据资料的强约束提示、引用溯源可核查、置信不足拒答转人工、badcase 回流优化切分与检索。上线后用制度题 golden set 做回归评测，持续迭代。",
+      "keyPoints": [
+        { "point": "离线链路：解析→切分（大小/重叠/元数据）→向量化→入库", "kw": ["解析", "切分", "向量", "元数据", "重叠"] },
+        { "point": "在线链路：改写→检索→重排→拼提示词→生成", "kw": ["改写", "检索", "重排", "提示词", "生成"] },
+        { "point": "防幻觉约束：仅依据资料+引用溯源+拒答转人工", "kw": ["依据", "引用", "拒答", "转人工"] },
+        { "point": "输出校验与评测闭环（golden set 回归）", "kw": ["校验", "评测", "golden", "回归"] }
+      ],
+      "explain": "加分项：块大小与重叠的具体数字、更新流水线、badcase 闭环；失分点：只说『文档存进向量库然后问』一句带过。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：RAG 是什么？为什么企业都用它而不是直接训练一个自己的模型？",
+    "hint": "提示：开卷考试类比 + 备菜出餐类比；成本与时效是关键论据。",
+    "modelAnswer": "RAG 就是让 AI 开卷考试：你先给它配一个资料库，每次提问它先翻资料找到相关段落，再照着资料回答，还要注明出处。企业用它而不是自己训模型，因为训模型太贵也太慢——知识一变就要重训；而 RAG 只要把文档更新进资料库，答案立刻跟着变，而且每个答案都能查到出处，不容易瞎编，敏感知识也不用出门。"
+  },
+  "links": [
+    { "to": "c3-hallucination", "text": "RAG 是幻觉的头号解药——让模型从『靠记忆猜』变成『照资料答』" },
+    { "to": "d3-embedding-vector-db", "text": "检索环节的底层引擎：Embedding 相似度与向量数据库索引" },
+    { "to": "g1-knowledge-qa-system", "text": "本页的单机版流程，在 G1 会升级成企业级知识库系统的完整设计题" }
+  ],
+  "interview": [
+    {
+      "q": "介绍一下 RAG 的完整流程？为什么要用 RAG？",
+      "stars": 5,
+      "source": "卡码笔记·RAG 大厂面试题汇总 / 小林面试笔记·RAG",
+      "tip": "离线/在线两段式讲全，动机答『知识时效、私有数据、可溯源、省训练成本』四点。"
+    },
+    {
+      "q": "RAG 和微调怎么选？",
+      "stars": 5,
+      "source": "卡码笔记·第3题（延伸）",
+      "tip": "知识类需求选 RAG、能力/风格类需求选微调，展开在 D5 详答。"
+    }
+  ],
+  "summary": "Q：RAG 离线与在线各做什么？（答：离线解析切块向量化入库；在线检索→增强拼装→生成引用）\nQ：RAG 的四大收益？（答：知识实时、减少幻觉、答案可溯源、私有数据不出域）\nQ：为什么它是企业落地第一选择？（答：不训练、成本低、见效快、效果可持续优化）"
+}
