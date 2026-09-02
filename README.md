@@ -5,7 +5,9 @@
 
 ## 在线访问
 
-部署于 GitHub Pages（启用后填写）：`https://<用户名>.github.io/llm-interview-map/`
+**https://runningshrimp.github.io/llm-interview-map/**
+
+仓库：https://github.com/RunningShrimp/llm-interview-map
 
 ## 本地运行
 

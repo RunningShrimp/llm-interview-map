@@ -12,9 +12,9 @@
 | 1 | 研究：检索子 Agent ×7（A→G，最多 2 并发） | research/module-{a..g}.md ×7 | ✅ 完成（50/56 点经外部检索核实） |
 | 1.5 | 定稿：审核合并 → 最终大纲（44–60 点） | syllabus.md + data/syllabus.js v1.1 | ✅ 完成（56 点） |
 | 2 | 骨架：index.html + 学习地图 + 模板 + 共享 CSS/JS | index.html / css / js | 冒烟测试中 |
-| 3 | 内容：生成子 Agent ×7 严格顺序 + 模块级自测 | data/content/*.json ×56、data/quizzes/*.json ×7 | 未开始 |
-| 4 | 集成自测：全量页面可开 / 判题正确 / 无 JS 报错 / 相对路径 | 自测报告（≤3 轮） | 未开始 |
-| 5 | 部署：git init → push → GitHub Pages | 站点 URL | 未开始 |
+| 3 | 内容：生成子 Agent ×7 严格顺序 + 模块级自测 | data/content/*.json ×56、data/quizzes/*.json ×7 | ✅ 完成（56/56，降级为主 Agent 亲撰） |
+| 4 | 集成自测：全量页面可开 / 判题正确 / 无 JS 报错 / 相对路径 | 自测报告（第 1 轮即全绿） | ✅ 完成 |
+| 5 | 部署：git init → push → GitHub Pages | https://runningshrimp.github.io/llm-interview-map/ | ✅ 完成 |
 
 ## 二、知识点完成跟踪（阶段3 逐模块更新）
 
@@ -46,3 +46,7 @@
 - 2026-09-02 [阶段1] 检索子 Agent 派发完成：A+B → C+D → E+F → G（严格遵守 2 并发与 A→G 顺序）。
 - 2026-09-02 [阶段1] 7/7 检索完成。共建议新增 16 条：2 条替换弱势点（MoE→A7、GRPO→B7），其余按不重复规则折叠进关联页；合计建议新增 6 点候选中实际新增 2 点，总点数维持 56。
 - 2026-09-02 [阶段1.5] 最终大纲定稿：56 点（7 模块全部在区间内），星级校准 8 处，来源全部落档 syllabus.md 与 data/syllabus.js。
+- 2026-09-02 [阶段3] 生成子 Agent 两次尝试（整批 10 点 / 2 点批）均触发平台运行上限且长时间无产出 → 按异常处理协议降级为主 Agent 按 CONTENT-SPEC 亲撰全部内容；validate.js + judge.test.js + 浏览器模块级自测门禁全部保留执行。
+- 2026-09-02 [阶段3] 56/56 知识点 + 7 套模块测验完成；校验器全量 ALL PASS；判题单测含 56 道场景题参考答案自洽抽测全部通过；7 个模块逐个浏览器自测（页面渲染/测验判分）零报错。
+- 2026-09-02 [阶段4] 集成自测第 1 轮即全绿：66 条路由（首页/地图/进度/56 知识点/7 测验）全部可开、9 区块齐全、控制台 0 JS 错误；相对路径检查通过（唯一 http 字样为 favicon data URI 的 SVG 命名空间，非网络请求）；判题交互抽测（选择/场景/测验）全部正常；进度持久化验证通过。
+- 2026-09-02 [阶段5] git init → 推送 RunningShrimp/llm-interview-map（public）→ GitHub Pages（main 根目录）构建成功 → 线上冒烟验证通过（首页 7 卡片、地图 56 节点、知识点 9 区块、测验 6 题、0 JS 错误）。站点 URL：https://runningshrimp.github.io/llm-interview-map/
