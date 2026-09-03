@@ -1,0 +1,142 @@
+{
+  "id": "b2-alignment-basics",
+  "title": "模型怎么变听话：SFT 与对齐的故事版",
+  "definition": "让模型听话分两步：SFT 用几万份『指令-满分回答』教它按格式干活；对齐再让人类对多个回答投票，把『什么样的回答更好』的品味装进模型。前者教会规矩，后者教会分寸。",
+  "analogies": [
+    {
+      "icon": "📋",
+      "name": "习题册与选美评委",
+      "text": "SFT 像发给新员工一本『任务-满分答卷』对照的习题册：接单怎么回、投诉怎么安抚，照着模仿就会干活了。对齐像办一场回答选美：同一个问题让模型答四个版本，人类评委投票选最优——评了百万次后，模型学会了『评委喜欢什么样的回答』：有礼貌、不啰嗦、该拒答就拒答。"
+    },
+    {
+      "icon": "🧭",
+      "name": "规矩与分寸",
+      "text": "SFT 教的是规矩：收到订单该出什么格式、什么内容——像员工手册；对齐教的是分寸：同样正确的话，哪种说法让人舒服、哪些要求要婉拒——像老师傅带的职场情商。只有规矩没有分寸的模型，答得对但难用。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：人类投票如何塑造回答",
+    "description": "点击『下一步』，看一次偏好投票怎么转化为模型的行为改变。",
+    "html": "<div class=\"d-steps\" id=\"b2-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：同一问题生成 4 个回答</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag\">问：帮我写个道歉邮件</span><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-card\">A：冷冰冰两句</span><span class=\"d-card d-pulse\" style=\"border-color:#10b981\">B：得体+方案 ✅</span><span class=\"d-card\">C：过度道歉一屏</span><span class=\"d-card\">D：跑题写了检讨</span></div></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：人类投票排序</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag green\">B &gt; A &gt; C &gt; D</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">百万次这样的投票</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：模型学会『评委的口味』</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">再遇到道歉邮件</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">自动输出 B 风格：得体、有方案、不啰嗦</span></div><div class=\"d-note\">人类的品味没法写成规则，但可以用海量投票教给模型。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#b2-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#b2-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#b2-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#b2-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📋",
+      "name": "SFT：教规矩",
+      "text": "用『指令-满分回答』成对数据训练，模型学会听指令、按格式干活。"
+    },
+    {
+      "icon": "🗳️",
+      "name": "对齐：教分寸",
+      "text": "人类对多个回答投票排序，模型学会『哪种回答更受欢迎』——有用、诚实、无害。"
+    },
+    {
+      "icon": "🎚️",
+      "name": "为什么不用规则",
+      "text": "『好的回答』写不成规则清单，但能靠大量人类偏好样本教会模型。"
+    },
+    {
+      "icon": "🎯",
+      "name": "调 API 能感受到它",
+      "text": "模型的礼貌用语、拒答话术、结构化排版都是对齐的产物——不当行为多半也是它学歪了。"
+    },
+    {
+      "icon": "🔧",
+      "name": "企业还能再调",
+      "text": "拿自己业务的『好回答样本』继续 SFT/对齐，模型就会说你家的『行话』（L2 实操）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】SFT 和对齐（人类偏好训练）最大的区别是？",
+      "options": [
+        "SFT 用的是人类投票，对齐用的是标准答案",
+        "SFT 教『该怎么答』（标准范例），对齐教『哪种答法更好』（偏好排序）",
+        "没有区别",
+        "SFT 只用于小模型"
+      ],
+      "answer": 1,
+      "explain": "选 B。SFT 是照着满分答卷学格式与内容；对齐是靠人类在多个回答中投票，学会品味与分寸。"
+    },
+    {
+      "type": "choice",
+      "q": "模型的拒答话术（『这个问题我无法回答』）主要来自哪一段训练？",
+      "options": [
+        "预训练",
+        "对齐（人类偏好教它什么该拒、怎么拒得体）",
+        "分词",
+        "随机"
+      ],
+      "answer": 1,
+      "explain": "选 B。什么该拒、怎么拒得礼貌得体，是人类偏好投票塑造的行为——这就是『分寸』的体现。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】老板试用某 AI 产品后抱怨：『回答都对，但语气冷冰冰还啰嗦，像机器人。』请用本关的直觉解释这是哪一层的问题，并给出两种改进思路。",
+      "reference": "『回答都对但语气差』说明模型的知识与格式没问题（预训练和 SFT 到位），差的是第三层——对齐的分寸：它的『人类偏好训练』里没有教过你们业务场景下什么是得体的语气，或者通用对齐的口味与你的用户不匹配。改进思路一：调提示词——在系统指令里明确角色与语气规范（如『以亲切的一线客服口吻，先共情再给方案，不超过三句』），这是零成本的用法层修正；思路二：做业务对齐——收集一批本业务『语气好的回答范例』与『差范例』，做一轮小规模偏好训练或 SFT，让模型的口味向你的用户校准（L2 会学 LoRA 这种低成本做法）。先试一后试二，符合成本递增原则；此外，回答中还应明确提到「顺序」。",
+      "keyPoints": [
+        {
+          "point": "定位：知识与格式没问题，差在对齐层口味",
+          "kw": [
+            "对齐",
+            "口味",
+            "分寸",
+            "偏好"
+          ]
+        },
+        {
+          "point": "思路一：提示词设定语气规范",
+          "kw": [
+            "提示词",
+            "语气",
+            "角色",
+            "规范"
+          ]
+        },
+        {
+          "point": "思路二：业务偏好训练/SFT 校准",
+          "kw": [
+            "偏好",
+            "训练",
+            "sft",
+            "范例"
+          ]
+        },
+        {
+          "point": "先便宜后贵的顺序意识",
+          "kw": [
+            "先",
+            "成本",
+            "顺序"
+          ]
+        }
+      ],
+      "explain": "能把『体验问题』定位到训练三段中的哪一段，就掌握了本关的精髓。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：模型是怎么从『会说话』变成『说话好听』的？",
+    "hint": "提示：习题册（规矩）+ 选美评委（分寸）。",
+    "modelAnswer": "两步：先给它看几万份『问题加满分回答』的对照范例，像发习题册，让它学会接到任务该怎么答；然后办回答选美——同一个问题让它答好几版，人类投票选最好的，投了上百万次后，它就把人类的口味学进去了：知道该礼貌、该简洁、什么该拒绝。规矩靠范例，分寸靠投票。"
+  },
+  "links": [
+    {
+      "to": "b6-rlhf-three-stages",
+      "text": "L3 你将看到『人类投票』的完整工程流程：正是 L1 类比里选美评委的 RLHF 三阶段"
+    },
+    {
+      "to": "b4-lora-practice",
+      "text": "想给模型注入你家的『分寸』？L2 学低成本做法：LoRA 微调实操"
+    }
+  ],
+  "interview": [
+    {
+      "q": "SFT 和 RLHF 有什么区别？",
+      "stars": 4,
+      "source": "牛客·RLHF 八股总结（高频对比题）",
+      "tip": "L1 档一句话：SFT 学标准答案，RLHF 学人类偏好；L3 再展开机制。"
+    }
+  ],
+  "summary": "Q：SFT 教什么？（答：照满分范例学规矩——听指令、按格式）\nQ：对齐教什么？（答：人类投票中学分寸——有用、诚实、无害）\nQ：为什么不能用规则写死？（答：好回答写不成清单，但能靠海量偏好样本学会）"
+}

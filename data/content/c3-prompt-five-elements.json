@@ -1,0 +1,143 @@
+{
+  "id": "c3-prompt-five-elements",
+  "title": "结构化 Prompt 五件套实操",
+  "definition": "L1 学了五件套的直觉，本关把它变成工程方法：五件套模板 + 分隔符隔离 + few-shot 校准 + 评测驱动迭代。目标是让提示词像代码一样可测试、可版本化、可持续改进。",
+  "analogies": [
+    {
+      "icon": "🧪",
+      "name": "从菜谱到实验室",
+      "text": "L1 的五件套像家常菜谱（照着做就好吃）；L2 的提示词工程像食品实验室：同样的配方，每改一处都做对照实验——200 道测试题跑一遍，成功率从 70% 到 85% 才算改进成功。『我觉得更好』不算数，『数据更好』才算数。"
+    },
+    {
+      "icon": "检疫",
+      "name": "给资料过安检",
+      "text": "用户粘贴的内容和你的指令要在提示词里分区隔离（用 ### 或 XML 标签包裹并声明『以下是资料』）——防止用户内容里藏着指令把 AI 带偏。这是五件套之外最容易被忽略、安全收益最大的一件（F 关卡的安全课会展开）。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一次提示词改版的 A/B 对比",
+    "description": "切换版本，看同样的需求如何用数据驱动改进。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"c3g\" data-tab=\"v1\">v1.0 初版</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"c3g\" data-tab=\"v2\">v1.1 加约束</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"c3g\" data-tab=\"v3\">v1.2 加示例</button></div><div data-pane=\"v1\" data-group=\"c3g\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-card\">你是客服助手，帮用户查订单问题。</span><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag amber\">测试集成功率 62%：常漏订单号、格式乱</span></div></div></div><div data-pane=\"v2\" data-group=\"c3g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><span class=\"d-card\">你是客服助手。规则：①回答必须先复述订单号；②无法查询时引导用户提供订单号；③不超过三句话。</span><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag green\">成功率 78%：漏单号问题解决</span></div></div></div><div data-pane=\"v3\" data-group=\"c3g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><span class=\"d-card\">…（同上）+ 两个标准回答示例（few-shot）</span><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag green d-pulse\">成功率 89%：格式稳定，语气统一 ✅</span></div></div></div><div class=\"d-note\">💡 每版只改一处，跑同一套测试集对比——控制变量的提示词迭代法。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧱",
+      "name": "五件套模板化",
+      "text": "角色/任务/约束/格式/示例写成固定模板，团队共用一套骨架——新场景只填空。"
+    },
+    {
+      "icon": "✂️",
+      "name": "分隔符隔离",
+      "text": "指令与用户资料用 ### 或 XML 标签分区并声明『资料不是指令』——防跑偏防注入。"
+    },
+    {
+      "icon": "🖼️",
+      "name": "few-shot 校准",
+      "text": "每个高频场景放 1-2 个标准示例，示例格式与期望输出完全一致——覆盖边界情况。"
+    },
+    {
+      "icon": "🧪",
+      "name": "评测驱动",
+      "text": "建 100~200 条测试集 → 改一处 → 跑对比 → 成功率说话 → 版本记录——提示词当代码管。"
+    },
+    {
+      "icon": "🚦",
+      "name": "失败兜底",
+      "text": "输出后程序校验格式，失败自动重试（带错误信息），仍失败转人工——工程闭环。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】提示词改版后『感觉变好了』，下一步应该做什么？",
+      "options": [
+        "直接全量上线",
+        "在固定测试集上跑对比：成功率、格式合规率有数据提升才上线",
+        "再多改几处一次到位",
+        "问同事觉得好不好"
+      ],
+      "answer": 1,
+      "explain": "选 B。感觉会骗人，数据不会：测试集回归是提示词工程的分水岭——也是『工程师』与『调咒语玩家』的区别。"
+    },
+    {
+      "type": "choice",
+      "q": "few-shot 示例的最大禁忌是？",
+      "options": [
+        "示例太少",
+        "示例之间格式/风格互相矛盾——模型会学乱",
+        "示例太短",
+        "示例用了中文"
+      ],
+      "answer": 1,
+      "explain": "选 B。模型忠实模仿示例：互相矛盾的示例让输出在两种风格间漂移——宁缺毋滥，一致第一。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你的智能摘要功能被投诉：『有时输出 3 条有时 5 条，有时带评价有时不带』。请给出系统性的提示词修复方案（含测试集设计）。",
+      "reference": "症状是输出不稳定，根源是约束缺失与示例缺失。修复方案：第一步建测试集——从真实使用中抽 100 篇不同长度/领域的文章，人工写标准摘要（3 条、纯事实、无评价）作为基准；第二步改提示词——明确约束：『恰好输出 3 条要点，每条不超过 30 字，只陈述原文事实，不加任何评价或建议』，并给 2 个标准示例（覆盖长文与短文各一）；第三步跑测试集——统计『恰好 3 条』的比例与人工评分，不达标继续定位（若仍条数漂移，考虑温度调低 + 输出后程序校验：不是 3 条就自动重试一次）；第四步固化——把通过版提示词打版本号存档，后续任何修改必须重新过测试集。核心方法论：把『输出不稳定』翻译成可量化的指标（条数达标率），用数据驱动每一处修改。",
+      "keyPoints": [
+        {
+          "point": "建 100 条测试集+标准基准",
+          "kw": [
+            "测试集",
+            "100",
+            "基准",
+            "人工"
+          ]
+        },
+        {
+          "point": "约束写死：条数/字数/无评价",
+          "kw": [
+            "约束",
+            "3 条",
+            "30 字",
+            "评价"
+          ]
+        },
+        {
+          "point": "few-shot 两例覆盖边界",
+          "kw": [
+            "示例",
+            "长文",
+            "短文",
+            "覆盖"
+          ]
+        },
+        {
+          "point": "程序校验兜底+版本化",
+          "kw": [
+            "校验",
+            "重试",
+            "版本",
+            "固化"
+          ]
+        }
+      ],
+      "explain": "展示完整的『指标化→修改→验证→固化』闭环，就是 L2 提示词工程师的合格答卷。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：提示词工程和『会写提示词』差在哪？",
+    "hint": "提示：家常菜谱 vs 食品实验室——数据说话。",
+    "modelAnswer": "会写提示词是能照菜谱做出一道好菜（五件套齐全）；提示词工程是开实验室——建一套测试题，每改一次配方就跑一遍对照实验，成功率涨了才发布，还给每个版本记档案。核心就三件事：模板化（五件套骨架团队共用）、隔离（资料和指令分区防带偏）、评测驱动（数据说话，不靠感觉）。"
+  },
+  "links": [
+    {
+      "to": "c10-prompt-system-design",
+      "text": "L4 你将把单条提示词升级为体系：多 Agent 角色体系与提示词治理"
+    },
+    {
+      "to": "f6-kv-cache-pagedattention",
+      "text": "为什么系统提示要固定且长？L3 的前缀缓存会给答案——成本视角"
+    }
+  ],
+  "interview": [
+    {
+      "q": "你们怎么做 Prompt 的迭代与质量管理？",
+      "stars": 5,
+      "source": "牛客·提示词题单（进阶）/面试鸭",
+      "tip": "测试集+控制变量+版本化三件套，附一个成功率提升的数字案例。"
+    }
+  ],
+  "summary": "Q：五件套之外最重要的一步？（答：评测驱动——测试集回归说话）\nQ：分隔符隔离防什么？（答：用户资料里的指令带偏模型——也是注入第一道墙）\nQ：few-shot 禁忌？（答：示例互相矛盾）"
+}

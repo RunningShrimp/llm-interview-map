@@ -1,0 +1,143 @@
+{
+  "id": "a4-tokenization-basics",
+  "title": "分词与 token：计费与上下文的计量单位",
+  "definition": "模型不认识汉字或单词，只认识 token（词块）：文本先被切成 token 序列再进模型。token 数=API 计费单位与上下文窗口的计量单位——应用开发里一切成本与长度的核算基础。",
+  "analogies": [
+    {
+      "icon": "🧩",
+      "name": "乐高积木库",
+      "text": "每家模型公司都有一套自己的积木库（词表，约 10 万块）：常见词是整块（『的』『the』），生僻词多拼几块。同一段话，用不同家的积木切出来的块数不同——所以同样的问题在不同模型那里 token 数和费用都不一样。中文大约 1 个字 ≈ 0.6~1 个 token。"
+    },
+    {
+      "icon": "🚕",
+      "name": "出租车计价器",
+      "text": "API 按 token 双程计费：你发的话按 token 收一次，AI 回的再收一次（通常更贵）。上下文里塞的每一段历史都在计价器上跑——理解 token，才能理解账单为什么膨胀（C 关卡的上下文管理就是省这个钱）。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：同一段话的两种切法",
+    "description": "切换词表策略，看同一句话切出的 token 数差异（示意）。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"a4g\" data-tab=\"s1\">优化中文的词表</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a4g\" data-tab=\"s2\">偏英文的词表</button></div><div data-pane=\"s1\" data-group=\"a4g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot\">大模型</span><span class=\"d-token\">改变</span><span class=\"d-token hot\">软件开发</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag green\">3 个 token · 费用低</span></div></div><div data-pane=\"s2\" data-group=\"a4g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">大</span><span class=\"d-token\">模</span><span class=\"d-token\">型</span><span class=\"d-token\">改</span><span class=\"d-token\">变</span><span class=\"d-token\">软</span><span class=\"d-token\">件</span><span class=\"d-token\">开</span><span class=\"d-token\">发</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag red\">9 个 token · 同样的话费用 ×3</span></div></div><div class=\"d-note\">💡 这就是选模型时要看『中文 token 效率』的原因——同样内容，费用差数倍。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🔤",
+      "name": "token 是模型的眼",
+      "text": "文本先切词块再进模型；模型眼里只有 token 序列，没有『字』和『词』。"
+    },
+    {
+      "icon": "🧩",
+      "name": "各家词表不同",
+      "text": "切分粒度由各家的词表决定——同一段话 token 数不同，费用不同。"
+    },
+    {
+      "icon": "💰",
+      "name": "计费双程",
+      "text": "输入与输出分别按 token 计费，输出更贵——长回答是账单大头。"
+    },
+    {
+      "icon": "📏",
+      "name": "窗口按 token 算",
+      "text": "上下文窗口 128K 指的是 token 数——中文约 6~10 万字。"
+    },
+    {
+      "icon": "⚠️",
+      "name": "切分陷阱",
+      "text": "数字被切碎、数数不准、算术易错——根源都在切分方式。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】同一段中文，在模型 A 花 300 token、模型 B 花 900 token，主要原因与影响是？",
+      "options": [
+        "模型 B 更聪明所以更贵",
+        "两家词表切分粒度不同；同样内容 B 的费用约是 A 的 3 倍",
+        "A 偷工减料",
+        "没有区别"
+      ],
+      "answer": 1,
+      "explain": "选 B。词表与合并策略决定切分粒度：中文 token 效率差的模型，同样的字数费用成倍——选型时必须看中文效率。"
+    },
+    {
+      "type": "choice",
+      "q": "『上下文窗口 128K』指的是什么？",
+      "options": [
+        "128K 字节",
+        "128K 个 token（中文约 6-10 万字）",
+        "128K 条对话",
+        "128K 元费用"
+      ],
+      "answer": 1,
+      "explain": "选 B。窗口的计量单位是 token 而非字——中文因切分效率，实际能装的字数少于 128K。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你的 AI 客服月账单超预算 3 倍。从 token 角度排查，最该先看的三个地方是什么？",
+      "reference": "先抓三处 token 大户：第一，输入侧——每轮对话是否把全部历史原文反复塞入（历史无限累积是最常见的账单爆炸原因），应改为历史压缩或滑动窗口；第二，系统提示——固定的长系统提示每次全量计费，应确认是否用上前缀缓存（相同前缀只计一次优惠价）；第三，输出侧——是否没设输出上限导致 AI 长篇大论，应设 max_tokens 合理上限并要求回答简明。排查顺序：先看账单里输入与输出的 token 占比，输入占大头先治历史与提示，输出占大头先治上限与话术。一句话：token 就是钱，每一轮对话的每一块 token 都要问『这钱必须花吗』。",
+      "keyPoints": [
+        {
+          "point": "历史原文累积是首要嫌疑",
+          "kw": [
+            "历史",
+            "累积",
+            "塞",
+            "压缩",
+            "滑动窗口"
+          ]
+        },
+        {
+          "point": "系统提示与前缀缓存",
+          "kw": [
+            "系统提示",
+            "前缀缓存",
+            "缓存"
+          ]
+        },
+        {
+          "point": "输出上限 max_tokens",
+          "kw": [
+            "输出",
+            "上限",
+            "max_tokens",
+            "简明"
+          ]
+        },
+        {
+          "point": "先看输入/输出占比再对症",
+          "kw": [
+            "占比",
+            "输入",
+            "输出",
+            "输出占"
+          ]
+        }
+      ],
+      "explain": "把 token 意识落到『账单排查三步』，是应用工程师的基本功。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：token 是什么？为什么同一个问题在不同 AI 那里费用不一样？",
+    "hint": "提示：乐高积木库 + 计价器。",
+    "modelAnswer": "AI 不认识字，只认识自己的积木块——每段话先切成积木块（token）再给它看。每家公司的积木库不一样：常见词在 A 家是整块、在 B 家要拆三块，所以同样一句话 token 数不同。而 API 像出租车按 token 计价，你发的话和 AI 回的话都要收费——所以积木切得碎的模型，同样的内容费用更高。"
+  },
+  "links": [
+    {
+      "to": "c6-context-management-practice",
+      "text": "L2 下一站就用 token 意识管理上下文：历史压缩与滑动窗口实操"
+    },
+    {
+      "to": "a1-what-is-llm",
+      "text": "回到起点：AI 眼里的世界从来不是文字，而是你此刻学到的 token 序列"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是 token？对应用开发有什么影响？",
+      "stars": 3,
+      "source": "内置知识（应用岗基础必问）",
+      "tip": "切分单位+双程计费+窗口计量三点，落到成本意识。"
+    }
+  ],
+  "summary": "Q：token 是什么？（答：模型的词块单位——切分、计费、窗口全用它计量）\nQ：为什么各家 token 数不同？（答：词表与切分策略不同）\nQ：账单排查先看什么？（答：输入/输出 token 占比，对症治历史、提示、上限）"
+}

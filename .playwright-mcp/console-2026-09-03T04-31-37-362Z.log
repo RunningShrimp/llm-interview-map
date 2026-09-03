@@ -1,0 +1,107 @@
+[   38000ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8788/data/boss/l1.json:0
+[   38305ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8788/data/content/a3-transformer-intuition.json:0
+[   38306ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8788/data/content/a3-transformer-intuition.json:0
+[ 4084217ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4084321ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4084411ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4085800ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4085922ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4087071ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4087186ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4088347ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4088462ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225077ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225220ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225357ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225532ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225668ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225804ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4225941ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4226079ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4226216ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4226356ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4226493ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4226629ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4226767ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4242500ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4271830ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4271898ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7
+[ 4272403ms] ReferenceError: s is not defined
+    at $$ (http://127.0.0.1:8788/js/app.js:15:94)
+    at restoreExercises (http://127.0.0.1:8788/js/app.js:498:5)
+    at http://127.0.0.1:8788/js/app.js:448:7

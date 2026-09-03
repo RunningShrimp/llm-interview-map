@@ -1,0 +1,85 @@
+{
+  "id": "c11-hallucination-defense",
+  "title": "幻觉治理的分层防御体系",
+  "definition": "L3 讲了幻觉的机理，L4 视角是治理体系：把缓解手段组织成事前（RAG 供料）、事中（约束与采样）、事后（校验与溯源）、运营（红队与监控）四层纵深——像安全工程一样对待幻觉。",
+  "analogies": [
+    {
+      "icon": "🏰",
+      "name": "城堡纵深防御",
+      "text": "单点防幻觉（比如只加一句『不许编』）像只有一堵城墙——敌兵总能翻过去。治理体系是城堡：护城河是 RAG（先给真资料）、城墙是提示约束（只准照资料答）、城内巡逻是输出校验（溯源核查）、王国制度是运营（红队持续攻击+badcase 回流）。每层都会失守，纵深让失守不致命。"
+    },
+    {
+      "icon": "🏭",
+      "name": "质量是体系不是检查",
+      "text": "成熟工厂的质量观：不是靠最后一道质检挑次品，而是全流程防错——来料检验（RAG 资料质量）、过程控制（生成约束）、出厂检测（一致性校验）、市场反馈（badcase 回流）。幻觉治理同理：把『拦截幻觉』升级为『减少幻觉产生』。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一个论断的四级安检之旅",
+    "description": "点击『下一步』，跟踪一句回答从生成到发布的防线。",
+    "html": "<div class=\"d-steps\" id=\"c11-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">事前：供料与地基</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">权威知识库 RAG</span><span class=\"d-tag green\">低置信资料→拒答路径</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">事中：约束生成</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">仅依据资料+标注引用</span><span class=\"d-tag\">低温采样</span><span class=\"d-tag\">每论断挂来源</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">事后：校验拦截</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">论断回查资料 ✓</span><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">无源论断 → 拦截</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">重写或兜底话术</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">运营：持续对抗</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">幻觉率周报（忠实度抽样）</span><span class=\"d-tag amber\">badcase 回流知识库</span><span class=\"d-tag green d-pulse\">防线版本化迭代</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#c11-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#c11-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#c11-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#c11-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "📚", "name": "事前：供料质量", "text": "RAG 知识库的权威性/新鲜度/覆盖率是地基；检索置信低直接走拒答，不硬答。" },
+    { "icon": "📝", "name": "事中：生成约束", "text": "仅依据资料+逐论断标注引用+低温采样+结构化输出降低发挥空间。" },
+    { "icon": "🔍", "name": "事后：校验拦截", "text": "论断回查资料的一致性校验、SelfCheckGPT 式多次采样比对、无源论断拦截重写。" },
+    { "icon": "📊", "name": "运营：度量迭代", "text": "幻觉率作为 SLO（忠实度周报）、badcase 回流、红队诱导语料持续回归。" },
+    { "icon": "🧭", "name": "医疗级实践", "text": "剂量等关键信息走规则引擎二次核验；宁拒答不编造；全程留痕可审计。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【架构题】为什么说『加一句不许编造的提示词』不是幻觉治理？",
+      "options": [
+        "提示词没有用",
+        "它只是事中的一层软约束——体系化治理需要供料/约束/校验/运营四层纵深",
+        "提示词会适得其反",
+        "只对英文有效"
+      ],
+      "answer": 1,
+      "explain": "选 B。单层提示词可被绕过且无度量无迭代——资深答案的关键是把治理升级为带度量的四层体系。"
+    },
+    {
+      "type": "choice",
+      "q": "『幻觉率是 SLO』意味着什么？",
+      "options": [
+        "幻觉无法度量",
+        "把忠实度作为有目标值、有监控、有迭代责任的服务质量指标来运营",
+        "幻觉率恒定不变",
+        "只统计不处理"
+      ],
+      "answer": 1,
+      "explain": "选 B。把幻觉率变成 SLO（如忠实度 ≥95%、周度回归），治理才从口号变成工程。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】医疗问答产品的幻觉近零容忍。请在『生成前/中/后/运营』四层给出完整方案，并说明如何度量。",
+      "reference": "生成前：构建权威医学知识库（指南/说明书/文献）做 RAG，来源准入审核与定期更新；检索置信不足直接走『建议就医』拒答路径，不留硬答空间。生成中：提示词强约束『仅依据提供的医学资料作答，不得推断，资料不足以回答时必须明确建议咨询医生』；每个论断标注引用来源；低温采样；不涉及诊断用药决策的范围限定。生成后：抽取回答中的药品名/剂量/结论逐条回查知识库做一致性校验；剂量类信息用规则引擎二次核验（数值范围/单位/相互作用表）；多次采样比对一致性（SelfCheckGPT 思路）；校验不过即拦截改安全话术。运营层：医生抽检审核队列、badcase 回流知识库与测试集、幻觉率周报（忠实度抽样 ≥98% 为 SLO）、全程留痕可审计、红队诱导语料（『劝诱开药』类）持续回归。度量贯穿四层：入口命中率、引用覆盖率、校验拦截率、最终忠实度——每层都有数字，体系才可运营。",
+      "keyPoints": [
+        { "point": "事前：权威库+低置信拒答", "kw": ["知识库", "置信", "拒答", "就医"] },
+        { "point": "事中：约束+引用+低温+范围限定", "kw": ["依据", "引用", "低温", "限定"] },
+        { "point": "事后：回查+规则引擎+一致性比对", "kw": ["回查", "规则引擎", "剂量", "一致性"] },
+        { "point": "运营：抽检/回流/SLO/红队", "kw": ["抽检", "回流", "slo", "忠实度", "红队"] }
+      ],
+      "explain": "四层齐备+每层有度量指标，是幻觉治理架构题的满分结构。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么说幻觉治理像城堡防御而不是一堵墙？",
+    "hint": "提示：护城河、城墙、巡逻、制度四层。",
+    "modelAnswer": "单靠一句『不许编』是只有一堵墙的防御，骗术高一点的输入就能翻过去。城堡式治理有四层：护城河是先给它喂真资料（RAG），城墙是生成时只准照资料答并标出处，城内巡逻是答案生成后逐句回查资料、无源论断直接拦截，王国制度是持续运营——幻觉率当成服务质量指标周报、坏案例回流改进、红队天天来攻。每层都会失守，但纵深让失守不致命。"
+  },
+  "links": [
+    { "to": "c8-hallucination-mechanism", "text": "体系的每一层都针对 L3 拆解过的机理——似真≠为真的工程对抗" },
+    { "to": "d3-rag-mvp", "text": "事前层的核心供给来自 RAG——回到最小链路复习" }
+  ],
+  "interview": [
+    {
+      "q": "资深岗追问：你们产品的幻觉治理体系是怎么设计的？",
+      "stars": 4,
+      "source": "博客园·高级岗 10 题追问链/53AI（v2 检索证实）",
+      "tip": "四层纵深+每层度量+医疗案例，体现体系化与可运营。"
+    }
+  ],
+  "summary": "Q：四层防御？（答：事前供料、事中约束、事后校验、运营迭代）\nQ：幻觉率是 SLO？（答：有目标值、有监控、有迭代责任的指标）\nQ：医疗级的特殊动作？（答：规则引擎二次核验+宁拒答不编造+全审计）"
+}

@@ -1,0 +1,85 @@
+{
+  "id": "d3-rag-mvp",
+  "title": "RAG 最小可用版：搭一条完整链路",
+  "definition": "L1 懂了直觉，本关动手搭最小可用 RAG：离线『解析→切分→向量化→入库』，在线『检索→拼装提示词→引用生成』。两周可上线的 MVP 架构——企业 RAG 的标准起手式。",
+  "analogies": [
+    {
+      "icon": "🍳",
+      "name": "备菜与出餐",
+      "text": "RAG 像餐厅：离线阶段是备菜——食材（文档）洗切配好装盒（切块→向量化→入库）；在线阶段是出餐——接单（用户问题）找到对应半成品（向量检索），按菜谱组装（拼提示词），大厨 final 出餐（LLM 生成）。备菜做得好，出餐才快而稳。"
+    },
+    {
+      "icon": "🧩",
+      "name": "三块积木",
+      "text": "最小可用 RAG 只需要三块积木：资料柜（向量库+你的文档）、检索器（把问题变坐标找近邻）、回答器（LLM 拿着检索结果作答）。开源框架把三块都造好了——你的工作是把它组装对、喂好料。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：在线链路四步走",
+    "description": "点击『下一步』，跟一个问题走完检索→生成全程。",
+    "html": "<div class=\"d-steps\" id=\"d3-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：用户提问</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber\">「公司年假有几天？」</span></div><div class=\"d-note\">离线已完成：手册→切块→向量化→入库。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：向量化检索</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">问题变坐标</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">召回 Top-3 相关块</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：拼装提示词</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-card\">系统：仅依据以下资料回答，不足则说不知道…</span><span class=\"d-card\">资料1：年假 10~20 天（p12）…</span><span class=\"d-card\">问题：公司年假有几天？</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 步：生成+引用</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag green d-pulse\">「年假 10~20 天，按司龄递增 [来源：手册 p12]」</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#d3-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#d3-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#d3-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#d3-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    { "icon": "📦", "name": "离线三步", "text": "解析（PDF/Word→文本）→ 切块（300~500 字+重叠）→ 向量化入库（带元数据）。" },
+    { "icon": "🔍", "name": "在线三步", "text": "问题向量化检索 Top-K → 拼装提示词（资料+约束+问题）→ 生成并引用。" },
+    { "icon": "🔒", "name": "提示词铁律", "text": "『仅依据资料回答 + 标注来源 + 资料不足明确说不知道』——防幻觉三件套。" },
+    { "icon": "🗂️", "name": "元数据别省", "text": "每块带文档名/章节/页码——引用、过滤、更新全靠它。" },
+    { "icon": "🔄", "name": "更新流水线", "text": "文档变更触发重建索引——知识新鲜度的保障。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】RAG 离线阶段的正确顺序是？",
+      "options": [
+        "向量化→切分→入库",
+        "文档解析→切块→向量化→存入向量库（带元数据）",
+        "检索→重排→入库",
+        "入库→解析→切块"
+      ],
+      "answer": 1,
+      "explain": "选 B。先把文档解析成文本，切块（带重叠与元数据），再向量化入库。检索/重排是在线阶段动作。"
+    },
+    {
+      "type": "choice",
+      "q": "提示词里『资料不足时明确说不知道』这条约束防的是什么？",
+      "options": [
+        "回答太短",
+        "检索没命中时模型硬编——把『猜』变成『承认』",
+        "token 浪费",
+        "用户不满意"
+      ],
+      "answer": 1,
+      "explain": "选 B。检索落空时若无此约束，模型会凭训练记忆硬答——正是幻觉的发生路径。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】用最小可用架构给公司搭『内部制度问答』：请列出离线与在线两个阶段的实施清单（各 3~4 项），并说明如何保证新制度当天生效。",
+      "reference": "离线清单：①文档解析——把员工手册从 PDF/Word 转成纯文本（表格单独处理）；②切块——按章节语义切 300~500 字块，块间 15% 重叠，每块附文档名/章节/页码元数据；③向量化入库——Embedding 后存入向量库；④更新流水线——文档系统变更时自动触发重新切块与入库。在线清单：①检索——用户问题向量化，召回 Top-5；②拼装提示词——系统约束（仅依据资料/标注来源/不知道就说）+ 资料块 + 问题；③生成——低温调用，答案带引用；④兜底——无命中或低置信时转人工话术。当天生效的关键在离线第④项：新制度文档上传后 webhook 自动触发『解析→切块→向量化→替换旧版本』的流水线，全程监控——知识更新从人工运维变成自动管道。",
+      "keyPoints": [
+        { "point": "离线四项：解析/切块/入库/更新流水线", "kw": ["解析", "切块", "入库", "流水线", "重叠"] },
+        { "point": "在线四项：检索/拼装/生成/兜底", "kw": ["检索", "提示词", "引用", "转人工"] },
+        { "point": "防幻觉约束三件套", "kw": ["依据资料", "来源", "不知道"] },
+        { "point": "当天生效靠 webhook 自动流水线", "kw": ["webhook", "自动", "当天", "替换"] }
+      ],
+      "explain": "两份清单+生效机制齐备，就是可写进方案的 MVP 设计。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：搭一个最小的 RAG 要哪几步？哪一步最容易被忽视？",
+    "hint": "提示：备菜三步 + 出餐三步；元数据。",
+    "modelAnswer": "离线备菜三步：把文档解析成文本、切成三四百字的小块、变成向量存进资料库；在线出餐三步：拿问题去库里找最近的知识块、把资料和问题一起塞给 AI 并叮嘱只准照资料答、让它带着出处回答。最容易被忽视的是给每块贴标签（来自哪个文档第几页）——没有它，引用、过滤、更新全都做不了；还有文档更新的自动流水线，忘了它答案就会过期。"
+  },
+  "links": [
+    { "to": "d4-chunking-practice", "text": "下一站深挖备菜第一刀：切分策略实操——检索质量的天花板" },
+    { "to": "d1-rag-intuition", "text": "忘记直觉了？回到 L1 的开卷考试类比" }
+  ],
+  "interview": [
+    {
+      "q": "描述一个你能落地的最小 RAG 架构？",
+      "stars": 5,
+      "source": "卡码笔记/小林面试笔记（落地题）",
+      "tip": "离线/在线两张清单+更新流水线，展示可实施性而非概念。"
+    }
+  ],
+  "summary": "Q：离线三步？（答：解析→切块→向量化入库）\nQ：在线三步？（答：检索→拼装→引用生成）\nQ：防幻觉约束？（答：仅依据资料+标注来源+不知道就说）"
+}

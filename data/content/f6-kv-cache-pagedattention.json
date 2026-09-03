@@ -1,0 +1,160 @@
+{
+  "id": "f6-kv-cache-pagedattention",
+  "title": "KV Cache 与 PagedAttention",
+  "definition": "KV Cache 把历史 token 的 Key/Value 缓存下来，让每步生成不必重算注意力——以显存换速度。PagedAttention（vLLM）借鉴操作系统分页，把缓存切成小块按需分配，消灭碎片、吞吐提升数倍。推理优化必考第一名。",
+  "analogies": [
+    {
+      "icon": "📓",
+      "name": "抄板书 vs 看笔记",
+      "text": "没有 KV Cache 的自回归像每写一个字都要把之前所有板书重新抄一遍再继续——大部分力气花在重复抄写（重算历史 token 的 K/V）。KV Cache 就是把板书誊在笔记本上：写到第 N 个字时直接翻笔记（读缓存），只需算新字的 K/V——空间（显存）换时间（速度）的经典交易。"
+    },
+    {
+      "icon": "🏨",
+      "name": "从整层包场到钟点房",
+      "text": "传统 KV Cache 管理像酒店按『整层楼』分配：请求来了预租一整层（按最大长度预留连续显存），实际只住一半房间（实际生成长度往往远小于上限），空房还不能给别人住——内部碎片严重。PagedAttention 学操作系统虚拟内存：把楼层拆成标准间（固定大小的 block），客人住几间租几间，退房房间立即转给新客——显存利用率从 ~30% 提到 90%+，同一块 GPU 能同时服务几倍的请求，吞吐暴涨。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：整层预租 vs 分页分配",
+    "description": "切换两种显存管理方式，观察利用率与可服务并发数。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"f2g\" data-tab=\"m1\">传统：按最大长度预留</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"f2g\" data-tab=\"m2\">PagedAttention：按块分页</button></div><div data-pane=\"m1\" data-group=\"f2g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">请求1：租 2048 格，用了 300（🔴 1748 格闲置）</span></div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap;margin-top:6px\"><span class=\"d-token\">请求2：想租 2048 格 → 没了，排队 ❌</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag red d-pulse\">显存利用率 ≈ 20~40%，大量碎片</span></div></div><div data-pane=\"m2\" data-group=\"f2g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">请求1：按需租 3 块（每块 16 token）</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">请求2：租 4 块，逻辑连续物理可散</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-tag green\">利用率 90%+ · 零浪费 · 同卡并发翻数倍 → 吞吐 ×2~4</span></div></div><div class=\"d-note\">💡 附赠能力：相同前缀的请求可共享物理块（Prefix Caching）——系统提示只存一份，多人共用（见 F9 语义缓存协同）。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📓",
+      "name": "KV Cache 是什么",
+      "text": "自回归生成时，历史 token 的 Key/Value 矩阵被缓存，注意力只需计算新 token 对历史的查询——避免每步重算全部历史，速度提升数量级。"
+    },
+    {
+      "icon": "📐",
+      "name": "显存账本",
+      "text": "KV 大小 = 2×层数×KV头数×head_dim×序列长×精度字节×batch；长上下文/大 batch 下轻松超过权重本身——显存的第一大头。"
+    },
+    {
+      "icon": "🧩",
+      "name": "传统管理之痛",
+      "text": "按最大长度预留连续显存：内部碎片（预留没用满）+ 外部碎片（不连续难分配）+ 无法共享，实际利用率常低于 40%。"
+    },
+    {
+      "icon": "🏨",
+      "name": "PagedAttention 四连",
+      "text": "① 固定大小 block 分页；② 逻辑连续物理离散（映射表）；③ 按需分配零预留；④ Copy-on-Write 支持并行采样共享——vLLM 的吞吐魔法。"
+    },
+    {
+      "icon": "🗜️",
+      "name": "KV 压缩族",
+      "text": "MQA（所有头共享一份 KV）、GQA（分组共享，LLaMA-2/3）、MLA（低秩潜压缩，DeepSeek）+ KV 量化——从结构上给 KV 减肥（呼应 A10）。"
+    },
+    {
+      "icon": "📉",
+      "name": "常考追问",
+      "text": "『KV Cache 为什么能加速』（免重算历史 K/V）、『为什么多头是 2 份缓存』（K 与 V 各一份，Q 不缓存）——原理细节是高频陷阱。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】（阿里云一面原题）KV Cache 为什么能加速大模型推理？",
+      "options": [
+        "它压缩了模型权重的存储",
+        "缓存历史 token 的 K/V，避免每生成一个 token 就重算全部历史的注意力中间结果",
+        "它提高了 GPU 的显存容量",
+        "它让模型一次生成多个答案"
+      ],
+      "answer": 1,
+      "explain": "选 B。自回归每步都要对全部历史做注意力，KV Cache 把历史的 K/V 存下来复用，每步只算新 token 的 Q/K/V——用显存换掉重复计算。注意缓存的只有 K 和 V，Q 不缓存。"
+    },
+    {
+      "type": "choice",
+      "q": "PagedAttention 相比传统 KV Cache 管理的核心改进是？",
+      "options": [
+        "把 KV Cache 压缩到 INT4",
+        "借鉴 OS 分页：固定大小 block 按需分配、逻辑连续物理离散，消灭碎片提升利用率",
+        "用更快的 GPU 显存",
+        "把 KV Cache 存到硬盘"
+      ],
+      "answer": 1,
+      "explain": "选 B。PagedAttention 用分页思想解决预留式管理的内外碎片问题，显存利用率从 ~30-40% 提到 90%+，同卡并发与吞吐翻数倍（vLLM 论文核心）。A 是量化的事（F3）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『7B 模型、32 层、32 头（每头 128 维）、fp16、4K 上下文、batch=16，估算 KV Cache 显存，并说明如何缓解长上下文下的 KV 压力。』请作答。",
+      "reference": "先算账：KV Cache = 2（K 和 V 两份）× 32 层 × 32 头 × 128 维 × 2 字节（fp16）× 4096 序列长 × 16 并发。单条序列 = 2×32×32×128×2×4096 ≈ 2.15GB，16 条并发 ≈ 34.4GB——而 7B 模型权重 fp16 才约 14GB（batch=16 时），KV 是权重的 2 倍多，明显超过权重，这就是长上下文下『KV 吃掉显存』的直接证据。缓解手段分三档：结构层——换用 GQA/MQA 结构的模型（如 8 组共享 KV，直接降到 1/4）或 MLA 低秩压缩；存储层——KV 量化（fp8/int8 可再省一半）、PagedAttention 消碎片把更多并发塞进同卡；业务层——限制最大上下文、滑动窗口（滑窗）截断历史、前缀缓存让系统提示只存一份共享。三档组合通常能把 KV 压力降一个数量级，代价（精度/复杂度）按业务容忍度取舍。",
+      "keyPoints": [
+        {
+          "point": "公式与代入：2×层数×头数×head_dim×字节×序列×batch",
+          "kw": [
+            "2",
+            "层",
+            "头",
+            "fp16",
+            "4096",
+            "batch"
+          ]
+        },
+        {
+          "point": "对比权重：KV 反超权重的结论",
+          "kw": [
+            "权重",
+            "14",
+            "超过",
+            "2 倍"
+          ]
+        },
+        {
+          "point": "结构层：GQA/MQA/MLA 共享压缩",
+          "kw": [
+            "gqa",
+            "mqa",
+            "mla",
+            "共享"
+          ]
+        },
+        {
+          "point": "存储与业务层：KV 量化/PagedAttention/滑窗/前缀缓存",
+          "kw": [
+            "量化",
+            "pagedattention",
+            "滑窗",
+            "前缀"
+          ]
+        }
+      ],
+      "explain": "加分项：算对数字（单条约 2GB）、指出 Q 不缓存、GQA 直接降为 1/4 组数；失分点：只说『很大』给不出公式。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：KV Cache 是什么？PagedAttention 又是怎么让一张卡多服务好几倍用户的？",
+    "hint": "提示：抄板书 vs 看笔记、整层包场 vs 钟点房两个类比连着讲。",
+    "modelAnswer": "AI 逐字写作文时，每写一个新字都要回头参考全文——KV Cache 就是把之前内容整理好的笔记，写新字时翻笔记就行，不用每次重抄全书，速度天差地别。但笔记很占桌面（显存），老式管理是每个人提前包一整层楼，大部分房间空着；PagedAttention 学酒店钟点房：把楼层拆成标准间按需分配，退一间立刻给下一位，桌面利用率从三四成提到九成——同一张卡就能同时服务几倍的请求，吞吐自然翻倍。"
+  },
+  "links": [
+    {
+      "to": "f1-slow-inference-basics",
+      "text": "KV Cache 化解的正是 decode 阶段的带宽瓶颈——先有 F1 的两阶段框架才有这里的优化"
+    },
+    {
+      "to": "a14-attention-optimization",
+      "text": "GQA/MQA/MLA 的结构压缩在 A10 埋过伏笔，这里是它们的推理落地"
+    },
+    {
+      "to": "f8-memory-planning",
+      "text": "KV 显存账本是 F5 容量规划的核心科目——本页学会算，那里学会规划"
+    }
+  ],
+  "interview": [
+    {
+      "q": "KV Cache 是什么？为什么能加速推理？",
+      "stars": 5,
+      "source": "牛客网·阿里云 Agent 算法一面原题 / 知乎·KV Cache 的原理",
+      "tip": "缓存历史 K/V 免重算 + 『Q 不缓存』的细节 + 显存换速度的代价，三点齐活。"
+    },
+    {
+      "q": "PagedAttention 解决了什么问题？原理是什么？",
+      "stars": 5,
+      "source": "牛客网·大厂推理类面试题总结（延伸追问）",
+      "tip": "碎片问题（预留浪费）→ 分页 block + 逻辑物理映射 + 按需分配，利用率 30%→90%。"
+    }
+  ],
+  "summary": "Q：KV Cache 缓存的是什么？（答：历史 token 的 K 与 V 两份矩阵；Q 不需要缓存）\nQ：PagedAttention 的三个关键词？（答：固定 block 分页、逻辑连续物理离散、按需分配——消灭碎片）\nQ：KV 显存公式？（答：2×层数×KV头数×head_dim×序列长×字节×batch——长上下文下反超权重）"
+}

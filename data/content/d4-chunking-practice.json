@@ -1,0 +1,143 @@
+{
+  "id": "d4-chunking-practice",
+  "title": "切分与元数据实操：块大小/重叠/标签",
+  "definition": "切块（Chunking）是把长文档切成检索友好的知识块：太大噪声多、太小语义碎。实操三要素：大小（300~500 字）、重叠（10~20%）、元数据（来源/章节/页码）——切分质量决定检索上限。",
+  "analogies": [
+    {
+      "icon": "🍞",
+      "name": "切面包",
+      "text": "整条面包没法入口：切太厚一口咬不完还混着别的东西（块过大：噪声多语义稀释）；切太薄碎屑满地看不出说的是啥（块过小：上下文破碎）。好切法是按面包纹路下刀（章节段落边界），每片适中，相邻两片留一点相连（重叠），再给每片贴上来自哪本书第几页的标签（元数据）。"
+    },
+    {
+      "icon": "📦",
+      "name": "快递分箱贴单",
+      "text": "打包仓库货物要按品类分箱并贴运单（元数据）。混装硬塞（固定长度硬切）到货没法按需取；分箱贴单（结构化切分）才能要哪个取哪个——检索系统找的是箱子，不是仓库。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：三种切法的效果对比",
+    "description": "切换切分策略，看同一段政策文档的块边界。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"d4g\" data-tab=\"s1\">固定 500 字硬切</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"d4g\" data-tab=\"s2\">按章节递归切</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"d4g\" data-tab=\"s3\">递归+重叠</button></div><div data-pane=\"s1\" data-group=\"d4g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">…年假规定（前半</span><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">拦腰切断❌</span><span class=\"d-token\">后半）…病假混入…</span></div></div><div data-pane=\"s2\" data-group=\"d4g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot\">[第三章 年假] 完整 ✅</span><span class=\"d-token hot\" style=\"animation-delay:.2s\">[第四章 病假] 完整 ✅</span></div></div><div data-pane=\"s3\" data-group=\"d4g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">[年假规定块]</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">[+15% 重叠 → 关键句两边都有]</span></div></div><div class=\"d-note\">💡 参数起点：300~500 字/块、10~20% 重叠、必带来源元数据。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📐",
+      "name": "大小权衡",
+      "text": "大块噪声多语义稀释、小块碎片化——300~500 字起步，按问答效果调。"
+    },
+    {
+      "icon": "🔗",
+      "name": "重叠保完整",
+      "text": "相邻块 10~20% 重叠，避免关键句落在切缝上被腰斩。"
+    },
+    {
+      "icon": "🌳",
+      "name": "递归切分",
+      "text": "标题→段落→句子逐级降级切，保自然边界——工程默认首选。"
+    },
+    {
+      "icon": "🧾",
+      "name": "元数据是分水岭",
+      "text": "来源/章节/页码/密级——支撑引用、权限过滤、增量更新，生产级必备。"
+    },
+    {
+      "icon": "🧩",
+      "name": "父子块进阶",
+      "text": "小块检索命中、回捞所属大块喂生成——精度与上下文兼得。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】chunk 过大最主要的问题是？",
+      "options": [
+        "索引体积上升",
+        "单块噪声多、语义被稀释，检索命中率与答案定位变差",
+        "向量维度变大",
+        "用户看不到引用"
+      ],
+      "answer": 1,
+      "explain": "选 B。大块把多个主题混进一个向量，相似度变模糊（稀释），塞进提示词还带入噪声。"
+    },
+    {
+      "type": "choice",
+      "q": "相邻块设 15% 重叠的目的是？",
+      "options": [
+        "增加存储以提升性能",
+        "避免关键句落在切缝被截断，保证块语义完整",
+        "提高向量维度",
+        "加快检索"
+      ],
+      "answer": 1,
+      "explain": "选 B。重叠让边界两侧信息同时出现在两个块里——用少量冗余换召回完整性。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你们的 RAG 对『某条款的适用条件』类问题常答错，怀疑切分有问题。请给出排查与优化方案。",
+      "reference": "先诊断再动手：抽 20 个答错的问题人工检查召回块，区分两种失败模式——若正确条款被拦腰切断（一半在上一块一半在下一块），是切缝问题；若正确条款压根没被召回，先看它是否被切碎或混入噪声。优化按层递进：一，把固定长度硬切改为按文档标题层级的递归切分，条款类文档保持一条条款一块，块间 15% 重叠，块上挂章节路径元数据；二，上父子块——用 200 字小块做检索命中，命中后回捞所属 1000 字大块进入提示词，兼顾精度与上下文完整；三，表格与流程图单独处理（整表保留或转键值文本）；四，把 20 个 badcase 连同标准答案做成回归测试集，每次调参后统计 Recall@10 对比——用数据确认改进而不是凭感觉。",
+      "keyPoints": [
+        {
+          "point": "先诊断失败模式（切缝截断 vs 未召回）",
+          "kw": [
+            "诊断",
+            "召回",
+            "切断",
+            "失败模式"
+          ]
+        },
+        {
+          "point": "递归切分+重叠+元数据",
+          "kw": [
+            "递归",
+            "标题",
+            "重叠",
+            "元数据"
+          ]
+        },
+        {
+          "point": "父子块机制",
+          "kw": [
+            "父子",
+            "小块",
+            "大块",
+            "回捞"
+          ]
+        },
+        {
+          "point": "回归测试集+Recall@10",
+          "kw": [
+            "badcase",
+            "回归",
+            "recall",
+            "对比"
+          ]
+        }
+      ],
+      "explain": "先诊断后优化+数据回归，是切分调优的标准作业流程。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：给 AI 的资料为什么不能整本喂也不能剪太碎？怎么切才科学？",
+    "hint": "提示：切面包——厚薄、纹路、相连、贴标签。",
+    "modelAnswer": "整本喂，AI 找不到重点还被无关内容带偏；剪太碎每片只有半句话。科学的切法像切面包：顺着纹路下刀（按章节段落边界），每片厚薄适中（三五百字），相邻两片留一点相连（重叠），再贴上来自哪本书第几页的标签——AI 翻资料时每次拿到的都是语义完整、来源清楚的小抄。"
+  },
+  "links": [
+    {
+      "to": "d3-rag-mvp",
+      "text": "切分是 RAG 备菜的第一刀——回到 MVP 链路看它的位置"
+    },
+    {
+      "to": "d11-enterprise-rag-data",
+      "text": "L4 的企业级数据管线会把本关的三要素升级成生产级治理"
+    }
+  ],
+  "interview": [
+    {
+      "q": "chunk 切分策略有哪些？大小和重叠怎么定？",
+      "stars": 4,
+      "source": "知乎·RAG通关指南/字节面试真题",
+      "tip": "固定/递归/语义三档+参数起点+权衡逻辑。"
+    }
+  ],
+  "summary": "Q：三要素？（答：300~500 字、10~20% 重叠、来源元数据）\nQ：块太大的代价？（答：噪声与语义稀释，命中率下降）\nQ：进阶招？（答：父子块——小块检索、大块喂生成）"
+}

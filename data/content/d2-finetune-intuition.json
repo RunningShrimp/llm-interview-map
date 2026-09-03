@@ -1,0 +1,145 @@
+{
+  "id": "d2-finetune-intuition",
+  "title": "微调是什么：送 AI 去培训班",
+  "definition": "微调（Fine-tuning）= 拿自己准备的数据继续训练模型，把特定能力或风格『练进』模型本身。像送员工脱产培训：贵、慢，但学会了就长在身上，不用每次提醒。",
+  "analogies": [
+    {
+      "icon": "🎓",
+      "name": "脱产培训 vs 随手给资料",
+      "text": "让员工胜任新岗位有两条路：给他一个资料柜随用随查（RAG），或者送他去培训一个月把技能练进脑子（微调）。资料柜路线：上手快、资料常换也行，但每次干活都要现翻；培训路线：培训贵、周期长，练成的技能随时信手拈来，连『说话的口吻』都变成自己风格。两条路对应两种注入知识/能力的方式，选哪个看你要什么。"
+    },
+    {
+      "icon": "🧬",
+      "name": "改本能 vs 给参考",
+      "text": "RAG 改变的是『这次回答时桌上有什么资料』；微调改变的是『模型的本能』——它的说话风格、输出格式、领域反应都会被训练改写。想让它永远用固定 JSON 格式回话？微调一次，此后不用在提示词里反复叮嘱。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：两种注入方式的效果对比",
+    "description": "切换『给资料』与『练本能』，看同一个需求的不同实现路径。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"d2g\" data-tab=\"m1\">方式 A：给资料（RAG）</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"d2g\" data-tab=\"m2\">方式 B：练本能（微调）</button></div><div data-pane=\"m1\" data-group=\"d2g\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag amber\">需求：AI 知道公司产品的退货条款</span><div class=\"d-row\" style=\"justify-content:center;margin-top:8px;flex-wrap:wrap\"><span class=\"d-tag green\">把条款放进资料柜，随查随用</span><span class=\"d-tag\">条款改了→换文件即可</span><span class=\"d-tag\">成本：低</span></div></div></div><div data-pane=\"m2\" data-group=\"d2g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag amber\">需求：AI 永远用固定客服口吻+固定 JSON 格式回答</span><div class=\"d-row\" style=\"justify-content:center;margin-top:8px;flex-wrap:wrap\"><span class=\"d-tag green\">拿几千条范例训练，风格练进本能</span><span class=\"d-tag\">改风格→要重新训练</span><span class=\"d-tag\">成本：中（LoRA 后可控）</span></div></div></div><div class=\"d-note\">💡 口诀：知识常变用 A，行为固定用 B；很多产品两个一起用。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🎓",
+      "name": "练进本能",
+      "text": "用自己数据继续训练，能力/风格长在模型上，推理时无需额外提醒。"
+    },
+    {
+      "icon": "💸",
+      "name": "成本与周期",
+      "text": "要准备数据、训练、验证——比 RAG 贵且慢；LoRA 让成本大幅下降（L2 学）。"
+    },
+    {
+      "icon": "🧬",
+      "name": "改的是行为",
+      "text": "适合改风格、格式、领域反应习惯；不适合灌『天天变的知识』。"
+    },
+    {
+      "icon": "⚠️",
+      "name": "会学歪",
+      "text": "数据不好会把模型带偏——微调是把双刃剑（L2 讲陷阱）。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "与 RAG 的选择",
+      "text": "知识类需求选 RAG，能力/风格类需求选微调——详细选型在 L2 的 D6。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】以下哪个需求最适合用微调解决？",
+      "options": [
+        "让 AI 知道昨天刚发布的新产品参数",
+        "让 AI 永远用公司规定的口吻和 JSON 格式回复",
+        "让 AI 查今天的天气",
+        "让 AI 记住每个用户的对话"
+      ],
+      "answer": 1,
+      "explain": "选 B。固定的行为风格是『本能』，适合练进模型；A 是常变知识（用 RAG）；C 要外接工具；D 是记忆问题。"
+    },
+    {
+      "type": "choice",
+      "q": "公司产品价格每周都在变，应该把价格表通过什么方式喂给 AI？",
+      "options": [
+        "微调进模型",
+        "放进资料库随用随查（RAG），价格表更新换文件即可",
+        "写在系统提示词里一次性写死",
+        "让 AI 自己猜"
+      ],
+      "answer": 1,
+      "explain": "选 B。高频变动的知识用微调既贵又滞后（每次变都要重训），RAG 换文件即时生效——『知识常变用 RAG』。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】老板说：『我们把公司全部文档喂给模型训练一遍，以后它就什么都知道了。』请评价这个方案的合理性，并给出更稳妥的替代思路。",
+      "reference": "这个方案把『知识』当成了『能力』，有三个问题：第一，文档内容会变，微调学进去的知识是凝固的——文档一更新就过期，每次更新都重新训练成本极高；第二，大量文档属于事实性资料，用微调灌知识性价比低，还容易因为数据质量参差把模型其他能力带偏（学歪）；第三，微调无法提供出处，答案错了难以核查。更稳妥的思路是分层处理：事实性、会更新的内容（产品资料、制度、价格）用 RAG 资料柜管理，随更新随生效、可溯源；真正需要微调的是稳定的行为特征——比如公司特有的话术风格、固定输出格式、领域术语的表达习惯，用少量高质量范例做轻量训练（LoRA）。两者组合：微调管『怎么说』，RAG 管『说什么』。",
+      "keyPoints": [
+        {
+          "point": "指出知识会过期+重训成本",
+          "kw": [
+            "过期",
+            "更新",
+            "知识",
+            "成本",
+            "凝固"
+          ]
+        },
+        {
+          "point": "指出学歪风险与不可溯源",
+          "kw": [
+            "学歪",
+            "带偏",
+            "出处",
+            "核查"
+          ]
+        },
+        {
+          "point": "替代方案：事实走 RAG",
+          "kw": [
+            "rag",
+            "资料",
+            "事实",
+            "溯源"
+          ]
+        },
+        {
+          "point": "微调保留给行为/风格",
+          "kw": [
+            "风格",
+            "格式",
+            "行为",
+            "loRA",
+            "lora"
+          ]
+        }
+      ],
+      "explain": "能分辨『知识 vs 能力』并给出组合方案，就掌握了本关的判断框架。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：微调和 RAG 有什么区别？分别什么时候用？",
+    "hint": "提示：脱产培训 vs 资料柜。",
+    "modelAnswer": "微调是送 AI 去培训班，把能力练进脑子——学会就随身携带，但培训贵、周期长，学的内容也凝固了；RAG 是给它配资料柜，随用随查，内容随时换。口诀：要它『会什么本事』（口吻、格式、领域反应）就培训（微调）；要它『知道什么信息』（文档、价格、制度）就配资料柜（RAG），而且很多产品是两个一起用。"
+  },
+  "links": [
+    {
+      "to": "d6-rag-vs-finetune-vs-longctx",
+      "text": "L2 你将学到完整的三方选型决策框架：RAG vs 微调 vs 长上下文"
+    },
+    {
+      "to": "b4-lora-practice",
+      "text": "担心微调太贵？L2 的 LoRA 实操把培训班学费打了一折"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么时候该用微调，什么时候该用 RAG？",
+      "stars": 5,
+      "source": "卡码笔记·第3题（必考对比）",
+      "tip": "L1 档答『能力 vs 知识』的直觉区分即可，L2 再展开完整框架。"
+    }
+  ],
+  "summary": "Q：微调改变什么？（答：模型的本能——风格/格式/领域反应）\nQ：它不适合做什么？（答：灌常变的知识——贵、滞后、易学歪）\nQ：与 RAG 的分工？（答：微调管怎么说，RAG 管说什么）"
+}

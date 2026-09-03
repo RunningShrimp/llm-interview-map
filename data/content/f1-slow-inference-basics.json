@@ -1,0 +1,134 @@
+{
+  "id": "f1-slow-inference-basics",
+  "title": "为什么大模型跑不快：逐字接龙的代价",
+  "definition": "大模型生成是逐字接龙：每写一个字都要把前面全部内容重看一遍——所以回答越长越慢、输入越长首字越等。理解这个『逐字税』，就理解了推理优化的所有方向。",
+  "analogies": [
+    {
+      "icon": "🪤",
+      "name": "接龙要重读全文",
+      "text": "成语接龙玩到第 100 个词时，规则要求把整条龙从头读一遍再接——这就是大模型的日常。写到第 500 字的回答，其实已经把前 499 字重读了 500 遍。字越多越慢、显存越吃紧——这不是bug，是它的生成方式决定的。"
+    },
+    {
+      "icon": "🚰",
+      "name": "先烧水再出水",
+      "text": "你提问后 AI 不是立刻吐字：先把你的问题整段『通读』一遍（像烧开水，问题越长烧越久，这就是首字前的等待），然后才开始逐字往外蹦（每蹦一个字还要回头看全文）。所以长问题等首字久，长回答越到后面越慢。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：感受『逐字税』",
+    "description": "切换输入与回答长度，看两段等待时间如何变化（示意值）。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"f1g\" data-tab=\"s1\">短问题短回答</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"f1g\" data-tab=\"s2\">长问题</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"f1g\" data-tab=\"s3\">长回答</button></div><div data-pane=\"s1\" data-group=\"f1g\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:130px;text-align:center\">等首字</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:15%\"></div></div><span style=\"font-size:12px\">快</span></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:130px;text-align:center\">每个字</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:12%;background:#60a5fa\"></div></div><span style=\"font-size:12px\">快</span></div></div></div><div data-pane=\"s2\" data-group=\"f1g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:130px;text-align:center\">等首字</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-shake\" style=\"width:85%;background:#ef4444\"></div></div><span style=\"font-size:12px\">很慢！全文要通读</span></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:130px;text-align:center\">每个字</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:30%;background:#60a5fa\"></div></div><span style=\"font-size:12px\">变慢（背的包袱大了）</span></div></div></div><div data-pane=\"s3\" data-group=\"f1g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:130px;text-align:center\">等首字</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:18%\"></div></div><span style=\"font-size:12px\">还行</span></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:130px;text-align:center\">每个字</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-pulse\" style=\"width:80%;background:#f59e0b\"></div></div><span style=\"font-size:12px\">越写越慢：包袱越来越重</span></div></div></div><div class=\"d-note\">💡 后续所有优化（缓存、量化、批处理）都是在给这个『逐字税』打折。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🔁",
+      "name": "逐字生成",
+      "text": "每次只写一个词，写完拼回去再写下一个——回答长度直接决定耗时。"
+    },
+    {
+      "icon": "⏳",
+      "name": "两段等待",
+      "text": "首字前的『通读你的问题』+ 每个字间的『重看已有内容』——长问题与长回答各卡一段。"
+    },
+    {
+      "icon": "🎒",
+      "name": "越写越重的包袱",
+      "text": "已生成的内容要随身携带反复读——所以长回答的后半段明显变慢。"
+    },
+    {
+      "icon": "💵",
+      "name": "慢=贵",
+      "text": "占用算力的时间就是钱：输入长、输出长都直接反映在账单上。"
+    },
+    {
+      "icon": "🛠️",
+      "name": "解法预告",
+      "text": "记笔记免重读（KV Cache）、压缩包袱（量化）、多人拼车（批处理）——L2/L3 逐个拆。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】把一段 2 万字的文章粘给 AI 让它总结，最明显的感受会是？",
+      "options": [
+        "第一个字出来前等很久",
+        "第一个字很快",
+        "完全没反应",
+        "输出内容变差"
+      ],
+      "answer": 0,
+      "explain": "选 A。超长输入要先整体通读（烧开水），首字延迟明显；这也是流式输出与分段处理要解决的问题。"
+    },
+    {
+      "type": "choice",
+      "q": "让 AI 写 3000 字长文时，为什么后半段明显变慢？",
+      "options": [
+        "模型累了",
+        "每写一个字都要重看全部已有内容，包袱越来越重",
+        "网络越来越慢",
+        "服务器换班了"
+      ],
+      "answer": 1,
+      "explain": "选 B。逐字接龙的固有代价：已生成内容是随身携带的包袱，越长越重——优化方向就是让『重看』变便宜（缓存）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】产品同学抱怨：『AI 总结功能粘贴长文档后要转圈 8 秒才出第一个字，用户都以为坏了。』请用本关直觉解释原因，并给出两个立刻能做的体验改善。",
+      "reference": "原因：长文档要先被整体通读一遍才能开始生成（相当于烧开水的过程），文档越长水烧得越久——8 秒基本都花在首字之前。立刻能做的体验改善：第一，上流式输出——让 AI 边读边给进度反馈（『正在阅读文档…已读取 60%』），哪怕内容还没开始生成，用户也知道没坏，焦虑大幅下降；第二，缩短要通读的长度——如果只是总结，可以先分段摘要再汇总（每段千字分别总结，最后合并），每段的首字等待都短，总时长也常更优；顺带把『读全文』的需求想清楚：如果用户其实只想问文档里的某几点，用检索只把相关段落给 AI 更快。长期方案（缓存、更快硬件）留给后面的关卡。",
+      "keyPoints": [
+        {
+          "point": "定位：首字前的整体通读是延迟大头",
+          "kw": [
+            "通读",
+            "首字",
+            "整体通读",
+            "整体通"
+          ]
+        },
+        {
+          "point": "改善一：流式/进度反馈降低焦虑",
+          "kw": [
+            "流式",
+            "进度",
+            "反馈",
+            "焦虑"
+          ]
+        },
+        {
+          "point": "改善二：分段摘要或按需检索缩短通读",
+          "kw": [
+            "分段",
+            "摘要",
+            "检索",
+            "缩短"
+          ]
+        }
+      ],
+      "explain": "能把延迟现象对应到『通读』与『逐字』两个阶段，就建立了正确的优化直觉。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么 AI 回答是一个字一个字蹦的？为什么长文档问题等首字特别久？",
+    "hint": "提示：接龙重读全文 + 烧开水。",
+    "modelAnswer": "因为它是接龙式写作：每次只写一个词，写完把整段重读一遍再写下个词——所以越写越慢。而等你提问后，它还得先把你的问题整段通读一遍才开口，问题越长这锅水烧得越久，首字就等得越久。后面的优化全是围绕给这个『逐字税』打折：让重读变笔记（缓存）、让包袱变轻（压缩）、多人拼车省成本（批处理）。"
+  },
+  "links": [
+    {
+      "to": "f6-kv-cache-pagedattention",
+      "text": "L3 你将看到『把重读变笔记』的核心优化：KV Cache 与 PagedAttention"
+    },
+    {
+      "to": "f3-quantization-practice",
+      "text": "L2 先学最直接的减负手段：把模型压小跑快——量化认知"
+    }
+  ],
+  "interview": [
+    {
+      "q": "为什么大模型推理比传统接口慢？",
+      "stars": 4,
+      "source": "小林面试笔记·解码策略（开场直觉题）",
+      "tip": "L1 档：接龙逐字+两段等待讲清即可，量化数据留到 L3。"
+    }
+  ],
+  "summary": "Q：生成方式决定什么？（答：逐字接龙——越长越慢越贵）\nQ：两段等待是什么？（答：首字前的通读 + 每字间的重看）\nQ：优化的大方向？（答：让重读变便宜、让包袱变轻、拼车分摊）"
+}

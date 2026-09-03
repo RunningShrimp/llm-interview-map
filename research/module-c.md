@@ -1,118 +1,77 @@
-# 模块C 检索报告（Prompt 工程与 LLM API 应用）
+# 模块C 检索报告 v2（层级化）
 
-> 检索日期：2026-09-02｜检索工具：WebSearch（共 6 次，其中 2 次超时失败）
-> 星级口径：5=几乎必问，4=高频，3=常见，2=偶见，1=罕见
-> 覆盖情况：c1 / c3 / c4 经外部检索核实；c2（两次检索超时）、c5 / c6（未检索）改用内置知识并逐条标注。
+> 检索日期：2026-09-03｜检索工具：WebSearch（中文 web-search-prime ×5、英文 exa ×1，另 1 次批量抓取核实原文）
+> 继承口径：星级沿用 v1（5=几乎必问，4=高频，3=常见，2=偶见，1=罕见）；v1 中 c1/c3/c4 为检索核实，c2 为旁证，c5/c6 为内置知识判断，均原样继承。
+> v2 目标：核实三个层级化考点——①复杂 Prompt 体系设计/提示词工程化治理（L4）、②幻觉分层防御体系（资深追问链）、③L1 直觉类开场题（非算法岗形态）。三个方向均获得外部来源支撑。
 
-## c1-prompt-fundamentals Prompt 基础与结构化写法
-- 星级：⭐5（维持；牛客有官方 Prompt 刷题题单（35 题）、面试鸭/力扣均有提示词工程专项题库，应用岗面经普遍出现「prompt 构造经验」，几乎必问）
-- 来源：
-  - 牛客网《大模型面试题，附答案！》：https://www.nowcoder.com/feed/main/detail/d939886827314e01a7643b93c79fa497
-  - 牛客官方题单《提示词工程题》（35 题）：https://www.nowcoder.com/exam/oj/ta?tpId=408
-  - 面试鸭《Prompt 提示词工程面试题》：https://www.mianshiya.com/bank/1991427562177298434
-  - 力扣讨论《大厂提示词工程面试真题》：https://leetcode.cn/discuss/post/4020675/
-  - 知乎《2024 NLP 大模型校招面经梳理》：https://zhuanlan.zhihu.com/p/692455162
-- 面试问法：
-  - 「一个专业的提示词（Prompt）模板通常包含以下几部分：角色定义（Role）→ 告诉模型'你是谁'……」（牛客面试题附答案，原文）
-  - 「怎样的 prompt 更好？谈谈你的 prompt 构造经验」（知乎校招面经汇总，概括）
-- 高频考点提示：
-  - Prompt 模板四要素：角色（Role）/ 任务（Task）/ 约束（Constraints）/ 输出格式
-  - Zero-Shot 与 Few-Shot 的区别及 few-shot 示例挑选原则
-  - 提示词迭代优化方法（加分隔符、给示例、指定格式、思维链引导）
-  - 行业趋势：考察已从「会不会写提示词」转向系统化评估（力扣观点）
-  - 多轮对话中的上下文管理与角色设定一致性
+## 继承考点（c1~c6 v1 结论）
 
-## c2-chain-of-thought 思维链 CoT 与推理增强（CoT/ToT/Self-Consistency）
-- 星级：⭐5（维持；注：本次两次检索均超时，为内置知识判断——CoT 属于大模型八股最高频题目之一，算法岗与应用岗都会问「CoT 原理/为什么有效」）
-- 来源：未经外部检索：内置知识（旁证：c1 检索中面试鸭题库与牛客考点总结均列出「Chain of Thought（思维链）」为常考内容，来源 https://www.mianshiya.com/bank/1991427562177298434 ）
-- 面试问法（内置知识示例，非检索原文）：
-  - 「介绍一下 Chain of Thought，它为什么有效？」
-  - 「Self-Consistency 和普通 CoT 的区别？Tree of Thought 用在什么场景？」
-- 高频考点提示：
-  - CoT 核心：中间推理步骤提升复杂推理任务表现；「Let's think step by step」的 zero-shot CoT
-  - Self-Consistency：多次采样 + 多数投票，降低单次推理随机性
-  - ToT：树状探索 + 剪枝/回溯，适合搜索式推理问题
-  - CoT 与幻觉的关系（推理链可能放大错误传播）
-  - 推理模型（o1/R1 类）兴起后「显式 CoT 提示」何时仍必要
+| id | 标题 | 星级 | 来源（v1 结论） |
+|---|---|---|---|
+| c1 | Prompt 基础与结构化写法 | ⭐5 | 检索核实：牛客官方题单/面试鸭/力扣/知乎校招面经（见 v1 来源表） |
+| c2 | 思维链 CoT 与推理增强（CoT/ToT/Self-Consistency） | ⭐5 | v1 内置知识判断；v2 获旁证：火山引擎《Agent 提示词工程相关要点（五）》15 题中涵盖 Chain-of-Thought（https://developer.volcengine.com/articles/7582491099638267930 ），星级维持 |
+| c3 | 幻觉成因与缓解 | ⭐5 | 检索核实：小林面试笔记/牛客/知乎（见 v1 来源表）；v2 进一步核实其资深岗追问链形态（见新增建议②） |
+| c4 | LLM API 实务（参数/流式/限流重试/成本） | ⭐4 | 检索核实：小林 coding/知乎/前端&AI 工程化面试指南/JavaGuide（见 v1 来源表） |
+| c5 | 结构化输出与 JSON Mode | ⭐3 | 未经外部检索（v1 内置知识判断），维持 |
+| c6 | 长上下文与 lost in the middle | ⭐3 | 未经外部检索（v1 内置知识判断），维持 |
+| n1（v1 新增） | Function Calling 与工具调用（Tool Use） | ⭐4 | 检索核实：牛客 AI-Agent 面试题汇总/面试鸭（见 v1 来源表） |
+| n2（v1 新增） | 多轮对话管理与记忆（Memory/上下文管理） | ⭐3 | 检索核实：面试鸭/牛客（见 v1 来源表） |
 
-## c3-hallucination 幻觉成因与缓解
-- 星级：⭐5（维持；小林面试笔记、牛客、知乎、面试鸭均有幻觉专题且以面试问答形式组织，属大模型面试最经典题目）
-- 来源：
-  - 小林面试笔记《大模型为什么会出现幻觉？怎么缓解？》：https://xiaolinnote.com/ai/llm/hallucination.html
-  - 牛客网《关于大模型的幻觉问题：LLM Hallucination》：https://www.nowcoder.com/discuss/512145145983152128
-  - 知乎《大模型面经｜如何解决大模型幻觉问题？》：https://zhuanlan.zhihu.com/p/1895872773722711693
-  - 知乎《2024年大模型面试准备（三）：聊一聊大模型的幻觉问题》：https://zhuanlan.zhihu.com/p/689203829
-- 面试问法：
-  - 「大模型为什么会出现幻觉？怎么缓解？」（小林面试笔记标题，原文）
-  - 「如何解决大模型幻觉问题？」（知乎面经标题，原文）
-- 高频考点提示：
-  - 定义两分法：Faithfulness（不遵循输入/原文）与 Factualness（不符合事实）
-  - 成因：Next Token Prediction 训练目标、数据噪声、知识边界、RLHF「迎合」倾向
-  - 缓解三阶段：训练侧（数据清洗/对齐）、推理侧（解码策略/CoT/自洽性）、外部增强（RAG/工具调用/引用溯源）
-  - 幻觉分类：Intrinsic（内在冲突）vs Extrinsic（与事实不符）
-  - RAG 与 Prompt 结合缓解幻觉是应用岗最常追问的落地方向
+## 层级化新增/调整建议
 
-## c4-llm-api-practice LLM API 实务（参数/流式/限流重试/成本）
-- 星级：⭐4（维持；temperature/top_p 是参数类必考题（多篇面试问答体文章专门讲解），流式/限流/超限截断在工程化面试指南中以面试官提问形式出现，但成本与重试细节问频略低于参数题）
-- 来源：
-  - 小林 coding《大模型的参数：温度值、Top-P、Top-K 分别是什么？各场景怎么设置？》（面试问答形式）：https://xiaolinnote.com/ai/llm/temperature_top_p_top_k.html
-  - 知乎《温度(temperature)、top_p 与 top_k 如何控制大语言模型输出》：https://zhuanlan.zhihu.com/p/1932579774422819015
-  - 《LLM 原理 - 前端 & AI 工程化面试指南》（含流式输出/重试/超限截断面试题）：https://opc-43d279b8.mintlify.app/ai/llm
-  - JavaGuide《LLM 运行机制：Token、上下文窗口与采样参数》：https://javaguide.cn/ai/llm-basis/llm-operation-mechanism.html
-- 面试问法：
-  - 「temperature 和 top_p 有什么区别？代码生成和创意写作场景分别怎么设置？」（小林 coding 面试问答，概括）
-  - 「输入超过上下文限制时如何截断而不影响质量？流式输出为什么能降低重试成本？」（前端 & AI 工程化面试指南考点，概括）
-- 高频考点提示：
-  - temperature 控制 softmax 分布平坦度（τ→0 趋向贪婪采样），top_p/top_k 控制候选集范围
-  - 事实性/准确性任务调低温度，创意任务调高；两参数一般不要同时大幅调整
-  - 流式输出（SSE）原理与用户体验/超时收益
-  - 限流（429/TPM/RPM）处理：指数退避重试、请求排队、降级路由
-  - 成本意识：token 计费、max_tokens、缓存（prompt caching）与模型按需路由
+- **[复杂 Prompt 体系设计与提示词工程化治理（多 Agent 提示体系/版本管理/Prompt-as-Code）]** ｜ 建议层级 L4 ｜ ⭐4 ｜ 来源：Interview Coder《Top 40 Prompt Engineer Interview Questions》(2026-05-26) https://www.interviewcoder.co/blog/prompt-engineer-interview-questions ；gitGood《AI System Design Interview Questions》(2026-08-14) https://gitgood.dev/blog/ai-system-design-interview-questions-2026 ；ClarityHire《How to Interview AI Engineers》(2026-06-09) https://clarity-hire.com/blog/how-to-interview-ai-engineers ；中文侧：JavaBetter《AI Agent 面试题第五弹：Prompt 分层架构、Skill 系统》 https://javabetter.cn/sidebar/itwanger/paicli/paicli-interview-prompt-skill.html ；GitHub 题库 ai-agents-from-zero（提示词模板化/灰度/评测条目） https://github.com/didilili/ai-agents-from-zero ；GitCode/CSDN《大模型与 Agent 智能体工程师面试指南》（Prompt-as-Code） https://gitcode.csdn.net/6a08858f662f9a54cb74f803.html ｜ 一句话定义：资深/架构师轮把提示词当作代码资产治理——system prompt 分层架构、git 版本管理与灰度发布（prompt 版本与模型版本一同 pin 住、变更回滚如同 deploy）、多 Agent 提示体系（orchestrator/子 agent 提示分工），硬编码提示词被视为 junior 反模式。
+- **[幻觉分层防御体系（从单点缓解到体系化追问链）]** ｜ 建议层级 L4（追问链可作为 L3→L4 过渡素材）｜ ⭐4 ｜ 来源：博客园《大模型面试题》（围绕「SELF-RAG 报错自愈系统+五重幻觉防御」项目的高级工程师/算法专家岗 10 题全链） https://www.cnblogs.com/wusier/p/19084900 ；53AI《大模型面经——关于大模型幻觉问题的深化理解》(2024-07-20) https://www.53ai.com/news/RAG/2024072018365.html ；gitGood（同上，"hallucination rate is an SLO"） https://gitgood.dev/blog/ai-system-design-interview-questions-2026 ；GitHub AgentGuide 大厂 RAG 专项面经（项目题「阐述大模型的幻觉现象及抑制方法」） https://github.com/adongwanai/AgentGuide/blob/main/docs/04-interview/12-company-interview-cases.md ｜ 一句话定义：资深岗将 c3 从「幻觉是什么/怎么缓解」的单点八股升级为体系化追问链：量化指标（幻觉率/引用有效率/拒答率）→ 分层防御（检索反思与拒答、强约束提示词、后处理引用校验、用户反馈降权闭环、低温参数）→ 隐式幻觉的主动探测与自我纠正 → 幻觉率当作 SLO 运营而非一次性修复的 bug。
+- **[评测驱动的 Prompt 迭代（golden set / LLM-as-judge / 灰度 A/B）]** ｜ 建议层级 L3（资深轮可追问至 L4 的「评测即架构」）｜ ⭐4 ｜ 来源：Interview Coder（面试 loop 中含 60 分钟 eval design 专轮；「Version in git. Re-run on every prompt change」） https://www.interviewcoder.co/blog/prompt-engineer-interview-questions ；ClarityHire（「the prompt is downstream of the eval」；staff/lead 轮系统设计权重 35%） https://clarity-hire.com/blog/how-to-interview-ai-engineers ；gitGood（「Output quality is probabilistic, so evaluation is architecture」；「eval sets are versioned artifacts」） https://gitgood.dev/blog/ai-system-design-interview-questions-2026 ；DataInterview《Top 32 Prompt Engineering Interview Questions》（Evaluation, Iteration & Testing 独立章节，golden set 50-200 条 + CI 门禁） https://www.datainterview.com/blog/prompt-engineering-interview-questions ；中文侧：牛客《大模型面试》话题（「七、Prompt 评估」：自动评估指标+人工评估+用户反馈） https://www.nowcoder.com/creation/subject/278ae3e75eca413fa6f96d70cd03ae57 ｜ 一句话定义：用 20~200 条版本化 golden set + LLM-as-judge + 灰度/AB 实验驱动提示词迭代，每次 prompt 变更必须跑评测并设回归门禁——有 shipped 经验与只做过 demo 的候选人在此题上区分度最大。
+- **[L1 直觉类开场题：「怎么把 AI 用好」/大模型能力边界（非算法岗形态）]** ｜ 建议层级 L1 ｜ ⭐3（限非算法岗/泛技术岗口径；AI 岗不适用）｜ 来源：小林面试笔记首页（「连后端开发、前端开发、数据开发这些原本跟 AI 隔了一道墙的岗位，面试官也开始或多或少地问起 AI 题了」） https://xiaolinnote.com/ai/ ；牛客《关于面后端岗面试官问 AI》（后端面经中面试官问 langchain/transformer 及「AI 场景题」，社区求助帖，单一来源线索） https://www.nowcoder.com/feed/main/detail/abed2d2634dc4d2982b70b56c5db7b37 ；牛客《面试官会追问的 AI 产品八股》（章节从「大模型基础概念」开场，Agent 与提示工程为「最高阶、面试重点」） https://www.nowcoder.com/discuss/889870139196227584 ；牛客《AI 产品经理面经汇总》（「AI 产品经理岗考察：大模型能力边界+产品方案+数据分析+商业化理解」） https://www.nowcoder.com/discuss/891328632507932672 ｜ 一句话定义：非算法岗（后端/产品/测试等）以直觉类开场题和 AI 场景题切入——考察「大模型能力边界在哪、什么任务适合交给模型、你平时怎么用它提效」，答案分层在于能否给出可复用的个人工作流而非罗列工具名。
+  - 注：未检索到「怎么把 AI 用好」逐字原题；上述问法为依据来源形态的概括与推断，已逐条标注。
 
-## c5-structured-output 结构化输出与 JSON Mode
-- 星级：⭐3（维持；注：本次未及检索，为内置知识判断——应用开发岗常问「如何稳定拿到可解析 JSON」，热度随 Agent/Function Calling 普及上升）
-- 来源：未经外部检索：内置知识
-- 面试问法（内置知识示例，非检索原文）：
-  - 「如何让 LLM 稳定输出合法 JSON？输出不合法（字段缺失/带 markdown 代码块）怎么兜底？」
-  - 「JSON Mode、Structured Outputs 和 Function Calling 之间是什么关系？」
-- 高频考点提示：
-  - 三种实现层次：prompt 约定格式 → JSON Mode（约束解码）→ Schema 约束（Structured Outputs/JSON Schema）
-  - 失败兜底：重试、few-shot 示例、输出后校验（pydantic/jsonschema）、容错解析
-  - 约束解码原理（按 grammar/token 采样）是加分项
-  - 与下游系统的对接：解析失败的重试成本与幂等性
+## 面试问法补充
 
-## c6-long-context 长上下文与 lost in the middle
-- 星级：⭐3（维持；注：本次未及检索，为内置知识判断——常作为 RAG 问题的追问点出现（「上下文够长还要 RAG 吗」「检索文档放前后有讲究吗」），单独出题频率中等）
-- 来源：未经外部检索：内置知识（论文锚点：Liu et al., "Lost in the Middle: How Language Models Use Long Contexts", TACL 2024）
-- 面试问法（内置知识示例，非检索原文）：
-  - 「什么是 lost in the middle？对 RAG 的文档排序有什么指导意义？」
-  - 「上下文窗口到 1M 了，还需要 RAG 和分块吗？」
-- 高频考点提示：
-  - 现象：模型对长上下文首尾信息利用好、中部信息检索性能下降（U 形曲线）
-  - 工程启示：关键指令放开头/结尾、检索结果重排序后放置、控制塞入文档数量
-  - 长上下文 ≠ 无限记忆：注意力稀释、成本随长度线性/平方增长、时效性问题仍需外部检索
-  - 位置编码外推（RoPE 缩放等）属加分项
+**复杂 Prompt 体系设计与提示词工程化治理（L4）**
+- 「How do you version a system prompt?」（Interview Coder Q38，原文；参考答案要点：像代码一样进 git、语义化版本、生产调用同时 pin prompt 版本与模型版本、每次变更跑评测、回滚如同 deploy）
+- 「Prompt Engineering 中，如何系统优化提示词并把准确率做上去？」（GitHub 题库 ai-agents-from-zero，检索摘要原文；答案强调任务拆解、样例驱动而非堆概念）
+- 「线上彻底杜绝硬编码字符串的 junior 做法，全面推行提示词即代码（Prompt-as-Code）的工程体系」（GitCode/CSDN 面试指南第一人称叙述，检索摘要原文，体现该考点以「治理叙事」出现）
 
-## 建议新增知识点清单
-- [Function Calling 与工具调用（Tool Use）] ⭐4 ｜ 来源：牛客网《AI-Agent 面试题汇总 - 大模型篇》 https://www.nowcoder.com/discuss/860538803759386624 ；面试鸭《Prompt 提示词工程面试题》 https://www.mianshiya.com/bank/1991427562177298434 （Agent/工具话题在高频题库中广泛出现）｜ 一句话定义：通过 API 传入函数 Schema 让模型输出结构化调用参数并由应用执行，是 LLM API 应用连接外部能力（搜索/数据库/业务接口）的标准机制。
-- [多轮对话管理与记忆（Memory/上下文管理）] ⭐3 ｜ 来源：面试鸭《Prompt 提示词工程面试题》（含「多轮对话优化」条目） https://www.mianshiya.com/bank/1991427562177298434 ；牛客《大模型面试题，附答案！》（角色设定与上下文管理） https://www.nowcoder.com/feed/main/detail/d939886827314e01a7643b93c79fa497 ｜ 一句话定义：在多轮会话中通过历史截断、摘要压缩、滑动窗口等策略管理系统提示与对话记忆，平衡效果、成本与上下文上限。
+**幻觉分层防御体系（L4 追问链）**
+- 「你在项目中提到"五重幻觉防御"，请详细解释每一重的设计原理和实际效果。」（博客园高级岗面试题问题 2，原文；五重=反思拒答/强约束 Prompt/后处理引用校验/用户反馈降权/低温低 top-p）
+- 「你如何评估"幻觉"的存在？有哪些量化指标？」「如果用户反馈"答案有帮助"，但其实引用的是错误工单（幻觉未被发现），系统如何自我纠正？」（博客园问题 4/问题 5，原文——体现「量化→体系→隐式幻觉」追问链）
+- 追问链示例（53AI 文章目录，原文）：幻觉问题如何量化 → 如何缓解幻觉问题 → 大模型在哪些问题上最容易出现幻觉 → 幻觉一定有害吗？
+- 英文侧高频形态：「How do you reduce hallucinations in a RAG pipeline?」（Interview Coder Q24 标题，原文）；面试官期待「hallucination rate is an SLO you measure and budget against, not a bug you fix once」（gitGood，原文）
 
-## 参考来源汇总
-| 来源 | 类型 | URL |
-|---|---|---|
-| 牛客网《大模型面试题，附答案！》 | 面试题库（社区） | https://www.nowcoder.com/feed/main/detail/d939886827314e01a7643b93c79fa497 |
-| 牛客官方题单《提示词工程题》 | 官方题单 | https://www.nowcoder.com/exam/oj/ta?tpId=408 |
-| 牛客《AI-Agent 面试题汇总 - 大模型篇》 | 面试题库（社区） | https://www.nowcoder.com/discuss/860538803759386624 |
-| 牛客《关于大模型的幻觉问题：LLM Hallucination》 | 面经（社区） | https://www.nowcoder.com/discuss/512145145983152128 |
-| 面试鸭《Prompt 提示词工程面试题》 | 商业题库 | https://www.mianshiya.com/bank/1991427562177298434 |
-| 力扣《大厂提示词工程面试真题》 | 面试讨论（社区） | https://leetcode.cn/discuss/post/4020675/ |
-| 知乎《2024 NLP 大模型校招面经梳理》 | 面经汇总（社区） | https://zhuanlan.zhihu.com/p/692455162 |
-| 小林面试笔记（幻觉/采样参数篇） | 技术博客（面试问答体） | https://xiaolinnote.com/ai/llm/hallucination.html ；https://xiaolinnote.com/ai/llm/temperature_top_p_top_k.html |
-| 知乎《大模型面经｜如何解决大模型幻觉问题？》 | 面经（社区） | https://zhuanlan.zhihu.com/p/1895872773722711693 |
-| 知乎《温度、top_p 与 top_k 如何控制输出》 | 技术博客 | https://zhuanlan.zhihu.com/p/1932579774422819015 |
-| 前端 & AI 工程化面试指南（LLM 原理） | 技术文档/面试指南 | https://opc-43d279b8.mintlify.app/ai/llm |
-| JavaGuide《LLM 运行机制》 | 技术文档/面试指南 | https://javaguide.cn/ai/llm-basis/llm-operation-mechanism.html |
+**评测驱动的 Prompt 迭代（L3→L4）**
+- 「How do you A/B test prompts in production?」（Interview Coder Q30 标题，原文）
+- 「Walk me through the eval suite you built. How did it change over time?」（ClarityHire 建议的行为面问题，原文）
+- 中文侧形态：「Prompt 评估需要全面和多维度的方法，结合自动评估指标、人工评估和用户反馈」（牛客《大模型面试》话题「七、Prompt 评估」，检索摘要）
+
+**L1 直觉类开场题（非算法岗，L1）**
+- 「平时怎么用 AI/大模型提效？什么任务你会交给模型、什么不会？」（推断：由小林笔记「非 AI 岗也开始问 AI 题」+ 牛客 AI 产品经理「考察大模型能力边界」综合概括，未经逐字原文核实）
+- 「给出一个 AI 场景题」（形态描述来自牛客后端岗求助帖原文「甚至给出一些 AI 场景题」；具体题目未见公开样本，属单一来源线索）
+
+## 参考来源汇总（v2 新增）
+
+| 来源 | 类型 | 日期 | URL |
+|---|---|---|---|
+| Interview Coder《Top 40 Prompt Engineer Interview Questions》 | 商业博客/题库 | 2026-05-26 | https://www.interviewcoder.co/blog/prompt-engineer-interview-questions |
+| gitGood《AI System Design Interview Questions (2026)》 | 技术博客/面试指南 | 2026-08-14 | https://gitgood.dev/blog/ai-system-design-interview-questions-2026 |
+| ClarityHire《How to Interview AI Engineers》 | 技术博客/面试官视角指南 | 2026-06-09 | https://clarity-hire.com/blog/how-to-interview-ai-engineers |
+| AY Automate《40 AI Engineer Interview Questions》 | 技术博客/招聘方指南 | 2026-06-03 | https://www.ayautomate.com/blog/ai-engineer-interview-questions |
+| DataInterview《Top 32 Prompt Engineering Interview Questions》 | 商业题库博客 | 未标注 | https://www.datainterview.com/blog/prompt-engineering-interview-questions |
+| 火山引擎开发者社区《AI 大模型面试精选之 Agent 提示词工程相关要点（五）》 | 厂商开发者社区题库 | 未标注 | https://developer.volcengine.com/articles/7582491099638267930 |
+| JavaBetter《AI Agent 面试题第五弹：Prompt 分层架构、Skill 系统》 | 技术博客/面试题 | 未标注 | https://javabetter.cn/sidebar/itwanger/paicli/paicli-interview-prompt-skill.html |
+| GitCode/CSDN《大模型与 Agent 智能体工程师面试指南：Prompt Engineering 核心解析》 | 技术博客/面试题 | 未标注 | https://gitcode.csdn.net/6a08858f662f9a54cb74f803.html |
+| GitHub ai-agents-from-zero《AI 智能体与大模型应用开发面试题库》 | 开源面试题库 | 未标注 | https://github.com/didilili/ai-agents-from-zero |
+| GitHub AgentGuide《12-company-interview-cases》（大厂 RAG 专项面经） | 开源面经汇编 | 未标注 | https://github.com/adongwanai/AgentGuide/blob/main/docs/04-interview/12-company-interview-cases.md |
+| 博客园 kopoo《大模型面试题》（SELF-RAG+五重幻觉防御 高级岗 10 题） | 博客/模拟面试题（含参考答案） | 未标注 | https://www.cnblogs.com/wusier/p/19084900 |
+| 53AI《大模型面经——关于大模型幻觉问题的深化理解》 | 技术社区/面经深化 | 2024-07-20 | https://www.53ai.com/news/RAG/2024072018365.html |
+| 牛客《大模型面试》话题（含 Prompt 评估章节） | 社区话题页 | 未标注 | https://www.nowcoder.com/creation/subject/278ae3e75eca413fa6f96d70cd03ae57 |
+| 牛客《关于面后端岗面试官问 AI》 | 社区求助帖（单一来源线索） | 未标注 | https://www.nowcoder.com/feed/main/detail/abed2d2634dc4d2982b70b56c5db7b37 |
+| 牛客《面试官会追问的 AI 产品八股》 | 社区面经 | 未标注 | https://www.nowcoder.com/discuss/889870139196227584 |
+| 牛客《AI 产品经理面经汇总（含回答思路）》 | 社区面经汇总 | 未标注 | https://www.nowcoder.com/discuss/891328632507932672 |
+| 小林面试笔记首页（岗位扩散趋势说明） | 技术博客/面试题站 | 未标注 | https://xiaolinnote.com/ai/ |
+| 面灵AI《大模型与 AI Agent 面试题汇编：265 道大厂真题（2026 版）》 | 题库汇编站 | 2026 版 | https://www.mianlingai.com/topics/llm-agent-interview-questions-2026/ |
 
 ## 开放问题
-- c2（CoT/ToT/Self-Consistency）与 c5/c6 未获得本次检索的直接来源，星级为内置知识判断，建议下次检索补验（候选关键词：「CoT 自洽性 面试」「JSON mode 面试」「lost in the middle RAG 面试」）。
-- 各点在「算法岗 vs 应用岗」的问频差异未做分层统计，现有星级更偏向应用开发岗口径。
+- L1 直觉类开场题未获得逐字原题证据，现有问法为形态概括+推断；如需逐字题面，建议下次定向抓取牛客 AI 产品/后端岗面经正文。
+- 「多 Agent 提示体系」多出现于英文资深 loop（orchestrator/subagent 提示分工，如 Anthropic multi-agent research 模式被 gitGood 引用）与国内 Agent 题库（牛客 AI-Agent 汇总、火山引擎第五辑），但「多 Agent 提示词如何设计」作为独立题面的公开样本仍偏少，⭐4 主要基于题库覆盖面推断。
+- 博客园「五重幻觉防御」为模拟面试题（含参考答案），并非候选人真实面经回述；追问链真实性由 53AI（2024）与英文多源交叉印证，但单题字面不必当作真题引用。
+- c5（JSON Mode）/c6（lost in the middle）连续两轮未做专项检索，星级仍为内置知识判断。

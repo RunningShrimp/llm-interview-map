@@ -1,0 +1,159 @@
+{
+  "id": "a9-positional-encoding-rope",
+  "title": "位置编码（正弦/可学习/RoPE）",
+  "definition": "位置编码（PE）是给每个 token 加上的『位置号码牌』：注意力本身不分先后，没有它模型就分不清『猫追狗』和『狗追猫』。主流做法 RoPE 是对 Q/K 向量按位置做旋转，让内积天然携带相对距离。",
+  "analogies": [
+    {
+      "icon": "🎫",
+      "name": "排队取号",
+      "text": "银行叫号系统里，每个人手里的号码牌（位置编码）和本人的业务资料（词向量）一起交给柜员。柜员不必记住谁先来的——看号牌就知道顺序。老式做法是把号牌直接『贴在』资料上（相加，如正弦/可学习 PE）；RoPE 更聪明：在比较两个人时按号码差『旋转对齐』，天然知道谁在前几步。"
+    },
+    {
+      "icon": "🕰️",
+      "name": "时钟指针",
+      "text": "RoPE 把每个位置的向量想象成一根按角度旋转的指针：位置 1 转 1 格、位置 5 转 5 格。两个词做注意力时，两根指针的『夹角』正好等于它们的距离——词义信息照常携带，位置信息藏进旋转角度里，这就是它既懂绝对位置又懂相对位置的原因。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：没有位置编码会发生什么？",
+    "description": "点击『下一步』，看位置编码从无到有的三代方案如何解决词序问题。",
+    "html": "<div class=\"d-steps\" id=\"a4-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第一步：不加位置编码的灾难</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag red\">『猫 追 狗』</span><span class=\"d-vs\"></span><span class=\"d-tag red\">『狗 追 猫』</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-card d-shake\">两个句子的注意力输出完全相同 ❌ 模型无法区分谁追谁</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第二步：加法式位置编码（正弦 PE / 可学习 PE）</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-token\">猫<sub>①</sub></span><span class=\"d-token\">追<sub>②</sub></span><span class=\"d-token\">狗<sub>③</sub></span><span class=\"d-arrow\">=</span><span class=\"d-card\">词向量 + 位置向量</span></div><div class=\"d-note\">正弦 PE：用不同频率的 sin/cos 生成，无需训练；可学习 PE（BERT/GPT-2）：位置向量当参数训练，简单但长度有上限。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第三步：RoPE 旋转（当前主流，LLaMA/Qwen 均采用）</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-token d-float\">Q⟲位置m</span><span class=\"d-token d-float\" style=\"animation-delay:.3s\">K⟲位置n</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">内积只与 (m−n) 有关</span></div><div class=\"d-note\">对 Q/K 按位置旋转角度 θ·m：绝对位置编码进旋转，内积天然表达相对距离，且便于外推。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#a4-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#a4-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#a4-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#a4-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "❓",
+      "name": "为什么必须",
+      "text": "注意力对集合而非序列计算——打乱词序输出不变；位置编码是唯一注入词序的通道，所以缺它不可。"
+    },
+    {
+      "icon": "🌊",
+      "name": "正弦 PE",
+      "text": "原论文方案：不同维度用不同频率的 sin/cos 生成固定编码；优点是无参数、可无限长，任意偏移的相对位置可被线性表达。"
+    },
+    {
+      "icon": "🎓",
+      "name": "可学习 PE",
+      "text": "把每个位置的向量当可训练参数（BERT、GPT-2）：效果灵活，但最大长度在训练时写死，超长即失效。"
+    },
+    {
+      "icon": "🔄",
+      "name": "RoPE 主流",
+      "text": "对 Q/K 乘旋转矩阵：内积只依赖相对位置；兼具绝对与相对位置能力、无参数、配合外推技术可扩展长度，LLaMA/Qwen/DeepSeek 均采用。"
+    },
+    {
+      "icon": "📈",
+      "name": "长度外推",
+      "text": "训练 4K 想用 128K 怎么办？Position Interpolation（位置插值压缩）、NTK-aware 缩放、YaRN（按维度分层缩放）让短训练模型在长序列上保持效果。"
+    },
+    {
+      "icon": "📍",
+      "name": "加在哪",
+      "text": "位置信息只需在进入注意力前注入（每层共享同一份），不必每层重复添加；RoPE 则只旋转 Q 和 K，不动 V。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】Transformer 为什么必须引入位置编码？",
+      "options": [
+        "为了增加模型参数量以提升容量",
+        "Self-Attention 对输入顺序不敏感，需要额外注入词序信息",
+        "为了让模型支持批量并行训练",
+        "为了防止过拟合"
+      ],
+      "answer": 1,
+      "explain": "选 B。注意力本质是『加权求和』，打乱输入顺序结果不变（置换等变），必须靠位置编码补顺序。A、C、D 均非其目的——并行恰恰是去掉循环结构后天然获得的。"
+    },
+    {
+      "type": "choice",
+      "q": "当前 LLaMA、Qwen 等主流开源大模型使用的位置编码是？",
+      "options": [
+        "正弦位置编码",
+        "可学习绝对位置编码",
+        "RoPE 旋转位置编码",
+        "相对位置偏置 ALiBi"
+      ],
+      "answer": 2,
+      "explain": "选 C。RoPE 以『旋转 Q/K 使内积携带相对距离』成为当前主流。A 是原论文方案、B 用于 BERT/GPT-2 时代、ALiBi 是注意力偏置方案（部分模型采用但非 LLaMA 系主流）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官连环问：『① 位置编码有哪几类？② RoPE 为什么能成为主流？③ 如果业务要把训练 8K 的模型用到 64K 长文档，你有哪些办法？』请作答。",
+      "reference": "① 三大类：正弦位置编码（固定函数生成）、可学习位置编码（当参数训练，如 BERT/GPT-2）、旋转位置编码 RoPE（对 Q/K 做位置相关旋转，还有 ALiBi 这类注意力偏置的变体）。② RoPE 成为主流的原因：无额外参数；内积只依赖相对位置，兼具绝对与相对能力；对长度外推友好，生态成熟。③ 长度外推三招：Position Interpolation（位置插值）直接把 64K 位置坐标压缩映射回训练区间再微调；NTK-aware 按非线性频率缩放基频，少训甚至免训；YaRN 在 NTK 基础上按维度分层缩放并调整注意力温度，效果更稳。工程上也可以改用支持长上下文的官方版本或配合滑动窗口检索（RAG）绕开。",
+      "keyPoints": [
+        {
+          "point": "说出三类位置编码：正弦/可学习/RoPE",
+          "kw": [
+            "正弦",
+            "可学习",
+            "rope"
+          ]
+        },
+        {
+          "point": "RoPE 机制：对 Q/K 旋转，内积只依赖相对位置",
+          "kw": [
+            "旋转",
+            "相对位置"
+          ]
+        },
+        {
+          "point": "提到长度外推方案 Position Interpolation",
+          "kw": [
+            "interpolation",
+            "插值"
+          ]
+        },
+        {
+          "point": "提到 NTK-aware 或 YaRN",
+          "kw": [
+            "ntk",
+            "yarn"
+          ]
+        },
+        {
+          "point": "给出工程侧替代思路（微调适配或 RAG/滑动窗口）",
+          "kw": [
+            "微调",
+            "rag",
+            "滑动窗口"
+          ]
+        }
+      ],
+      "explain": "加分项：能说出 RoPE『只旋转 Q/K 不动 V』、YaRN 的分层思想；失分点：只背名词说不出机制、把可学习 PE 说成可以无限长。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么模型需要『位置号码牌』？RoPE 的旋转思路妙在哪？",
+    "hint": "提示：先用『猫追狗/狗追猫』说清问题，再用『时钟指针夹角=距离』讲 RoPE。",
+    "modelAnswer": "注意力是『一堆词互相看』，它天生不知道谁先谁后，所以得给每个词发一张写着位置的号码牌，不然猫追狗和狗追猫它当成同一件事。老办法是把号码牌内容直接加到词向量上；RoPE 的办法是让每个词的向量像时钟指针一样按位置转过角度，两个词比较时夹角正好就是它们的距离——位置信息不用贴标签，就藏在旋转里，还能通过缩放角度让模型处理更长的句子。"
+  },
+  "links": [
+    {
+      "to": "a3-transformer-intuition",
+      "text": "并行计算丢掉了 RNN 的天然时序，位置编码正是补回词序的那块拼图"
+    },
+    {
+      "to": "c6-context-management-practice",
+      "text": "长度外推解决的是同一个问题的工程面：如何用好超长上下文"
+    },
+    {
+      "to": "f6-kv-cache-pagedattention",
+      "text": "位置编码方案影响 KV Cache 的形态与显存占用，是推理优化的上游约束"
+    }
+  ],
+  "interview": [
+    {
+      "q": "Transformer 为什么需要位置编码？有哪些实现方式？",
+      "stars": 4,
+      "source": "小林笔记·位置编码 / 掘金·大厂高频 LLM 面试36题",
+      "tip": "先讲『注意力置换等变』的本质原因，再按正弦→可学习→RoPE 的演进顺序作答。"
+    },
+    {
+      "q": "RoPE 的原理是什么？为什么大模型都用它？",
+      "stars": 4,
+      "source": "知乎·必会的位置编码 / B站·卢菁 RoPE 详解",
+      "tip": "抓住『旋转 Q/K、内积只依赖相对位置、无参数、外推友好』四个关键词。"
+    }
+  ],
+  "summary": "Q：没有位置编码，模型输出会怎样？（答：『猫追狗』与『狗追猫』的表示完全相同，词序信息丢失）\nQ：RoPE 与加法式编码的本质区别是什么？（答：加法是把位置向量加进词向量；RoPE 是按位置旋转 Q/K，让内积天然携带相对距离）\nQ：模型要用超过训练长度的上下文有哪些办法？（答：Position Interpolation、NTK-aware、YaRN 等外推/微调方案，或改用滑动窗口+RAG 的工程路线）"
+}

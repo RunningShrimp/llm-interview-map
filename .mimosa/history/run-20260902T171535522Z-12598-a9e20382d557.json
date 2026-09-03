@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "mimosa-finding-history/v1",
+  "runId": "20260902T171535522Z-12598-a9e20382d557",
+  "runStatus": "inconclusive",
+  "errors": [
+    "candidate-select:tools/tmp-placeholder.js: changed_file_unreadable: observed changed file no longer exists or cannot be read",
+    "scan:data/syllabus.js: scanner_failed: batch scanner status 1",
+    "scan:js/judge.js: scanner_failed: batch scanner status 1",
+    "scan:js/app.js: scanner_failed: batch scanner status 1",
+    "scan:tools/validate.js: scanner_failed: batch scanner status 1",
+    "scan:tools/judge.test.js: scanner_failed: batch scanner status 1",
+    "supply-chain-check:.: empty scanner output (status 1)"
+  ],
+  "target": ".",
+  "revision": "5c8597030ab51417531adbdcbb0dbec6b7361ea5",
+  "diffHash": "5667a5d159e30b882539698e7b2df5b7e4809edf4efb5b27464ec83bd8e628d7",
+  "rulesVersion": "unavailable",
+  "recordedAt": "2026-09-02T17:15:35.522Z",
+  "timing": {
+    "startedAt": "2026-09-02T17:15:35.214Z",
+    "completedAt": "2026-09-02T17:15:35.522Z",
+    "durationMs": 308
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "modelCalls": 0,
+    "measurement": "known-zero"
+  },
+  "findings": {
+    "total": 0,
+    "bySeverity": {},
+    "byStatus": {}
+  },
+  "coverage": {
+    "status": "partial",
+    "reasonCounts": {
+      "changed_file_unreadable": 1,
+      "scanner_failed": 5,
+      "project_check_failed": 7,
+      "finding_ledger_read_failed": 1
+    }
+  },
+  "evidenceBoundary": "static_only",
+  "immutableReport": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95-20260902T171535522Z-12598-a9e20382d557.json"
+}

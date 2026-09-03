@@ -1,0 +1,165 @@
+{
+  "id": "c7-cot-principle",
+  "title": "思维链 CoT 与推理增强",
+  "definition": "思维链（CoT, Chain-of-Thought）是在提示中让模型『一步步写出推理过程再给答案』。中间步骤给模型更多计算空间，复杂问题准确率显著提升。进阶变体：Self-Consistency 多路投票、ToT 树状探索。",
+  "analogies": [
+    {
+      "icon": "🧮",
+      "name": "口算 vs 列竖式",
+      "text": "让模型直接报答案像逼人口算 37×42——一步到位容易错；CoT 是允许列竖式：先把中间步骤写出来（37×40=1480，37×2=74，相加=1554），每步都简单可靠，串起来正确率大增。本质：模型的每个生成 token 都是一次计算，推理步骤越长、可用『草稿纸』越大。"
+    },
+    {
+      "icon": "🕵️",
+      "name": "写破案笔记",
+      "text": "侦探直接宣布凶手容易冤枉人（模型瞎猜）；要求他先写破案笔记——列线索、排除嫌疑、推理链——逻辑漏洞会在纸面上暴露。CoT 的副产品是可解释性：推理过程可检查，错了能定位是哪一步出的问题。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：有 CoT 和没 CoT 的对比",
+    "description": "切换两种模式，看同一道数学题的作答过程与结果差异。",
+    "html": "<div id=\"c2-wrap\"><div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"c2g\" data-tab=\"d1\">直接回答（无 CoT）</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"c2g\" data-tab=\"d2\">思维链（CoT）</button></div><div data-pane=\"d1\" data-group=\"c2g\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><span class=\"d-tag\">问：食堂有 23 个苹果，用掉 20 个做午餐，又买了 6 个，还有几个？</span><span class=\"d-card d-shake\" style=\"border-color:#ef4444\">答：27 个 ❌（20−23 心算出错直接跳步）</span></div></div><div data-pane=\"d2\" data-group=\"c2g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag\">同样的问 + 『请一步步思考』</span><span class=\"d-card d-anim\">思考：先算用掉后剩 23−20=3；再算又买后 3+6=9。</span><span class=\"d-card d-anim-late\" style=\"border-color:#10b981;background:#f0fdf4\">答：9 个 ✅</span></div><div class=\"d-note\">中间步骤把难题拆成两次简单运算，每步都稳——这就是 CoT 的全部秘密。</div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#c2-wrap\">🔄 重播动画</button></div></div><div class=\"d-note\">💡 触发方式：零样本 CoT 魔法句『Let's think step by step』；少样本 CoT 在示例里就写出推理过程。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🪜",
+      "name": "原理",
+      "text": "把多步问题拆成一串单步生成；每步只需简单联想，累计错误率远低于一次性跳跃——测试时计算量换准确率。"
+    },
+    {
+      "icon": "✨",
+      "name": "零样本 CoT",
+      "text": "一句话魔法：『请一步步思考』/『Let's think step by step』——无需示例即可激活推理行为（Kojima 2022）。"
+    },
+    {
+      "icon": "🖼️",
+      "name": "少样本 CoT",
+      "text": "在示例的答案里就写出完整推理链，模型会模仿这种作答格式——对格式类推理（表格、方程）更稳。"
+    },
+    {
+      "icon": "🗳️",
+      "name": "Self-Consistency",
+      "text": "同一问题采样多条推理路径，对最终答案投票取多数——用多次采样换稳健性，数学题准确率再涨一截。"
+    },
+    {
+      "icon": "🌳",
+      "name": "ToT 树状思考",
+      "text": "Tree-of-Thoughts：推理树状展开、中途评估剪枝、可回溯——适合搜索空间大的规划题；代价是计算量数倍。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "适用边界",
+      "text": "对数学/逻辑/多步规划收益大；对简单事实问答无益反浪费 token；小模型 CoT 可能『一本正经推错』——推理模型（R1 类）已把思考内化。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】CoT（思维链）提升复杂推理准确率的本质原因是？",
+      "options": [
+        "它给模型增加了额外参数",
+        "中间推理步骤为模型提供了更多逐步计算的空间，把多步难题拆成一串单步生成",
+        "它让模型检索了外部知识",
+        "它提高了模型的温度参数"
+      ],
+      "answer": 1,
+      "explain": "选 B。自回归模型每生成一个 token 就是一次计算，写出推理步骤等于扩展了测试时的计算预算。A、C、D 均非 CoT 机制。"
+    },
+    {
+      "type": "choice",
+      "q": "Self-Consistency 的做法是？",
+      "options": [
+        "让模型自我检查一遍答案",
+        "同一问题采样多条推理路径，对最终答案做多数投票",
+        "用更大的模型重新回答",
+        "把答案转成 JSON 再输出"
+      ],
+      "answer": 1,
+      "explain": "选 B。多条推理路径殊途同归的答案更可信——少数错误路径会被多数正确路径投票淹没。A 是 Reflection 的做法。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你的 RAG 问答系统在多跳问题（如「A 的作者所在公司的 CEO 是谁」）上错误率很高，CoT 能帮上什么忙？具体怎么落地？』请作答。",
+      "reference": "能帮上大忙：多跳问题失败的主因是模型试图一步到位，把两跳检索和一次推理压缩在单次生成里。落地分四步：第一步任务分解——用 CoT 提示要求模型先列出解题计划（先查 A 的作者是谁，再查该作者的公司，再查公司 CEO），把计划显式写出；第二步逐步检索——每列出一个未知实体就触发一次检索调用，把新证据追加进上下文，实现 ReAct 式的思考-检索交替；第三步约束与验证——提示词要求每个中间结论都注明证据来源片段，无证据则声明不知道，防止跳步编造；第四步采样增强——对高难度问题用 Self-Consistency 采样 3~5 条推理路径投票定稿。同时要核算成本：CoT 会增加 token 消耗与延迟，简单问题走直答、复杂多跳才启用 CoT 路由。",
+      "keyPoints": [
+        {
+          "point": "指出多跳失败根因：单次生成试图一步到位",
+          "kw": [
+            "多跳",
+            "一步",
+            "分解",
+            "单次"
+          ]
+        },
+        {
+          "point": "CoT 分解计划 + 逐步检索交替",
+          "kw": [
+            "计划",
+            "检索",
+            "交替",
+            "逐步"
+          ]
+        },
+        {
+          "point": "证据约束防编造（注明来源/无证据说不知道）",
+          "kw": [
+            "证据",
+            "来源",
+            "不知道"
+          ]
+        },
+        {
+          "point": "Self-Consistency 采样投票增强",
+          "kw": [
+            "consistency",
+            "采样",
+            "投票"
+          ]
+        },
+        {
+          "point": "成本核算与难易路由",
+          "kw": [
+            "成本",
+            "延迟",
+            "路由",
+            "token"
+          ]
+        }
+      ],
+      "explain": "加分项：CoT+检索结合成 ReAct 的意识、成本路由设计；失分点：只答『加一句 step by step』而无系统落地。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么让 AI『把思考过程写出来』它就变聪明了？",
+    "hint": "提示：口算 vs 列竖式——草稿纸越大越不容易错。",
+    "modelAnswer": "AI 生成每个字都要花一次『脑力』，你让它直接报答案，等于逼它口算难题，一步跳过去容易错；让它先写思考过程，就像允许列竖式打草稿——难题被拆成一串简单的小步骤，每步都不容易错，连起来正确率自然高。还可以同一道题让它想好几遍投票表决，或者把想法画成树枝探索后再选最优路径，都是用更多思考时间换更靠谱的答案。"
+  },
+  "links": [
+    {
+      "to": "c3-prompt-five-elements",
+      "text": "『请一步步思考』是加在结构化五件套之上的推理开关，二者叠加使用"
+    },
+    {
+      "to": "e3-react-practice",
+      "text": "CoT 只在脑内推演，ReAct 把『思考』升级为边想边调用工具行动——推理的外化版"
+    },
+    {
+      "to": "b10-rlvr-grpo",
+      "text": "推理模型（R1 类）用 RLVR 把『写思考』内化成自发行为——CoT 的训练进化版"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是思维链 CoT？为什么它有效？",
+      "stars": 5,
+      "source": "内置知识（旁证：面试鸭题库列 CoT 为常考）",
+      "tip": "先定义，再答『测试时计算换准确率 + 问题分解』两层原理，补零样本/少样本两种触发。"
+    },
+    {
+      "q": "CoT 的变体有哪些？各自适用什么场景？",
+      "stars": 4,
+      "source": "内置知识（旁证：面试鸭题库）",
+      "tip": "Self-Consistency 投票、ToT 树状搜索、ReAct 工具交替；按问题类型选型并提成本代价。"
+    }
+  ],
+  "summary": "Q：CoT 有效的原因？（答：推理步骤扩展测试时计算空间，多步难题拆成单步生成）\nQ：零样本 CoT 的触发方式？（答：『Let's think step by step』式提示，无需示例）\nQ：Self-Consistency 与 ToT 的区别？（答：前者多路采样投票定答案，后者树状展开中途评估可回溯）"
+}

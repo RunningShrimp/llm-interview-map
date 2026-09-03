@@ -1,0 +1,145 @@
+{
+  "id": "c4-decoding-params-practice",
+  "title": "解码参数实操：temperature/top_p 怎么调",
+  "definition": "temperature 控制随机性（低=稳定复读机式，高=发散创意），top_p 控制候选池宽度（只在最像样的前 p 比例里选）。按任务选参数组合，是每个 LLM 应用工程师的日课。",
+  "analogies": [
+    {
+      "icon": "🎚️",
+      "name": "水龙头与滤网",
+      "text": "temperature 是水龙头开度：拧到最小（0），AI 永远给最标准答案，稳但死板；拧大（1.0+），水花四溅有创意也可能失控。top_p 是滤网：0.9 表示只在累计概率前 90% 的候选里选——把离谱选项滤掉。经验：事实问答拧小水龙头，创意写作拧大；两个旋钮调一个就好，别同时大动。"
+    },
+    {
+      "icon": "🎲",
+      "name": "抽签箱",
+      "text": "AI 每写一个词，都是从候选箱抽签：temperature 决定箱子里冷门签的重量（低温=冷门签几乎没重量），top_p 决定箱子保底留几个签。事实问答要『基本照抄标准答案』，创意写作要『给冷门签一点机会』——不同的活配不同的箱子。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：拖动温度看接法变化",
+    "description": "拖动滑杆调整温度，观察『今天天气真好，』的续写候选。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:8px\"><input type=\"range\" min=\"0\" max=\"150\" value=\"20\" data-output=\"#c4-t\" data-suffix=\"\"><span>temperature = <b id=\"c4-t\">0.20</b>（滑杆 ÷100）</span></div><div class=\"demo-box\" style=\"padding:12px\"><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\">低温 &lt;0.3</span><span class=\"d-token hot\">今天</span><span class=\"d-token\">天气</span><span class=\"d-token\">晴朗</span><span class=\"d-arrow\">→ 稳定、可复现</span></div><div class=\"d-row\"><span class=\"d-tag amber\">0.5~0.8</span><span class=\"d-token\">今天</span><span class=\"d-token\">心情</span><span class=\"d-token\">不错</span><span class=\"d-arrow\">→ 自然多样</span></div><div class=\"d-row\"><span class=\"d-tag red\">&gt;1.2</span><span class=\"d-token d-shake\">今天</span><span class=\"d-token\">橙子</span><span class=\"d-token\">在</span><span class=\"d-token\">歌唱</span><span class=\"d-arrow\">→ 创意/失控</span></div></div></div><div class=\"d-note\">💡 经验速查：抽取/代码 0~0.3 ｜ 对话 0.5~0.8 ｜ 创意写作 0.9+ ｜ 出现复读机式输出先调高温度。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🌡️",
+      "name": "temperature 管发散",
+      "text": "0≈永远选最高概率词（稳但死板）；越高越随机——事实任务低温，创意任务高温。"
+    },
+    {
+      "icon": "🪣",
+      "name": "top_p 管门槛",
+      "text": "核采样：只在累计概率前 p 的候选里选；0.9 是常用值，过滤离谱选项。"
+    },
+    {
+      "icon": "🔁",
+      "name": "复读机急救",
+      "text": "输出机械重复时，先调高 temperature/top_p——低温陷入循环是高频故障。"
+    },
+    {
+      "icon": "📏",
+      "name": "其他两旋钮",
+      "text": "max_tokens 控长度（省钱）、stop 序列控截断点——配上才算完整工程调用。"
+    },
+    {
+      "icon": "🎯",
+      "name": "可复现性",
+      "text": "要测试稳定就 temperature=0；但注意它只是『近似贪心』，不同批次仍可能有微小差异。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】从 API 拿到的回答像复读机一样机械重复，最先调什么？",
+      "options": [
+        "调高 temperature / top_p，恢复采样多样性",
+        "调大 max_tokens",
+        "换更长的系统提示",
+        "关闭流式输出"
+      ],
+      "answer": 0,
+      "explain": "选 A。低温下模型近似贪心选词，容易陷入重复循环——调高温度是第一急救措施（牛客题库同款归因）。"
+    },
+    {
+      "type": "choice",
+      "q": "做『从合同中抽取金额』的功能，参数怎么配？",
+      "options": [
+        "temperature=1.0，发挥模型理解力",
+        "temperature=0~0.2：抽取要稳定可复现，不需要发散",
+        "temperature=1.5 保证覆盖各种情况",
+        "随机即可"
+      ],
+      "answer": 1,
+      "explain": "选 B。抽取类任务要的是准确与一致：低温让每次抽取结果尽量相同，配合结构化输出（下一站）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你的 AI 写作助手要服务两类需求：①帮运营写 10 个活动标题（要发散）；②帮财务把报销单摘要转成标准格式（要稳）。请给出两个场景的参数配置与理由。",
+      "reference": "场景①标题发散：temperature 0.9~1.1、top_p 0.95——目标是要多样性，让冷门组合有机会出现，一次生成 10 个不同风格的标题；可以配合『10 个风格各异的标题』的指令。场景②格式转换：temperature 0~0.2、top_p 0.8——目标是稳定与可复现，摘要转格式不需要任何创造性，低温让每次输出几乎一致，方便程序校验；同时设 max_tokens 上限防止发挥。共同注意：两个场景都建议先各跑 20 条样本人工检查——参数没有万能值，按你的具体数据微调；若同一功能两类需求并存，用不同参数分别封装成两个调用入口，而不是一个参数通吃。",
+      "keyPoints": [
+        {
+          "point": "①发散：高温 + 宽 top_p",
+          "kw": [
+            "0.9",
+            "1.1",
+            "发散",
+            "标题",
+            "多样性"
+          ]
+        },
+        {
+          "point": "②求稳：低温 + 紧 top_p + 上限",
+          "kw": [
+            "0",
+            "0.2",
+            "稳定",
+            "可复现",
+            "max_tokens"
+          ]
+        },
+        {
+          "point": "先跑 20 条人工验证再定参",
+          "kw": [
+            "样本",
+            "人工",
+            "跑 20 条",
+            "微调"
+          ]
+        },
+        {
+          "point": "不同需求分入口配置",
+          "kw": [
+            "入口",
+            "分别",
+            "封装",
+            "通吃"
+          ]
+        }
+      ],
+      "explain": "能按任务性质给出参数组合并说明验证方法，就是本关目标。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：temperature 和 top_p 各管什么？遇到复读机输出怎么办？",
+    "hint": "提示：水龙头开度 + 抽签箱。",
+    "modelAnswer": "temperature 是水龙头开度：拧小 AI 永远给最标准的答案，稳但死板；拧大就开始天马行空。top_p 是抽签箱的门槛：只在最像样的候选里抽。所以事实问答拧小、创意写作适当拧大。如果输出像复读机一样重复，第一反应就是把温度调高一点，让冷门候选有机会出头。"
+  },
+  "links": [
+    {
+      "to": "c9-sampling-math",
+      "text": "L3 拆开旋钮看数学：温度如何缩放概率分布、核采样如何截断"
+    },
+    {
+      "to": "c1-prompt-basics",
+      "text": "参数管『怎么接』，提示词管『接什么』——回到 L1 的工单思维"
+    }
+  ],
+  "interview": [
+    {
+      "q": "temperature 和 top_p 分别控制什么？生产中怎么配？",
+      "stars": 4,
+      "source": "小林 coding·采样参数/CSDN 面试问答",
+      "tip": "机制一句话+场景经验值+复读机急救，三段作答。"
+    }
+  ],
+  "summary": "Q：两旋钮分工？（答：温度管发散度，top_p 管候选门槛）\nQ：复读机急救？（答：调高温度/top_p）\nQ：抽取类任务怎么配？（答：低温 0~0.2 + 结构化输出）"
+}

@@ -1,0 +1,143 @@
+{
+  "id": "f2-gpu-memory-basics",
+  "title": "显存是什么：AI 酒店的房间账",
+  "definition": "显存是 GPU 上的高速工作内存：模型要整个住进来（权重），每个请求还要占房（KV Cache）。『多大的模型塞进哪张卡、能同时服务几个人』——本质是一道酒店房间账。",
+  "analogies": [
+    {
+      "icon": "🏨",
+      "name": "AI 酒店",
+      "text": "把 GPU 想成一家酒店：模型权重是楼体本身——开业前必须整栋建好（7B 模型 fp16 约 14GB，先占掉一半房间）；每个来的客人（用户请求）要占几间活动房（KV Cache，聊得越长占越多）；还有员工通道水电（激活与开销）。房间总数固定（比如 24G 卡就是 24 千间），楼太大或客人太多都会『客满拒收』。部署模型，就是算这笔账。"
+    },
+    {
+      "icon": "🧳",
+      "name": "行李箱的限制",
+      "text": "显存像登机行李箱：容量固定、必须一次装下所有东西。模型大小是箱子里的西装（必须带），对话内容是随身衣物（越多越占），系统开销是洗漱包。为什么大家疯狂研究『压缩模型』（量化）？因为箱子就那么大——压得越扁，能带的西装越大、能装的衣物越多。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：24G 酒店的房间分配",
+    "description": "切换『模型大小』与『并发客人数』，看房间是否够用。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"f2g\" data-tab=\"r1\">7B 模型 + 8 位客人</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"f2g\" data-tab=\"r2\">13B 模型 + 8 位客人</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"f2g\" data-tab=\"r3\">13B 量化后 + 16 位客人</button></div><div data-pane=\"r1\" data-group=\"f2g\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px\">楼体（权重 14G）</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:58%;background:#8b5cf6\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px\">客房（8 人 KV ≈4G）</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:17%;background:#10b981\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px\">水电杂费 ≈3G</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:12%;background:#f59e0b\"></div></div></div><div class=\"d-tag green\" style=\"margin-top:6px\">✅ 24G 卡住得下，还有余量</div></div></div><div data-pane=\"r2\" data-group=\"f2g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px\">楼体（权重 26G）</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-shake\" style=\"width:110%;background:#ef4444\"></div></div></div><div class=\"d-tag red\" style=\"margin-top:6px\">❌ 楼体本身就超了 24G —— 根本开不了业</div></div></div><div data-pane=\"r3\" data-group=\"f2g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px\">楼体（量化后 6.5G）</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:27%;background:#8b5cf6\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px\">客房（16 人 KV ≈8G）</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-pulse\" style=\"width:33%;background:#10b981\"></div></div></div><div class=\"d-tag green\" style=\"margin-top:6px\">✅ 压缩楼体后：同一张卡多服务一倍客人 —— 这就是量化的魔力</div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🏨",
+      "name": "显存=工作内存",
+      "text": "GPU 的超高速内存，模型运行时所有东西必须 whole 装进去，不够就跑不了。"
+    },
+    {
+      "icon": "🏢",
+      "name": "权重是固定账",
+      "text": "模型多大就占多少（7B 模型 fp16 约 14G），开业前一次性占死。"
+    },
+    {
+      "icon": "🛏️",
+      "name": "KV 是变动账",
+      "text": "每个请求按对话长度占房：聊得越长、人越多，占得越多——常被新手漏算。"
+    },
+    {
+      "icon": "🗜️",
+      "name": "压缩是核心杠杆",
+      "text": "量化把楼体压小（14G→3.5G），同样的卡能跑更大的模型、服务更多客人。"
+    },
+    {
+      "icon": "🧾",
+      "name": "会算账=会选卡",
+      "text": "『模型多大、要服务多少人、买哪张卡』全靠这笔房间账（L3 系统学）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】把 7B 模型从 14G 压缩到 3.5G（量化），最直接的收益是？",
+      "options": [
+        "模型变聪明了",
+        "同样的卡能装更大模型、或服务更多并发客人",
+        "回答速度一定变慢",
+        "不需要 GPU 了"
+      ],
+      "answer": 1,
+      "explain": "选 B。省出的房间可以装更大的楼（更大模型）或多接客人（更高并发）——这是量化的第一性收益。"
+    },
+    {
+      "type": "choice",
+      "q": "新手估算『能不能跑下某模型』时，最容易漏算哪一项？",
+      "options": [
+        "模型权重",
+        "每个请求的 KV Cache 客房（随对话长度与人数增长）",
+        "显卡价格",
+        "操作系统"
+      ],
+      "answer": 1,
+      "explain": "选 B。只算楼体不算客房是经典翻车：聊得越长、人越多，KV 占用可能反超权重。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】朋友想在自己 24G 显卡上本地跑一个 13B 模型陪你聊天，原始大小约 26G。请用酒店账告诉他为什么装不下，以及两条可行建议。",
+      "reference": "用酒店账解释：24G 卡是 24 千间房，但 13B 模型的楼体本身就要 26 千间——楼还没盖就已经爆了，聊天要占的客房更是无从谈起，所以直接装不下。两条建议：第一条是压缩楼体——用 4bit 量化把 13B 模型压到约 6.5G（相当于把整栋楼压缩打包），剩下的房间足够你和它聊天时占用的客房，这是最主流的做法；第二条是换小一点的模型——8B 或 7B 级别的模型楼体 14G，24G 卡住得下还有余量，且当下小模型能力已经不错，日常聊天完全够用。顺带提醒：除了楼体和客房还要留些水电杂费的空间，预算别卡得太满。",
+      "keyPoints": [
+        {
+          "point": "楼体 26G 超 24G 直接装不下",
+          "kw": [
+            "26",
+            "24",
+            "楼体",
+            " 直接装不下",
+            "装不下"
+          ]
+        },
+        {
+          "point": "建议一：4bit 量化压楼体",
+          "kw": [
+            "量化",
+            "4bit",
+            "6.5",
+            "压缩"
+          ]
+        },
+        {
+          "point": "建议二：换更小模型",
+          "kw": [
+            "8b",
+            "7b",
+            "小模型",
+            "换"
+          ]
+        },
+        {
+          "point": "提醒留开销余量",
+          "kw": [
+            "杂费",
+            "余量",
+            "提醒"
+          ]
+        }
+      ],
+      "explain": "能用量化前后对比讲清『为什么装不下+怎么办』即达标。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：显存为什么是大模型的硬门槛？为什么大家都在研究压缩？",
+    "hint": "提示：酒店房间账——楼体、客房、杂费。",
+    "modelAnswer": "GPU 显存像一家房间数固定的酒店：模型本体是楼体，开业前必须整栋建好；每个来聊天的用户还要占几间活动房，聊得越长占越多。楼太大根本开不了业，客人一多就没房。所以大家拼命研究压缩（量化）——把楼体压扁到四分之一，同一张卡就能装更大的模型、接更多的客人，这直接决定了『多大的模型、多少成本、服务多少人』。"
+  },
+  "links": [
+    {
+      "to": "f3-quantization-practice",
+      "text": "L2 学最实用的压缩术：模型量化怎么选、怎么用"
+    },
+    {
+      "to": "f6-kv-cache-pagedattention",
+      "text": "L3 你将看到客房（KV Cache）的高效管理术：分页把利用率从三成提到九成"
+    }
+  ],
+  "interview": [
+    {
+      "q": "部署一个 7B 模型大约需要多少显存？",
+      "stars": 4,
+      "source": "知乎·显存估算专文（频次很高）",
+      "tip": "L1 档先答权重 14G + 客房和杂费要另算；L3 再给完整公式。"
+    }
+  ],
+  "summary": "Q：显存里住着什么？（答：权重楼体 + 每请求的 KV 客房 + 水电杂费）\nQ：为什么量化是核心杠杆？（答：楼体压小，同卡装更大模型/接更多客）\nQ：新手最易漏哪笔账？（答：随对话长度和人数增长的 KV 客房）"
+}

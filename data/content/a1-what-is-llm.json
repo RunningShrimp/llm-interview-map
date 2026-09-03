@@ -1,0 +1,137 @@
+{
+  "id": "a1-what-is-llm",
+  "title": "什么是大模型（LLM）",
+  "definition": "LLM（Large Language Model，大语言模型）是一个读完了海量互联网文本、用超级算力训练出来的『文字接龙机器』：给它开头，它按学到的语言规律预测下一个词，接下去就成了回答、代码甚至推理。",
+  "analogies": [
+    {
+      "icon": "🦜",
+      "name": "超级学舌鹦鹉的升级版",
+      "text": "想象一只读完了全世界图书馆的鹦鹉：你起个头『今天天气真好，』它能接出无数种下文——有的平淡、有的精彩。普通软件像计算器：输入公式给固定答案；大模型像这位鹦鹉学者：它不查表，而是凭『读过的所有文字』培养出的语言直觉，一个词一个词地往下接，接龙接得又长又合理，就看起来像在思考。"
+    },
+    {
+      "icon": "📱",
+      "name": "会聊天的 App 底座",
+      "text": "ChatGPT、文心一言、通义千问这些产品，都是『大模型 + 产品外壳』。模型是发动机，聊天窗口是方向盘。学大模型应用开发，就是学会把这台『文字发动机』装到各种产品上：客服、写作、写代码、查资料——这也是这门课的主线。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：感受『接龙』生成",
+    "description": "点击『下一步』看 AI 如何逐词接龙；再点『换一种接法』感受同一开头的不同续写。",
+    "html": "<div class=\"d-steps\" id=\"a1-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：你给个开头</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber\">输入：春天的公园里，</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：AI 一个词一个词往外接</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">孩子</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.2s\">们</span><span class=\"d-token\">在</span><span class=\"d-token\">放</span><span class=\"d-token\">风筝</span></div><div class=\"d-note\">每接一个词，都要把已有内容整体重新看一遍再决定下一个词。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：同一个开头，多种接法</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">孩子们在放风筝</span><span class=\"d-tag amber\">樱花落了满地</span><span class=\"d-tag\">一位老人在打太极</span></div><div class=\"d-note\">接哪种有随机性——这就是后来会遇到的『温度/采样』旋钮（L2 会学）。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#a1-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#a1-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#a1-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#a1-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🦜",
+      "name": "本质是文字接龙",
+      "text": "LLM 的核心能力是『预测下一个词』，规模够大后涌现出对话、翻译、写代码等通用能力。"
+    },
+    {
+      "icon": "📚",
+      "name": "读得多才聪明",
+      "text": "训练数据是海量互联网文本，模型的『知识』来自这些文本，因此知识有截止日期。"
+    },
+    {
+      "icon": "🧩",
+      "name": "模型≠产品",
+      "text": "ChatGPT 类产品 = 大模型 + 界面与工程；应用开发者的价值在后者。"
+    },
+    {
+      "icon": "🎲",
+      "name": "回答有随机性",
+      "text": "同一问题可能得到不同回答，这不是 bug，是采样机制（L2 深入）。"
+    },
+    {
+      "icon": "🚫",
+      "name": "它不是数据库",
+      "text": "模型不会保证事实正确，可能一本正经地编（术语叫幻觉，下一关讲）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】大模型回答问题时，它在做的事情最接近下面哪一件？",
+      "options": [
+        "在数据库里搜索标准答案",
+        "根据学过的语言规律，逐词预测最合理的下文",
+        "联网查询实时信息后总结",
+        "按照程序员预先写好的台词回复"
+      ],
+      "answer": 1,
+      "explain": "选 B。LLM 的本质是『下一个词预测』：没有答案库、没有预设台词，联网搜索是外挂能力（RAG，后面会学）。理解这一点，后面的幻觉、温度、上下文才好懂。"
+    },
+    {
+      "type": "choice",
+      "q": "为什么同一个问题问 ChatGPT 两次，回答可能不一样？",
+      "options": [
+        "模型被更新了",
+        "生成过程有随机采样，同一开头可以接出不同下文",
+        "服务器不稳定",
+        "模型记性差"
+      ],
+      "answer": 1,
+      "explain": "选 B。接龙『接哪条路』由采样策略决定，有意的随机性让回答自然多样（L2 的 temperature 就是在控制它）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】家人问你：『这个 ChatGPT 到底是什么？它是不是把所有答案都存在里面了？』请用大白话解释大模型是什么，并纠正『存答案』这个误解。",
+      "reference": "它更像一位读完了全世界图书馆的『接龙大师』，而不是一个答案仓库。训练阶段让它读了海量文章，学到的是语言的规律和世界的常识——就像人读完很多书后形成的表达直觉，而不是把原文背下来存档。你问它问题时，它是在根据你的问题接着往下写最合理的话，所以它回答流畅、常常正确，但也可能接出错的部分——因为它是在『写像样的回答』，不是在『查标准答案』。另外它只在训练时读过资料，训练之后世界上新发生的事它并不知道，除非再给它补充资料。所以它是强大的语言处理引擎，不是百分百可靠的百科全书。",
+      "keyPoints": [
+        {
+          "point": "说清『接龙/预测下一个词』的本质",
+          "kw": [
+            "接龙",
+            "往下写"
+          ]
+        },
+        {
+          "point": "纠正『存答案』：学到的是规律不是原文",
+          "kw": [
+            "规律",
+            "不是把原文背下来"
+          ]
+        },
+        {
+          "point": "解释为什么会说错（在写像样的回答，不是查答案）",
+          "kw": [
+            "写像样的回答",
+            "查标准答案",
+            "错的部分"
+          ]
+        },
+        {
+          "point": "提到知识有截止时间",
+          "kw": [
+            "训练之后",
+            "新发生",
+            "补充资料"
+          ]
+        }
+      ],
+      "explain": "L1 的场景题重在『讲得让人听懂』：能用类比、能纠正常见误解就达标。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向完全不懂 AI 的家人解释：大模型是什么？",
+    "hint": "提示：抓住三个词——接龙、读过很多书、可能说错。",
+    "modelAnswer": "它是一个读完了互联网上几乎所有文章的『文字接龙高手』。你说一句话，它就按学到的语言规律一个词一个词往下接，接得又长又合理，看起来就像在聊天、在思考。它不是把答案存在肚子里，而是学会了『怎么说』，所以大多数时候说得很好，但偶尔也会一本正经地说错话。"
+  },
+  "links": [
+    {
+      "to": "c1-prompt-basics",
+      "text": "L1 先建立『接龙』的直觉，接下来学怎么把话说清楚，让接龙接得又准又稳"
+    },
+    {
+      "to": "a3-transformer-intuition",
+      "text": "接龙时 AI 怎么『看懂』你的话？答案是 Transformer——本关下一站"
+    }
+  ],
+  "interview": [
+    {
+      "q": "简单介绍一下你理解的大模型 / LLM 的工作原理？",
+      "stars": 4,
+      "source": "牛客·大模型基础题（开场必问）",
+      "tip": "开场题答『下一个词预测 + 海量数据 + 规模涌现』三件套即可，30 秒内讲清。"
+    }
+  ],
+  "summary": "Q：LLM 的核心机制是什么？（答：下一个词预测——接龙）\nQ：它的知识从哪来？有何局限？（答：来自训练语料，有截止日期且不保证正确）\nQ：模型和产品什么关系？（答：模型是发动机，产品是外壳，应用开发做的是外壳与工程）"
+}

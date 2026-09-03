@@ -1,164 +1,82 @@
-# 模块E 检索报告（Agent 智能体）
+# 模块E 检索报告 v2（层级化）
 
-> 检索时间：2026-09-02；共执行 8 次检索（1 次超时）。已检索到《AI Agent 面试 Top50 必刷题》原帖（牛客网）。
-> 标注约定：「经外部检索」= 有可查 URL 的来源；「转述」= 来自搜索结果摘要、原帖 URL 未直接返回；「内置知识」= 未检索到、基于模型内部知识，可信度较低。
+> v1 检索时间 2026-09-02（8 次）；v2 补充检索时间 2026-09-03（5 次：中文搜索 ×2 + Exa 英文/中文 ×3）。
+> v2 补充方向：①「多 Agent 平台架构」L4 资深岗问法；②「Agent 评测与生产治理」真题形态；③ L1 直觉类开场题面经形态。
+> 标注约定：「经外部检索」= 有可查 URL 的来源；「转述」= 来自搜索结果摘要、原帖未直接打开；「内置知识」= 未检索到、可信度较低。
 
-## e1-agent-anatomy Agent 核心架构（规划/记忆/工具）
-- 星级：⭐4（维持。多来源显示它是 Agent 面试的开场定义题，但常作为 ReAct/Function Calling 的引子而非独立深挖，未达"几乎必问"的 ⭐5）
-- 来源：
-  - 牛客网《大模型Agent面试全攻略（附答题思路）》"核心概念与架构篇"首题即考架构组成：https://www.nowcoder.com/discuss/871718560224112640 （经外部检索）
-  - 牛客网《AI Agent 面试Top50 必刷题》：https://www.nowcoder.com/discuss/886328246717911040 （经外部检索）
-- 面试问法：
-  - 「请简述Agent的基本架构组成，并解释其与传统LLM Chain的区别。」（牛客·大模型Agent面试全攻略，原文）
-  - 「Agent = LLM + 规划(Planning) + 记忆(Memory) + 工具使用(Tool Use)」（同上文的标答要点，原文）
-- 高频考点提示：
-  - 四件套公式：LLM（大脑）+ Planning + Memory + Tool Use，要能逐项展开
-  - Agent 与传统 Chain/Pipeline 的区别：动态决策循环 vs 固定流程编排
-  - 各组件的工程落点：规划靠 ReAct/Plan-and-Execute，记忆靠上下文+外部存储，工具靠 Function Calling
-  - 常被追问"你的项目里 Agent 是怎么架构的"，需结合自己做过的项目答
+## 继承考点（e1~e9 v1 结论）
 
-## e2-react-loop ReAct 循环
-- 星级：⭐5（确认。《AI Agent 面试 Top50 必刷题》第 1 题即"什么是ReAct？"，且有真实面经帖专门记录被问 ReAct，属几乎必问）
-- 来源：
-  - 牛客网《AI Agent 面试Top50 必刷题》第 1 题：https://www.nowcoder.com/discuss/886328246717911040 （经外部检索）
-  - 牛客真实面经《Agent面试会问什么？#面试官真问了ReAct》：https://www.nowcoder.com/feed/main/detail/54c6b1e12c8646d799d1c0bd18e4f471 （经外部检索）
-  - 牛客《Top50 必刷题解析（ReAct 篇）》系列：https://www.nowcoder.com/discuss/1654835 （经外部检索）
-  - 知乎·代码随想录《2026年Agent大厂面试题汇总：ReAct、Function Calling、MCP、RAG》：https://zhuanlan.zhihu.com/p/2028511483969937686 （经外部检索）
-- 面试问法：
-  - 「什么是ReAct？」（牛客 Top50 第 1 题，原文）
-  - 「ReAct 就是让模型'边想边做'，先推理再调用工具；任务拆解分步走」（牛客真实面经中的答题要点，原文）
-- 高频考点提示：
-  - Reasoning + Acting 交替循环：Thought → Action → Observation，直到得出 Final Answer
-  - 与 CoT 的区别：CoT 只推理不行动，ReAct 把工具观察结果写回推理链
-  - ReAct 循环的终止条件与最大步数控制（与 e4 死循环防护联动，知乎汇总里就有"ReAct 循环会死循环吗"一题）
-  - 手写伪代码级掌握：prompt 拼接、解析 Action、执行工具、回填 Observation
+| id | 名称 | 星级 | 主要来源（完整 URL 见文末 v1 来源索引） |
+|---|---|---|---|
+| e1-agent-anatomy | Agent 核心架构（规划/记忆/工具） | ⭐4 | 牛客·大模型Agent面试全攻略、牛客·Top50 必刷题（经外部检索） |
+| e2-react-loop | ReAct 循环 | ⭐5 | 牛客 Top50 第 1 题、牛客真实面经"面试官真问了ReAct"、代码随想录 2026 汇总（经外部检索） |
+| e3-function-calling | Function Calling 与参数校验 | ⭐5 | 小林面试笔记、CSDN FC 详解、代码随想录、Seven97、知乎 FC/MCP/A2A（经外部检索） |
+| e4-tool-error-loops | 工具调用异常与死循环防护 | ⭐4 | 代码随想录 2026 汇总（原文）、面试鸭题库/字节追问（经转述） |
+| e5-agent-memory | Agent 记忆系统 | ⭐4 | 知乎·字节面试题记忆系统、JavaGuide、JavaBetter 13 题（经外部检索） |
+| e6-planning-reflection | 规划与反思（Plan-and-Execute/Reflection） | ⭐3 | 知乎 15 题、牛客全攻略（间接）；专项面经原文未检索到 |
+| e7-multi-agent | 多智能体协作 | ⭐3 | 无虚熊 150+ 题、知乎 15 题、CSDN 框架对比（间接） |
+| e8-mcp-tools | MCP 协议与工具生态 | ⭐4 | 知乎 MCP 必考题、腾讯云、JavaUp、阿里云（经外部检索） |
+| e9-agent-frameworks | Agent 开发框架对比 | ⭐3 | 小林面试笔记、GolangStar、GitHub AgentGuide（经外部检索） |
+| e10-context-engineering（v1 已建议新增） | 上下文工程（压缩/摘要/卸载） | ⭐4 | JavaBetter 13 题、阿里云记忆系统 ｜ v2 建议层级：L3 |
+| e11-a2a-protocol（v1 已建议新增） | A2A 协议与 Agent 互操作 | ⭐3 | 知乎 FC/MCP/A2A、ANP 十问十答 ｜ v2 建议层级：L3~L4 |
 
-## e3-function-calling Function Calling 与参数校验
-- 星级：⭐5（确认。小林面试笔记、代码随想录、Seven97 等多个独立题库均设专项，且"FC 怎么训练/微调""FC vs MCP"是高频追问）
-- 来源：
-  - 小林面试笔记《什么是 Function Calling？原理是什么？》：https://xiaolinnote.com/ai/tools/1_function_calling.html （经外部检索）
-  - CSDN《大模型面试之 Function Call 详解》（含"怎么训练、怎么微调"问法）：https://blog.csdn.net/m0_37733448/article/details/147440119 （经外部检索）
-  - 代码随想录《Function Calling 详解——为什么是 Agent 的基础》：https://notes.kamacoder.com/llm/app/function_calling.html （经外部检索）
-  - Seven 的菜鸟成长之路《LLM 工具调用常见面试题》：https://www.seven97.top/interview/ai/tool.html （经外部检索）
-  - 知乎面经《Function Call、MCP、A2A》：https://zhuanlan.zhihu.com/p/1898326676087223572 （经外部检索）
-- 面试问法：
-  - 「什么是Function Calling？原理是什么？」（小林面试笔记标题，原文）
-  - 「Function Call 是怎么训练、怎么微调的？」（CSDN 面试详解，原文）
-  - 「MCP 与 Function Call 的区别是什么？」（知乎面经高频对比题，原文）
-- 高频考点提示：
-  - 核心机制：模型只输出函数名 + JSON 参数（tool_calls），不真正执行，由应用侧执行后回传结果
-  - Schema/参数校验：JSON Schema 定义、必填字段与枚举校验、幻觉参数（编造不存在的参数值）处理
-  - 并行调用：一次响应输出多个 tool_calls（如"同时查北京和上海的天气"）
-  - 进阶追问：FC 能力的来源（SFT 指令微调，Llama3/Qwen 技术报告有公开细节）
-  - 对比题三连：Function Call vs MCP vs A2A
+## 层级化新增/调整建议
 
-## e4-tool-error-loops 工具调用异常与死循环防护
-- 星级：⭐4（维持。确认为字节等大厂高频追问、面试鸭设有专项题，但多以追问/场景题形式出现，独立出题密度略低于 e2/e3，故不上调 ⭐5）
-- 来源：
-  - 知乎·代码随想录《2026年Agent大厂面试题汇总》（原文含"死循环：工具持续失败 Agent 反复重试→解法：最大步数+相同动作检测；幻觉工具调用"）：https://zhuanlan.zhihu.com/p/2028511483969937686 （经外部检索）
-  - 面试鸭 AI Agent 题库（含"Agent 死循环问题有遇到过吗？如何解决？"专项题）：https://nageoffer.com/ai/interview/home/ （经外部检索，问法经搜索摘要转述）
-  - 字节面试追问「你的 Agent 调了三个工具就死循环了」「工具调用失败怎么办？」（转述：来自搜索摘要引述的知乎/面试鸭汇总内容，原帖 URL 未在结果中返回）
-- 面试问法：
-  - 「Agent 死循环问题有遇到过吗？如何解决？」（面试鸭题库，经转述）
-  - 「工具调用失败怎么办？」（字节高频追问，经转述；标答要求覆盖调用前参数/权限校验、调用中超时、失败后区分临时性 vs 确定性错误）
-- 高频考点提示：
-  - 死循环三根因：参数错误未修正盲目重试、无重试上限、每轮重试都向用户发消息
-  - 防护手段：最大步数/最大重试次数、相同（动作,参数）检测、超时与熔断
-  - 错误分型处理：临时性错误指数退避重试，确定性错误降级/换工具/兜底告知用户
-  - 幻觉工具调用：调用不存在的工具名，需在 Runtime 层严格校验并拦截
-  - 加分项：把失败观察（error observation）回填给 LLM 让其自行修正，而非静默重试
+- [Agent vs Chatbot vs Workflow 三分谱系（开场定义题）] ｜ 建议层级 L1 ｜ ⭐4 ｜ 来源：JavaGuide《AI Agent 面试题总结》基础篇第 1 题即"AI Agent 是什么？和普通 Chatbot 有什么区别？"（https://javaguide.cn/ai/interview-questions/agent-interview-questions.html ，经外部检索）；牛客真实面经《Agent 概念与基本架构面试问答》Q2"Chatbot、Workflow 和 Agent 有什么区别？"（https://www.nowcoder.com/discuss/916877028622598144 ，经外部检索）；卡码笔记《Agent 到底是什么？和普通大模型问答、ChatBot、Workflow 有什么区别》专文（https://notes.kamacoder.com/llm/app/agent_intro.html ，经外部检索）；CSDN《agent面试必备2：搞懂 AI Agent 与 ChatBot、LLM Chain 的本质区别（面试必考）》（https://bqleng.blog.csdn.net/article/details/161744517 ，经外部检索） ｜ 一句话定义：用"是否由模型自己决定下一步"区分 Chatbot（生成回复）、Workflow（代码预定义路径）、Agent（模型动态决策+反馈闭环），是面经中确认存在的第一道开场题。
+  - 调整建议：e1 的 L1 开场形态应前置为本题（比"架构四件套"更基础），四件套公式作为本题的展开答案；卡码文强调其筛选动机——"很多简历上写了 Agent，但讲出来还是一个 ChatBot"。
+- [多 Agent 平台架构（编排模式/通信协议栈/平台化治理）] ｜ 建议层级 L4（资深岗） ｜ ⭐4 ｜ 来源：知乎《多Agent架构面试全解析：通信、编排、Tool取舍与工程代价》，含"面试官问主Agent和子Agent的通信链路、为什么用多Agent而不是Tool"（https://zhuanlan.zhihu.com/p/2040834441451459515 ，经外部检索）；卡码笔记《Multi-Agent Harness面试详解：未来竞争不是谁的Agent更多》，讲"架构编排层与决策权"（https://notes.kamacoder.com/interview/llm/multi_agent_harness_interview.html ，经外部检索）；面试大师·网易 AI 应用开发真实面经题《对接多家国内大模型官方 API 时，如何设计统一调用网关来屏蔽接口差异？》（https://mianshidashi.cn/interview-questions/netease/ai-application-development/netease-ai-application-llm-provider-gateway ，经外部检索，页面标注"真实面经题"）；技术栈《AI面试临阵磨枪-59：企业内部 AI 系统权限、数据隔离、审计设计》（https://jishuzhan.net/article/2058539259574403073 ，经外部检索）；AI Master《设计一个 AI Gateway：支持多模型路由、降级与成本优化》（https://www.ai-master.cc/interview/ai-gateway-design-001 ，经外部检索） ｜ 一句话定义：把 e7 的"多 Agent 协作"上升到平台层——主/子 Agent 编排与决策权设计、MCP/A2A 构成的通信协议栈、以及多租户权限/审计/成本治理（AI Gateway、Agent Harness 六层治理）的平台化能力。
+  - 层级理由：编排与协作本身是 L3（e7 ⭐3），但"平台化治理"（网关收敛密钥与审计、多租户隔离、Token 预算熔断）只出现在资深岗系统设计题，符合 L4 定位；"Agent 无密钥、Gateway 掌密钥"（AI Master）与 Harness 六层治理结构（yeasy.gitbook.io/agentic_ai_guide 9.5，经外部检索）可作为标答框架。
+- [Agent 评测与生产治理（轨迹评估/解决率/Trace 可观测）] ｜ 建议层级 L4（基础问法下探 L3） ｜ ⭐4 ｜ 来源：CSDN 智能体开发者社区《【AI Agent面试题】LLM-as-a-Judge：让大模型当裁判，怎么做、坑在哪？》，覆盖 Pointwise/Pairwise/Reference-based 三形态（https://adg.csdn.net/6a87b5d210ee7a33f29d5a54.html ，经外部检索）；知乎《大模型面试118题（十六）：模型评估》Q94 LLM-as-a-Judge 可靠性、Q96 LLM Observability（https://zhuanlan.zhihu.com/p/2057196604575290069 ，经外部检索）；ZiCode《Agent面试详解（下）：评测、安全与落地判断》——"用 Trace 还原轨迹，用四层测试控制不确定性"（https://zicode.com/blog/agent-interview-guide-part-3/ ，经外部检索）；LangChain LangSmith 官方教程《Evaluate a complex agent》三粒度：final response / trajectory / single step（https://docs.langchain.com/langsmith/evaluate-complex-agent ，经外部检索）；LangChain《Evaluating AI Agents at the Run, Trace, and Thread Level》——Run/Trace/Thread 三原语、会话级指标 resolution rate/escalation frequency/goal completion、89% 组织有可观测但仅 52% 跑离线评测（https://www.langchain.com/resources/agent-evals ，经外部检索，2026-06）；Galileo《How to Become An AI Agent Evaluation Engineer?》含多道原文面试题（https://galileo.ai/blog/how-to-become-agent-evaluation-engineer-career-guide ，经外部检索） ｜ 一句话定义：对非确定性 Agent 用 Run/Trace/Thread 三级粒度做评估——最终答案、工具调用轨迹（trajectory match 的 strict/unordered/subset/superset 四模式）、跨轮会话解决率，配合 LLM-as-Judge 校准与线上可观测（LangSmith 类 Trace 工具）形成"生产 Trace→回归数据集"治理闭环。
+  - 层级与星级理由：中文面试资料已出现专项题（CSDN/知乎/ZiCode），符合 v1 对 ⭐4 的判据（"出现大量专项面试资料"）；但中文真实面经原文样本仍少于 MCP，故不评 ⭐5；基础问法（"怎么评估 Agent 效果"）L3 即需掌握，系统设计形态（"给一群 Agent 设计生产监控"）属 L4。
 
-## e5-agent-memory Agent 记忆系统
-- 星级：⭐4（维持。有来源称"Memory 几乎是所有 AI Agent 面试的核心考点"（单一来源观点），另有字节真题与专项 13 题清单佐证；考虑其常并入 e1 架构题作答，维持 ⭐4、贴近 ⭐5）
-- 来源：
-  - 知乎《字节面试题：Agent 的记忆系统怎么设计？短期记忆和长期记忆到底有什么区别？》：https://zhuanlan.zhihu.com/p/2054956661874472543 （经外部检索）
-  - 知乎《十分钟带你快速掌握Agent记忆管理高频面试题》：https://zhuanlan.zhihu.com/p/2056052651524109554 （经外部检索）
-  - JavaGuide《AI Agent 记忆系统：短期记忆、长期记忆与记忆演化机制》：https://javaguide.cn/ai/agent/agent-memory.html （经外部检索）
-  - JavaBetter《AI Agent 面试题第二弹：Memory 系统、RAG 检索、长上下文工程 13 题》：https://javabetter.cn/sidebar/itwanger/paicli/paicli-interview-memory-context.html （经外部检索）
-- 面试问法：
-  - 「Agent 的记忆系统怎么设计？短期记忆和长期记忆到底有什么区别？」（知乎·字节面试题标题，原文）
-  - 「大模型应用中如何实现长短期记忆机制？怎么存、怎么检索？」（ai-master.cc 面试题标题，原文：https://www.ai-master.cc/interview/agent-memory-implementation-001 ）
-- 高频考点提示：
-  - 两层模型：短期记忆 = Session 级对话历史/滑动窗口/摘要压缩；长期记忆 = 跨 Session 持久化（向量库/结构化 DB）
-  - 记忆生命周期：写入时机、存储粒度、检索策略（相似度召回 + 注入上下文）、淘汰与遗忘
-  - 进阶：记忆压缩（Memory Summary）、用户画像沉淀、记忆冲突与治理
-  - 可提的四层架构：感知记忆/短期（工作台）/长期（知识库）/实体记忆（结构化关键事实）
-  - 常与上下文窗口限制、RAG 的边界一起追问
+## 面试问法补充
 
-## e6-planning-reflection 规划与反思（Plan-and-Execute/Reflection）
-- 星级：⭐3（维持。仅获间接佐证——知乎《Agent 精选15题》覆盖"规划执行"、牛客全攻略将 Planning 列为架构四件套之一；Reflection/Plan-and-Execute 专项题未检索到，故维持 ⭐3）
-- 来源：
-  - 知乎《Agent 精选15题》（涵盖记忆管理、规划执行、多Agent系统）：https://zhuanlan.zhihu.com/p/1980294044010702447 （经外部检索，间接）
-  - 牛客《大模型Agent面试全攻略》（Planning 为标答四件套之一）：https://www.nowcoder.com/discuss/871718560224112640 （经外部检索，间接）
-  - Plan-and-Execute/Reflection 专项面试题：未经外部检索：内置知识
-- 面试问法（内置知识，未检索到原文）：
-  - 「ReAct 和 Plan-and-Execute 有什么区别？各自适用什么场景？」（内置知识）
-  - 「什么是 Reflection/Self-Critique？如何用反思提升 Agent 完成率？」（内置知识）
-- 高频考点提示：
-  - 先规划后执行 vs 边想边做：Plan-and-Execute 适合长任务、ReAct 适合短平快，混合模式（执行中重规划）
-  - Reflection 闭环：执行 → 自评/批判 → 修正再执行（Reflexion 思路）
-  - 任务拆解（Decomposition）：子目标生成与依赖排序
-  - 工程落点：计划的可变性、失败子任务的重规划成本
-
-## e7-multi-agent 多智能体协作
-- 星级：⭐3（维持。多智能体被多个独立考点清单收录（无虚熊 150+ 题、知乎 15 题、Top50 考点趋势），但专项检索超时未获直接面经原文，维持 ⭐3）
-- 来源：
-  - 无虚熊AI《AI Agent 面试题大全（150+ 题）》（含 Multi-Agent 协作专题）：https://www.wushixiongai.com/agent （经外部检索，间接）
-  - 知乎《Agent 精选15题》（含多Agent系统）：https://zhuanlan.zhihu.com/p/1980294044010702447 （经外部检索，间接）
-  - CSDN《LangChain+LlamaIndex+AutoGen+LangGraph对比》（AutoGen 多智能体协作模式：双人对话/群聊/经理-员工）：https://blog.csdn.net/usa_washington/article/details/151869985 （经外部检索，间接）
-  - 多智能体专项面经原文：检索超时，未经外部检索：内置知识
-- 面试问法（内置知识，未检索到原文）：
-  - 「什么场景下需要多智能体？相比单 Agent 的收益和代价是什么？」（内置知识）
-  - 「多智能体之间如何通信与任务编排？怎么解决消息传递失控/成本膨胀？」（内置知识）
-- 高频考点提示：
-  - 编排模式：中心化（Manager/Orchestrator）vs 去中心化（群聊/握手）；AutoGen/CrewA/LangGraph 的模式差异
-  - 通信协议与消息格式、共享黑板 vs 点对点传话
-  - 工程痛点：错误传播放大、上下文重复消耗、可观测性差
-  - 适用性判断：能单 Agent 解决就不上多 Agent（面试官常考这个"反直觉"判断）
-
-## e8-mcp-tools MCP 协议与工具生态
-- 星级：⭐4（上调自 ⭐3。2025–2026 出现大量 MCP 专项面试资料，标题直用"必考题""高频面试题"表述，且进入 Top50 考点趋势与阿里云 65 题宝典，热度显著高于一般 ⭐3 主题）
-- 来源：
-  - 知乎《面试官最爱问的MCP问题！大模型岗位必考题精选》：https://zhuanlan.zhihu.com/p/1950977740351177021 （经外部检索）
-  - 腾讯云《面试官：你项目里接了MCP，讲一下你的理解？》：https://cloud.tencent.com/developer/article/2664521 （经外部检索）
-  - JavaUp《MCP协议面试速查》：https://javaup.chat/ai-interview/quick-review/mcp-protocol/ （经外部检索）
-  - 知乎《MCP 最新面试八股文》：https://zhuanlan.zhihu.com/p/1955109180521314171 （经外部检索）
-  - 阿里云开发者《面试被问MCP？看这一篇文章就行了》：https://developer.aliyun.com/article/1733890 （经外部检索）
-- 面试问法：
-  - 「面试官：你项目里接了MCP，讲一下你的理解？」（腾讯云文章标题，原文）
-  - 「MCP协议要解决什么问题？」（JavaUp 速查 Q1，原文）
-  - 「MCP 如何做到跨平台兼容？」（CSDN MCP 篇必考问，原文：https://mcp.csdn.net/6a2e3b13662f9a54cb7ed3a1.html ）
-- 高频考点提示：
-  - 定位：Anthropic 2024 年底开源协议，把 M×N 工具接入碎片化降为 M+N
-  - 架构三角色：Host / Client / Server；传输 stdio（本地）与 SSE/Streamable HTTP（远程）
-  - 三大能力原语：Tools、Resources、Prompts
-  - 必考对比：MCP（系统级能力接入协议）vs Function Calling（单次调用接口），及与 A2A 的分工
-  - 项目向追问："你项目里怎么接的 MCP"，要能讲接入与鉴权实操
-
-## e9-agent-frameworks Agent 开发框架对比（LangChain/AutoGen/LlamaIndex）
-- 星级：⭐3（维持。小林面试笔记、GolangStar 等设有"框架了解/选型"专项题，属常问但不属于每场必问的深水区）
-- 来源：
-  - 小林面试笔记《你了解过哪些AI Agent 开发框架？》：https://xiaolinnote.com/ai/langchain/agent_frameworks.html （经外部检索）
-  - GolangStar《LangChain vs LlamaIndex 核心场景对比（LLM 面试题）》：https://golangstar.cn/backend_series/llm_interview/agent_frame_compare.html （经外部检索）
-  - GitHub AgentGuide《Agent 开发框架对比》（含 Star 数与难度评级）：https://github.com/adongwanai/AgentGuide/blob/main/resources/agent/frameworks.md （经外部检索）
-- 面试问法：
-  - 「你了解过哪些AI Agent 开发框架？」（小林面试笔记标题，原文）
-  - 「LangChain 和 LlamaIndex 有什么区别、分别适合什么场景？」（GolangStar 对比题主旨，原文）
-- 高频考点提示：
-  - 定位差异：LangChain 通用编排、LlamaIndex 数据索引/RAG 专精、AutoGen 多 Agent 对话、LangGraph 状态图流程控制
-  - 组合使用是加分项：如 LlamaIndex 做检索并封装成 Tool，LangGraph 做编排
-  - 按场景选型：简单 RAG 用轻量方案，复杂长任务/多 Agent 才上 LangGraph/CrewAI/AutoGen
-  - 追问"为什么不用/要去框架化"：抽象层开销、调试黑盒、版本迭代快
-
-## 建议新增知识点清单
-- [Agent 上下文工程（Context Engineering：压缩/摘要/卸载）] ⭐4 ｜ 来源：JavaBetter《AI Agent 面试题第二弹：Memory 系统、RAG 检索、长上下文工程 13 题》（https://javabetter.cn/sidebar/itwanger/paicli/paicli-interview-memory-context.html ）、阿里云开发者《AI Agent 的记忆系统》（含压缩、卸载等上下文工程策略，https://developer.aliyun.com/article/1710635 ）｜ 一句话定义：通过滑动窗口、摘要压缩、外部化卸载（写入文件/存储再按需取回）等手段管理 Agent 长任务中的上下文窗口，防止爆窗与信息丢失。
-- [A2A 协议与 Agent 互操作] ⭐3 ｜ 来源：知乎面经《大模型算法面经：Function Call、MCP、A2A》（https://zhuanlan.zhihu.com/p/1898326676087223572 ）、Agent Network Protocol《MCP十问十答》（https://agent-network-protocol.com/zh/blogs/posts/mcp-10-questions ）｜ 一句话定义：Google 提出的 Agent2Agent 开放协议，标准化跨 Agent 的任务委托与状态通信，面试中常以"FC vs MCP vs A2A"三方对比题出现（MCP 连接工具，A2A 连接 Agent）。
+- Agent vs Chatbot vs Workflow（L1）：
+  - 「AI Agent 是什么？和普通 Chatbot 有什么区别？」（JavaGuide 基础篇第 1 题，原文）
+  - 「Chatbot、Workflow 和 Agent 有什么区别？」及追问「ChatBot 加上插件是不是就变成 Agent 了？」「RAG+Chat 算不算 Agent？」（牛客面经 Q2 原文 + CSDN agent面试必备2 原文）
+- 多 Agent 平台架构（L4）：
+  - 「主 Agent 和子 Agent 的通信链路是怎样的？为什么用多 Agent 而不是把能力做成 Tool？」（知乎·多Agent架构面试全解析，经转述自摘要）
+  - 「在设计企业内部的 AI Agent 或 RAG 系统时，你如何实现多租户权限控制、企业级数据隔离以及全链路合规审计？」（技术栈·临阵磨枪-59，原文）
+  - 「对接多家国内大模型官方 API 时，如何设计统一调用网关来屏蔽接口差异？」（网易 AI 应用开发真实面经题，原文）；同族题：「设计一个 AI Gateway：支持多模型路由、降级与成本优化」（AI Master 题库标题，原文）
+- Agent 评测与生产治理（L4）：
+  - 「How would you design an evaluation framework for a multi-step reasoning agent?」（Galileo 评测工程师指南原文；标答需覆盖轨迹级评估、Agent 专属指标、非确定性输出的统计方法）
+  - 「An agent's tool selection accuracy dropped 3% this week. Walk through your debugging process.」（Galileo 原文场景题；考察数据漂移排查、失败案例归因、统计显著性）
+  - 「LLM-as-a-Judge 怎么做？坑在哪？」（CSDN ADG 专项题标题，原文；标答覆盖 Pointwise/Pairwise/Reference-based 与 judge 校准）
+  - 中文基础问法（推断，未检索到原句）：「怎么评估一个 Agent 的好坏？只看最终回复够吗？」——可由 ZiCode 评测篇与知乎 118 题 Q94/Q96 支撑作答。
 
 ## 开放问题
-- e6（Plan-and-Execute/Reflection）与 e7（Multi-Agent）未检索到可直接引用的面经原文问法，星级基于多个间接考点清单与内置知识判断，建议后续用"Reflection 面试题""CrewAI 面经"等关键词补一轮定向检索。
-- "Memory 几乎是所有 AI Agent 面试的核心考点"为单一来源（知乎）表述，e5 是否上调 ⭐5 需更多面经样本佐证。
 
-## 参考来源（含类型与检索时间 2026-09-02）
+- 「多 Agent 平台架构」的"通信协议栈"问法（如"A2A 消息格式怎么设计""跨 Agent 身份与委托链"）未检索到直接面经原文，当前仅由编排/治理问法侧面覆盖；建议后续用"A2A 面试题""Agent 通信协议 面试"补检。
+- 「解决率（resolution rate）」作为中文面试术语尚未在中文题库中直接出现（当前来源为 LangChain 英文资料），中文问法更可能以"上线后怎么衡量 Agent 效果/任务完成率"形式出现——此为推断。
+- v1 遗留：e6（Reflection 专项）与 e7（Multi-Agent 直接面经）仍未获原文问法，本轮新增的知乎多Agent解析可部分缓解 e7，e6 维持内置知识标注。
+
+## 参考来源
+
+### v2 新增（检索时间 2026-09-03）
+| 来源 | 类型 | URL |
+|---|---|---|
+| JavaGuide·AI Agent 面试题总结 | 权威技术文档站题库 | https://javaguide.cn/ai/interview-questions/agent-interview-questions.html |
+| 牛客·agent面经 Agent 概念与基本架构问答 | 真实面经 | https://www.nowcoder.com/discuss/916877028622598144 |
+| 卡码笔记·Agent vs ChatBot/Workflow 区别 | 技术博客题库 | https://notes.kamacoder.com/llm/app/agent_intro.html |
+| 卡码笔记·Agent 大厂面试题汇总 | 技术博客题库 | https://notes.kamacoder.com/interview/llm/agent_interview.html |
+| CSDN·agent面试必备2 ChatBot/Chain/Agent 区别 | 技术博客题库 | https://bqleng.blog.csdn.net/article/details/161744517 |
+| 犬小哈教程·Agent 与大模型本质不同 | 技术博客题库 | https://www.quanxiaoha.com/java-interview/agent-vs-llm-difference |
+| 知乎·多Agent架构面试全解析 | 社区题解 | https://zhuanlan.zhihu.com/p/2040834441451459515 |
+| 卡码笔记·Multi-Agent Harness 面试详解 | 技术博客题库 | https://notes.kamacoder.com/interview/llm/multi_agent_harness_interview.html |
+| 面试大师·网易 AI 应用开发面经（统一调用网关） | 面经解析站（标注真实面经题） | https://mianshidashi.cn/interview-questions/netease/ai-application-development/netease-ai-application-llm-provider-gateway |
+| 技术栈·企业内部 AI 权限/数据隔离/审计设计 | 面试题解析站 | https://jishuzhan.net/article/2058539259574403073 |
+| AI Master·设计一个 AI Gateway | 题库站 | https://www.ai-master.cc/interview/ai-gateway-design-001 |
+| yeasy GitBook·Agentic AI 指南 9.5 企业级部署 | 开源指南（背景参考） | https://yeasy.gitbook.io/agentic_ai_guide/di-san-bu-fen-gong-cheng-shi-jian-yu-luo-di/09_agentops/9.5_enterprise.md |
+| CSDN ADG·LLM-as-a-Judge 面试题 | 社区题库 | https://adg.csdn.net/6a87b5d210ee7a33f29d5a54.html |
+| 知乎·大模型面试118题（十六）模型评估 | 社区题库 | https://zhuanlan.zhihu.com/p/2057196604575290069 |
+| ZiCode·Agent面试详解（下）：评测、安全与落地判断 | 技术博客题库 | https://zicode.com/blog/agent-interview-guide-part-3/ |
+| LangSmith 官方·Evaluate a complex agent | 官方文档 | https://docs.langchain.com/langsmith/evaluate-complex-agent |
+| LangChain·Agent Evals（Run/Trace/Thread） | 官方白皮书（2026-06） | https://www.langchain.com/resources/agent-evals |
+| LangChain 博客·Agent observability powers evaluation | 官方博客（2026-01） | https://www.langchain.com/blog/agent-observability-powers-agent-evaluation |
+| Galileo·How to Become An AI Agent Evaluation Engineer | 厂商博客（含面试题，2025-12） | https://galileo.ai/blog/how-to-become-agent-evaluation-engineer-career-guide |
+| AWS·Agent 质量评估（Agentic AI 基础设施系列六） | 云厂商博客（背景参考） | https://aws.amazon.com/cn/blogs/china/agent-quality-evaluation/ |
+
+### v1 来源索引（检索时间 2026-09-02，星级判定依据）
 | 来源 | 类型 | URL |
 |---|---|---|
 | 牛客·AI Agent 面试Top50 必刷题 | 社区题库（种子已核实） | https://www.nowcoder.com/discuss/886328246717911040 |
@@ -182,6 +100,7 @@
 | 知乎·Agent 记忆管理高频面试题 | 社区题库 | https://zhuanlan.zhihu.com/p/2056052651524109554 |
 | JavaGuide·Agent 记忆系统 | 权威技术文档站 | https://javaguide.cn/ai/agent/agent-memory.html |
 | JavaBetter·Memory/长上下文工程 13 题 | 社区题库 | https://javabetter.cn/sidebar/itwanger/paicli/paicli-interview-memory-context.html |
+| JavaBetter·Agent 核心架构 13 题（ReAct/Plan-and-Execute/Multi-Agent） | 社区题库 | https://javabetter.cn/sidebar/itwanger/paicli/paicli-interview-agent-core.html |
 | ai-master·长短期记忆机制面试题 | 题库站 | https://www.ai-master.cc/interview/agent-memory-implementation-001 |
 | 知乎·Agent 精选15题 | 社区题库 | https://zhuanlan.zhihu.com/p/1980294044010702447 |
 | 无虚熊AI·Agent 面试题大全 150+ | 题库站 | https://www.wushixiongai.com/agent |

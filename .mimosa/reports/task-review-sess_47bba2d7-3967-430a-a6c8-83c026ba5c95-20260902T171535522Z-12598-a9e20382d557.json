@@ -1,0 +1,320 @@
+{
+  "schema_version": "mimosa-task-review/v2",
+  "run_id": "20260902T171535522Z-12598-a9e20382d557",
+  "run_status": "inconclusive",
+  "errors": [
+    {
+      "stage": "candidate-select",
+      "target": "tools/tmp-placeholder.js",
+      "reason": "changed_file_unreadable: observed changed file no longer exists or cannot be read"
+    },
+    {
+      "stage": "scan",
+      "target": "data/syllabus.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "js/judge.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "js/app.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "tools/validate.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "tools/judge.test.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "supply-chain-check",
+      "target": ".",
+      "reason": "empty scanner output (status 1)"
+    }
+  ],
+  "coverage": {
+    "schema_version": "mimosa-hook-coverage/v1",
+    "status": "partial",
+    "scope": "hook_observed_diff",
+    "baseline": {
+      "complete": true,
+      "captured_files": 7,
+      "candidate_limit": 5000,
+      "truncated": false,
+      "enumeration_error_count": 0,
+      "snapshot_error_count": 0,
+      "compensated_target_count": 6
+    },
+    "change_tracking": {
+      "touched_observed": 7,
+      "touched_retained": 7,
+      "truncated": false,
+      "bash_mutation": true,
+      "bash_discovered": 6,
+      "bash_discovery_limit": 80,
+      "bash_discovery_truncated": false
+    },
+    "candidates": {
+      "eligible_files": 6,
+      "selected_files": 6,
+      "limit": 20,
+      "truncated": false
+    },
+    "scanning": {
+      "required_files": 5,
+      "scanned_files": 0,
+      "skipped_files": 0,
+      "failed_files": 5,
+      "project_checks_required": 1,
+      "project_checks_completed": 0
+    },
+    "notification": {
+      "eligible_findings": 0,
+      "detailed_findings": 0,
+      "detail_limit": 3,
+      "truncated": false
+    },
+    "reason_counts": {
+      "changed_file_unreadable": 1,
+      "scanner_failed": 5,
+      "project_check_failed": 7,
+      "finding_ledger_read_failed": 1
+    },
+    "reasons": [
+      {
+        "code": "changed_file_unreadable",
+        "stage": "candidate-select",
+        "target": "tools/tmp-placeholder.js",
+        "detail": "observed changed file no longer exists or cannot be read",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "data/syllabus.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "js/judge.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "tools/validate.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "tools/judge.test.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "candidate-select",
+        "target": "tools/tmp-placeholder.js",
+        "detail": "changed_file_unreadable: observed changed file no longer exists or cannot be read",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "data/syllabus.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "js/judge.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "tools/validate.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "tools/judge.test.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "supply-chain-check",
+        "target": ".",
+        "detail": "empty scanner output (status 1)",
+        "affects_completion": true
+      },
+      {
+        "code": "finding_ledger_read_failed",
+        "stage": "finding-ledger",
+        "target": ".",
+        "detail": "file:///Users/didi/.zcode/cli/plugins/cache/zcode-plugins-official/mimosa/1.0.3/payload/dist/cli.js:3 const path = require(\"node:path\"); ^ ReferenceError: require is not defined in ES module scope, you can use import instead This file is being treated as an ES module because it has a '.js' file exte",
+        "affects_completion": false
+      }
+    ],
+    "reasons_truncated": false
+  },
+  "generated_at": "2026-09-02T17:15:35.522Z",
+  "session_id": "sess_47bba2d7-3967-430a-a6c8-83c026ba5c95",
+  "target": ".",
+  "revision": "5c8597030ab51417531adbdcbb0dbec6b7361ea5",
+  "rules_version": "unavailable",
+  "diff_hash": "5667a5d159e30b882539698e7b2df5b7e4809edf4efb5b27464ec83bd8e628d7",
+  "diff": {
+    "algorithm": "sha256",
+    "changed_file_count": 6,
+    "changed_files": [
+      {
+        "file": "data/syllabus.js",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 134
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "2d39f6e1f7c2c25d08172d3d62201c5e0f97b692974841045227b37b3bf8b95d"
+      },
+      {
+        "file": "js/app.js",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 827
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "8cf42b1fcdc250e631ff4d7321d7ce45d25e2a2db8ae8f7696b474aa4a7ad941"
+      },
+      {
+        "file": "js/judge.js",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 50
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "94bde6fec6bee3389bec80377d381574e684d382b732650663ca6d4daecea0a4"
+      },
+      {
+        "file": "package.json",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 10
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "3322cc1800f71ec26db03b71f20048c2afc353d3c70a6a4e7f9f7f580aceaa5c"
+      },
+      {
+        "file": "tools/judge.test.js",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 76
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "88fa3a325511e3dfe876790f73b41880979bfffdb3c2ef4fe86b2e32a6d13eb8"
+      },
+      {
+        "file": "tools/validate.js",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 202
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "62e7b42c619cd552b78c34fef3168e6ae306eb6f8d191ce3947877d2b878a083"
+      }
+    ]
+  },
+  "timing": {
+    "started_at": "2026-09-02T17:15:35.214Z",
+    "completed_at": "2026-09-02T17:15:35.522Z",
+    "duration_ms": 308,
+    "measurement": "hook_wall_clock"
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "model_calls": 0,
+    "measurement": "known-zero"
+  },
+  "telemetry": {
+    "schemaVersion": "mimosa-gate-telemetry/v1",
+    "profile": "gate",
+    "operation": "Stop",
+    "outcome": "partial/INCONCLUSIVE",
+    "latencyMs": 308,
+    "peakMemoryBytes": 114081792,
+    "memoryMeasurement": "max-observed-process-rss",
+    "scannedFiles": 0,
+    "cache": {
+      "hits": 0,
+      "misses": 0,
+      "measurement": "not-applicable"
+    },
+    "denyCount": 0,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0,
+      "modelCalls": 0,
+      "measurement": "known-zero"
+    }
+  },
+  "finding_count": 0,
+  "rewake_finding_count": 0,
+  "evidence_boundary": {
+    "scan": "candidate",
+    "static_fix_verification": "observed_static_only",
+    "runtime_verification": "not_performed"
+  },
+  "finding_events": [],
+  "findings": [],
+  "artifacts": {
+    "immutable_report": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95-20260902T171535522Z-12598-a9e20382d557.json",
+    "latest_report": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95.json",
+    "history_summary": ".mimosa/history/run-20260902T171535522Z-12598-a9e20382d557.json"
+  }
+}

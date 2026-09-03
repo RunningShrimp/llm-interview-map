@@ -1,132 +1,127 @@
-/* 大纲数据 — LLM 应用开发面试学习地图
- * 注意：本文件为 UMD 风格，浏览器与 Node(validate.js) 均可加载。
- * 星级与来源由阶段1 检索校准后于阶段1.5 定稿更新。
- */
+/* 大纲数据 v2 — 模块 × 层级矩阵（L1 筑基 → L4 专家），UMD 风格 */
 (function (g) {
   "use strict";
   g.SYLLABUS = {
-    version: "1.1-final",
+    version: "2.0",
     updatedAt: "2026-09-02",
-    siteName: "LLM 应用开发面试学习地图",
-    quizPassScore: 4,
+    siteName: "LLM 应用开发四级晋升学习站",
+    quizPassRatio: 0.8,
+    xp: { visit: 10, choice: 15, scenario: 25, bossQuestion: 10, bossPass: 100 },
+    titleThresholds: [0, 400, 1200, 2400],
+    levels: [
+      { id: "L1", name: "筑基", title: "AI 小白", color: "#10b981", icon: "🌱", desc: "建立直觉：是什么、为什么重要，零术语门槛", unlockBy: null },
+      { id: "L2", name: "应用", title: "应用工程师", color: "#3b82f6", icon: "🛠️", desc: "学会使用：真实场景演练，API 与参数怎么选", unlockBy: "L1" },
+      { id: "L3", name: "原理", title: "原理达人", color: "#8b5cf6", icon: "🔬", desc: "懂其所以然：机制推导、方案对比与选型依据", unlockBy: "L2" },
+      { id: "L4", name: "专家", title: "面试架构师", color: "#f59e0b", icon: "🏆", desc: "架构师视角：系统设计、成本权衡、能出题考别人", unlockBy: "L3" }
+    ],
     modules: [
       {
-        id: "A",
-        name: "深度学习与 Transformer 基础",
-        icon: "🧱",
-        color: "#4f6ef7",
-        tagline: "看懂大模型的『骨架』：注意力、归一化与三大架构家族",
+        id: "A", name: "深度学习与 Transformer 基础", icon: "🧱", color: "#4f6ef7",
         points: [
-          { id: "a1-transformer-architecture", num: "A1", title: "Transformer 整体架构", stars: 5, source: "牛客网·大模型常考面试题100道", deps: [], oneLiner: "完全基于注意力机制的序列建模架构，可并行训练，是大模型的地基" },
-          { id: "a2-self-attention-qkv", num: "A2", title: "Self-Attention 与 QKV", stars: 5, source: "牛客网·LLM面试题：Transformer", deps: ["a1-transformer-architecture"], oneLiner: "每个词用 Query 查询 Key、加权求和 Value，实现全句互相关联" },
-          { id: "a3-multi-head-attention", num: "A3", title: "Multi-Head Attention 多头注意力", stars: 5, source: "牛客网·大模型常考面试题100道 / 知乎·LLM手撕代码合集", deps: ["a2-self-attention-qkv"], oneLiner: "把注意力拆成多组并行视角，分别捕捉不同类型的关系" },
-          { id: "a4-positional-encoding", num: "A4", title: "位置编码（正弦/可学习/RoPE）", stars: 4, source: "小林笔记·位置编码 / 知乎·必会的位置编码", deps: ["a1-transformer-architecture"], oneLiner: "给并行处理注入词序信息的机制，RoPE 是当前主流方案" },
-          { id: "a5-layer-vs-batch-norm", num: "A5", title: "LayerNorm vs BatchNorm", stars: 4, source: "CSDN·面试题33 LN vs BN / 知乎·归一化方法总结", deps: ["a1-transformer-architecture"], oneLiner: "两种归一化方式：LayerNorm 按样本归一，适合变长序列" },
-          { id: "a6-residual-norm", num: "A6", title: "残差连接与 Pre-LN/Post-LN", stars: 3, source: "知乎·归一化方法总结（延伸考点）", deps: ["a1-transformer-architecture", "a5-layer-vs-batch-norm"], oneLiner: "跨层安全通道防止梯度消失；归一化位置影响训练稳定性" },
-          { id: "a7-moe-mixture-of-experts", num: "A7", title: "MoE 混合专家（Router/Top-K/负载均衡）", stars: 4, source: "小林笔记·MoE（检索核实）", deps: ["a1-transformer-architecture"], oneLiner: "路由网络只为每个 token 激活 Top-K 个专家 FFN，总参数大而激活参数少" },
-          { id: "a8-tokenization-embedding", num: "A8", title: "分词（BPE）与 Embedding", stars: 3, source: "未经外部检索（内置知识）", deps: [], oneLiner: "文本变 token、token 变向量的入口环节，决定模型能读什么" },
-          { id: "a9-model-family", num: "A9", title: "Encoder-only / Decoder-only / Encoder-Decoder", stars: 5, source: "牛客网·为什么大模型几乎都是 Decoder-only", deps: ["a1-transformer-architecture"], oneLiner: "BERT、GPT、T5 三大架构家族各自的适用场景" },
-          { id: "a10-attention-optimization", num: "A10", title: "注意力复杂度与优化方向", stars: 4, source: "知乎·MHA+KV Cache / GitHub·大模型基础必考题107题", deps: ["a2-self-attention-qkv"], oneLiner: "O(n²) 复杂度是瓶颈，稀疏/线性注意力与 IO 优化是解法" }
+          { id: "a1-what-is-llm", num: "A1", level: "L1", title: "什么是大模型（LLM）", stars: 4, source: "牛客·大模型基础题/小林coding", deps: [], oneLiner: "一个读过几乎整个互联网、靠接龙说话的超级文字预测器" },
+          { id: "a2-how-models-learn", num: "A2", level: "L1", title: "模型是怎么学的（训练与过拟合直觉）", stars: 3, source: "内置知识（基础题）", deps: ["a1-what-is-llm"], oneLiner: "训练=海量刷题改答案本，把题目背下来就是过拟合" },
+          { id: "a3-transformer-intuition", num: "A3", level: "L1", title: "Transformer 直觉版：AI 怎么读句子", stars: 5, source: "牛客·大模型常考100道", deps: ["a1-what-is-llm"], oneLiner: "每个词环顾全句找相关词，几十层反复加工，位置号码牌补顺序" },
+          { id: "a4-tokenization-basics", num: "A4", level: "L2", title: "分词与 token：计费与上下文的计量单位", stars: 3, source: "内置知识（应用岗基础）", deps: ["a1-what-is-llm"], oneLiner: "文本被切成词块，token 数=API 费用与窗口长度的计量单位" },
+          { id: "a5-embedding-basics", num: "A5", level: "L2", title: "Embedding 初体验：语义坐标", stars: 4, source: "小林笔记（检索核实）", deps: ["a1-what-is-llm"], oneLiner: "文本变向量，意思越近坐标越近——换个说法也能搜到的底层" },
+          { id: "a6-model-family-basics", num: "A6", level: "L2", title: "主流模型家族速览与选型", stars: 5, source: "牛客·为什么大模型几乎都是 Decoder-only", deps: ["a3-transformer-intuition"], oneLiner: "GPT 式会写、BERT 式会读、T5 式先懂后写——按任务选" },
+          { id: "a7-self-attention-qkv", num: "A7", level: "L3", title: "Self-Attention 与 QKV 推导", stars: 5, source: "牛客·LLM面试题：Transformer", deps: ["a3-transformer-intuition"], oneLiner: "Q 查询 K 索引、加权 V、缩放 √d 防梯度消失——公式逐项拆" },
+          { id: "a8-multi-head-attention", num: "A8", level: "L3", title: "Multi-Head Attention 原理", stars: 5, source: "知乎·LLM手撕代码合集", deps: ["a7-self-attention-qkv"], oneLiner: "拆 h 个低维头各学一种关系，拼接后过 W_O 融合" },
+          { id: "a9-positional-encoding-rope", num: "A9", level: "L3", title: "位置编码与 RoPE 旋转机制", stars: 4, source: "小林笔记·位置编码/知乎", deps: ["a7-self-attention-qkv"], oneLiner: "正弦→可学习→RoPE：旋转 Q/K 让内积携带相对位置" },
+          { id: "a10-layer-vs-batch-norm", num: "A10", level: "L3", title: "LayerNorm vs BatchNorm 与 RMSNorm", stars: 4, source: "CSDN·面试题33/知乎·归一化总结", deps: ["a3-transformer-intuition"], oneLiner: "统计方向决定命运：按样本归一适配变长序列" },
+          { id: "a11-residual-norm", num: "A11", level: "L3", title: "残差连接与 Pre/Post-LN", stars: 3, source: "知乎·归一化方法总结（延伸）", deps: ["a10-layer-vs-batch-norm"], oneLiner: "恒等通道让梯度无衰减，LN 位置决定深层可训性" },
+          { id: "a12-moe-experts", num: "A12", level: "L3", title: "MoE 混合专家原理", stars: 4, source: "小林笔记·MoE（检索核实）", deps: ["a8-multi-head-attention"], oneLiner: "Router 打分选 Top-K 专家：总参数大、激活参数小" },
+          { id: "a13-architecture-trends", num: "A13", level: "L4", title: "架构演进趋势：Decoder-only 为何胜出", stars: 5, source: "牛客·Decoder-only 专题/掘金", deps: ["a6-model-family-basics"], oneLiner: "目标统一/信号密度/KV 契合/涌现最好——四点论证" },
+          { id: "a14-attention-optimization", num: "A14", level: "L4", title: "注意力优化与长上下文前沿", stars: 4, source: "知乎·MHA+KV Cache/GitHub·107题", deps: ["a7-self-attention-qkv"], oneLiner: "O(n²) 三路优化（少算/算巧/省存）+长度外推技术族" }
         ]
       },
       {
-        id: "B",
-        name: "训练与对齐",
-        icon: "🎯",
-        color: "#8b5cf6",
-        tagline: "大模型如何从『会说话』到『听话好用』：SFT、RLHF 与高效微调",
+        id: "B", name: "训练与对齐", icon: "🎯", color: "#8b5cf6",
         points: [
-          { id: "b1-training-paradigms", num: "B1", title: "训练范式全景：预训练→SFT→对齐", stars: 4, source: "知乎·大模型面试118题（训练范式专章）", deps: ["a9-model-family"], oneLiner: "大模型先通识、后听话的三段式成长路线" },
-          { id: "b2-sft-instruction-tuning", num: "B2", title: "SFT 指令微调与数据构造", stars: 4, source: "GitHub·大模型面试仓库 SFT 专章（检索核实）", deps: ["b1-training-paradigms"], oneLiner: "用指令-回答数据教模型听懂人话，数据质量大于数量" },
-          { id: "b3-rlhf-three-stages", num: "B3", title: "RLHF 三阶段流程", stars: 5, source: "牛客网·RLHF 八股总结 / 知乎·RLHF 与对齐面试118题", deps: ["b1-training-paradigms"], oneLiner: "SFT→训练奖励模型→强化学习优化，让模型对齐人类偏好" },
-          { id: "b4-ppo-vs-dpo", num: "B4", title: "PPO 与 DPO 对比", stars: 5, source: "牛客网·26届校招 PPO vs DPO 专项 / 知乎·秋招必考题", deps: ["b3-rlhf-three-stages"], oneLiner: "经典强化学习对齐 vs 免奖励模型的直接偏好优化" },
-          { id: "b5-lora-qlora", num: "B5", title: "LoRA/QLoRA 原理", stars: 5, source: "知乎/掘金/CSDN·LoRA 专项面经", deps: ["b1-training-paradigms"], oneLiner: "冻结原模型、只训练低秩小矩阵的低成本微调法" },
-          { id: "b6-peft-family", num: "B6", title: "PEFT 家族对比（Adapter/Prefix/P-tuning/LoRA）", stars: 3, source: "相邻检索命中（专项检索超时，见 research/module-b.md）", deps: ["b5-lora-qlora"], oneLiner: "各类只训一小部分参数的微调方案与取舍" },
-          { id: "b7-grpo-rlvr", num: "B7", title: "GRPO 与推理模型对齐（RLVR）", stars: 4, source: "牛客网·DeepSeek-R1 相关面经（检索核实）", deps: ["b3-rlhf-three-stages", "b4-ppo-vs-dpo"], oneLiner: "组相对策略优化：组内奖励归一化替代 Critic，推理模型对齐主流算法" },
-          { id: "b8-evaluation-benchmarks", num: "B8", title: "模型评测（Benchmark/人工评估/LLM-as-Judge）", stars: 3, source: "面试鸭 / 小林面试笔记·模型评测专项", deps: ["b1-training-paradigms"], oneLiner: "如何科学给模型打分：自动基准、人评、模型当裁判" },
-          { id: "b9-distributed-training", num: "B9", title: "分布式训练基础（DP/TP/PP、DeepSpeed）", stars: 4, source: "知乎·大模型面试118题（五）：分布式训练 / CSDN·面试题53", deps: ["b1-training-paradigms"], oneLiner: "单卡装不下大模型时，如何把训练切到多卡多机" }
+          { id: "b1-pretraining-basics", num: "B1", level: "L1", title: "预训练是什么：AI 的三段成长故事", stars: 4, source: "知乎·训练范式专章", deps: ["a1-what-is-llm"], oneLiner: "先狂读书→岗前培训→师傅带教，从会说话到会干活" },
+          { id: "b2-alignment-basics", num: "B2", level: "L1", title: "模型怎么变听话：SFT 与对齐的故事版", stars: 4, source: "牛客·RLHF 八股总结", deps: ["b1-pretraining-basics"], oneLiner: "拿几万份问题-满分回答教格式，再让人类投票教分寸" },
+          { id: "b3-sft-data-practice", num: "B3", level: "L2", title: "SFT 数据怎么造：来源、清洗与配比", stars: 4, source: "GitHub·大模型面试仓库 SFT 专章", deps: ["b2-alignment-basics"], oneLiner: "真实日志+难例+通用数据混合，质量大于数量" },
+          { id: "b4-lora-practice", num: "B4", level: "L2", title: "LoRA 上手：一张卡调大模型", stars: 5, source: "知乎/掘金/CSDN·LoRA 专项面经", deps: ["b2-alignment-basics"], oneLiner: "冻结大模型只训小马甲，QLoRA 把底座压到 4bit" },
+          { id: "b5-sft-pitfalls", num: "B5", level: "L2", title: "微调数据陷阱与灾难性遗忘对策", stars: 3, source: "知乎·SFT 延伸追问", deps: ["b3-sft-data-practice"], oneLiner: "全用领域数据会学傻——混通用、控学习率、留验证集" },
+          { id: "b6-rlhf-three-stages", num: "B6", level: "L3", title: "RLHF 三阶段与奖励建模", stars: 5, source: "牛客·RLHF 八股总结/知乎·118题", deps: ["b2-alignment-basics"], oneLiner: "SFT 打底→人类排序训 RM→PPO 优化，KL 惩罚防刷分" },
+          { id: "b7-ppo-vs-dpo", num: "B7", level: "L3", title: "PPO vs DPO 原理对比", stars: 5, source: "牛客·26届校招专项/知乎·秋招必考", deps: ["b6-rlhf-three-stages"], oneLiner: "四模型在线闭环 vs 两模型离线直优——五维取舍表" },
+          { id: "b8-lora-principle", num: "B8", level: "L3", title: "LoRA 低秩分解原理与参数账", stars: 5, source: "知乎/掘金·LoRA 面经", deps: ["b4-lora-practice"], oneLiner: "ΔW=BA 低秩假设、B 零初始化、QLoRA 三件套" },
+          { id: "b9-distributed-training", num: "B9", level: "L3", title: "分布式训练原理（DP/TP/PP/ZeRO）", stars: 4, source: "知乎·118题（五）/CSDN·面试题53", deps: ["b1-pretraining-basics"], oneLiner: "切数据/切算子/切层+训练状态分摊，16 字节/参数账本" },
+          { id: "b10-rlvr-grpo", num: "B10", level: "L4", title: "对齐前沿：RLVR/GRPO 与推理模型", stars: 4, source: "牛客·DeepSeek-R1 相关面经", deps: ["b7-ppo-vs-dpo"], oneLiner: "组内相对优势替代 critic，可验证奖励刷出推理能力" },
+          { id: "b11-training-cost-tradeoff", num: "B11", level: "L4", title: "训练成本权衡：架构师的微调决策账", stars: 4, source: "知乎·118题（综合）/卡码笔记·第3题", deps: ["b4-lora-practice"], oneLiner: "显存/数据/维护成本 vs RAG——何时训何时挂" }
         ]
       },
       {
-        id: "C",
-        name: "Prompt 工程与 LLM API 应用",
-        icon: "💬",
-        color: "#06b6d4",
-        tagline: "不动模型也能改变模型：提示词、思维链与 API 实战",
+        id: "C", name: "Prompt 工程与 LLM API 应用", icon: "💬", color: "#06b6d4",
         points: [
-          { id: "c1-prompt-fundamentals", num: "C1", title: "Prompt 基础与结构化写法", stars: 5, source: "牛客网·官方提示词工程题单 / 面试鸭 Prompt 题库", deps: [], oneLiner: "用角色+任务+约束+示例稳定操控模型输出" },
-          { id: "c2-chain-of-thought", num: "C2", title: "思维链 CoT 与推理增强", stars: 5, source: "内置知识（旁证：面试鸭题库列 CoT 为常考）", deps: ["c1-prompt-fundamentals"], oneLiner: "让模型先写思考过程再给答案，提升复杂推理准确率" },
-          { id: "c3-hallucination", num: "C3", title: "幻觉成因与缓解", stars: 5, source: "小林面试笔记·幻觉 / 知乎·幻觉面经", deps: ["c1-prompt-fundamentals"], oneLiner: "模型一本正经胡说八道的机制根源与工程缓解手段" },
-          { id: "c4-llm-api-practice", num: "C4", title: "LLM API 实务（参数/流式/限流重试/成本）", stars: 4, source: "小林 coding·采样参数 / 前端&AI 工程化面试指南", deps: ["c1-prompt-fundamentals"], oneLiner: "temperature、top_p、流式输出、限流重试与成本核算" },
-          { id: "c5-structured-output", num: "C5", title: "结构化输出与 JSON Mode", stars: 3, source: "未经外部检索（内置知识）", deps: ["c4-llm-api-practice"], oneLiner: "让模型稳定输出可被程序解析的结构化数据" },
-          { id: "c6-long-context", num: "C6", title: "长上下文与 lost in the middle", stars: 3, source: "未经外部检索（内置知识；论文锚点 Lost in the Middle, TACL 2024）", deps: ["c4-llm-api-practice"], oneLiner: "上下文窗口很大不等于都能用好，中间信息容易被忽略" }
+          { id: "c1-prompt-basics", num: "C1", level: "L1", title: "和 AI 对话的第一课：把话说清楚", stars: 5, source: "牛客·官方提示词题单/面试鸭", deps: [], oneLiner: "你是谁+做什么+边界在哪+交付长什么样+照着做" },
+          { id: "c2-hallucination-basics", num: "C2", level: "L1", title: "幻觉直觉版：AI 为什么一本正经胡说", stars: 5, source: "小林面试笔记·幻觉", deps: ["a1-what-is-llm"], oneLiner: "它的目标把话说像，不是把话说对——空白处按风格补全" },
+          { id: "c3-prompt-five-elements", num: "C3", level: "L2", title: "结构化 Prompt 五件套实操", stars: 5, source: "牛客·提示词题单/面试鸭", deps: ["c1-prompt-basics"], oneLiner: "角色+任务+约束+格式+示例，配评测驱动的迭代法" },
+          { id: "c4-decoding-params-practice", num: "C4", level: "L2", title: "解码参数实操：temperature/top_p 怎么调", stars: 4, source: "小林 coding·采样参数/CSDN", deps: ["c1-prompt-basics"], oneLiner: "温度控随机性、top_p 控候选池——按任务选参数组合" },
+          { id: "c5-structured-output-practice", num: "C5", level: "L2", title: "结构化输出与 JSON Mode 三道关", stars: 3, source: "内置知识（应用岗常问）", deps: ["c4-decoding-params-practice"], oneLiner: "提示词给 Schema→API 严格模式→代码校验带错重试" },
+          { id: "c6-context-management-practice", num: "C6", level: "L2", title: "多轮对话与上下文管理实操", stars: 3, source: "内置知识（论文锚点 TACL 2024）", deps: ["c4-decoding-params-practice"], oneLiner: "近期原文+远期摘要+相关检索；关键信息放头尾" },
+          { id: "c7-cot-principle", num: "C7", level: "L3", title: "CoT 为什么有效：测试时计算换准确率", stars: 5, source: "内置知识（CoT 常考）", deps: ["c1-prompt-basics"], oneLiner: "生成每个 token 都是一次计算，推理步骤=草稿纸扩容" },
+          { id: "c8-hallucination-mechanism", num: "C8", level: "L3", title: "幻觉机理：似真不等于为真", stars: 5, source: "小林面试笔记/知乎·幻觉面经", deps: ["c2-hallucination-basics"], oneLiner: "下一词预测优化连贯性而非真实性，三层缓解防线" },
+          { id: "c9-sampling-math", num: "C9", level: "L3", title: "采样机制的数学：温度与核采样", stars: 4, source: "小林 coding·采样参数", deps: ["c4-decoding-params-practice"], oneLiner: "温度缩放分布、top-p 截断候选池——机制与经验值" },
+          { id: "c10-prompt-system-design", num: "C10", level: "L4", title: "复杂 Prompt 体系设计", stars: 4, source: "牛客·提示词题单（进阶）", deps: ["c3-prompt-five-elements"], oneLiner: "角色体系/工具协议/评测驱动——把提示词当代码治理" },
+          { id: "c11-hallucination-defense", num: "C11", level: "L4", title: "幻觉治理的分层防御体系", stars: 4, source: "知乎·幻觉面经（综合）", deps: ["c8-hallucination-mechanism"], oneLiner: "事前 RAG/事中约束/事后校验/运营兜底四层纵深" }
         ]
       },
       {
-        id: "D",
-        name: "RAG 检索增强",
-        icon: "📚",
-        color: "#10b981",
-        tagline: "给模型配一个『外接图书馆』：检索、重排与开卷考试",
+        id: "D", name: "RAG 检索增强", icon: "📚", color: "#10b981",
         points: [
-          { id: "d1-rag-pipeline", num: "D1", title: "RAG 总体流程", stars: 5, source: "卡码笔记·RAG 大厂面试题汇总 / 小林面试笔记·RAG", deps: ["c1-prompt-fundamentals"], oneLiner: "先检索知识库再让模型开卷作答：索引→检索→生成" },
-          { id: "d2-chunking-strategies", num: "D2", title: "文档解析与切分策略", stars: 4, source: "知乎·RAG面试通关指南 / 知乎·字节面试真题 Chunk 切分", deps: ["d1-rag-pipeline"], oneLiner: "把长文档切成合适的知识块，是检索质量的第一关" },
-          { id: "d3-embedding-vector-db", num: "D3", title: "Embedding 与向量数据库", stars: 4, source: "面试鸭·HNSW vs IVF / 腾讯云·一文讲透 IVF/HNSW/PQ", deps: ["d1-rag-pipeline"], oneLiner: "语义向量化 + 近似最近邻索引（HNSW/IVF）支撑相似检索" },
-          { id: "d4-hybrid-retrieval-rerank", num: "D4", title: "混合检索与重排", stars: 4, source: "卡码笔记·RAG 题单 / 掘金·Rerank 重排序全面介绍", deps: ["d3-embedding-vector-db"], oneLiner: "关键词+向量双路召回，再用 Rerank 模型精排" },
-          { id: "d5-rag-vs-finetune-vs-longctx", num: "D5", title: "RAG vs 微调 vs 长上下文选型", stars: 5, source: "卡码笔记·第3题 / 知乎·851 道大模型面试题整理", deps: ["d1-rag-pipeline", "b5-lora-qlora"], oneLiner: "三种给模型注入知识路线的成本/时效/能力对比" },
-          { id: "d6-rag-evaluation", num: "D6", title: "RAG 评估（忠实度/相关性/RAGAS）", stars: 3, source: "知乎·阿里大模型二面 RAGAS / 小林面试笔记·评估", deps: ["d1-rag-pipeline"], oneLiner: "用检索命中率与答案忠实度等指标量化 RAG 质量" },
-          { id: "d7-advanced-rag", num: "D7", title: "高级 RAG（Self-RAG/CRAG/GraphRAG/多跳）", stars: 3, source: "卡码笔记·第26/27题（Agentic RAG / GraphRAG）", deps: ["d4-hybrid-retrieval-rerank"], oneLiner: "让 RAG 学会自我反思、纠错与结构化检索的进阶架构" },
-          { id: "d8-rag-troubleshooting", num: "D8", title: "RAG 常见问题与调优", stars: 4, source: "卡码笔记·第22/23题 / 知乎·RAG 夺命10连问", deps: ["d4-hybrid-retrieval-rerank"], oneLiner: "检索不准、答案不全、表格失效等典型问题的排查套路" }
+          { id: "d1-rag-intuition", num: "D1", level: "L1", title: "开卷考试：RAG 直觉版", stars: 5, source: "卡码笔记·RAG 题单", deps: ["c1-prompt-basics"], oneLiner: "先翻资料找到相关段落，再照着回答并注明出处" },
+          { id: "d2-finetune-intuition", num: "D2", level: "L1", title: "微调是什么：送 AI 去培训班", stars: 3, source: "卡码笔记·第3题", deps: ["b2-alignment-basics"], oneLiner: "把能力练进模型本身：慢、贵，但学会就长在身上" },
+          { id: "d3-rag-mvp", num: "D3", level: "L2", title: "RAG 最小可用版：搭一条完整链路", stars: 5, source: "卡码笔记·RAG 题单/小林面试笔记", deps: ["d1-rag-intuition"], oneLiner: "解析→切分→向量化→检索→引用生成的两周 MVP" },
+          { id: "d4-chunking-practice", num: "D4", level: "L2", title: "切分与元数据实操：块大小/重叠/标签", stars: 4, source: "知乎·RAG通关指南/字节真题", deps: ["d3-rag-mvp"], oneLiner: "结构感知切分+15% 重叠+来源标签，检索质量第一关" },
+          { id: "d5-vector-db-practice", num: "D5", level: "L2", title: "向量库与混合检索实操", stars: 4, source: "面试鸭·HNSW vs IVF/腾讯云", deps: ["a5-embedding-basics", "d3-rag-mvp"], oneLiner: "HNSW 索引+BM25 双路召回+RRF 融合的工程组合" },
+          { id: "d6-rag-vs-finetune-vs-longctx", num: "D6", level: "L2", title: "RAG vs 微调 vs 长上下文选型", stars: 5, source: "种子锚点·卡码笔记第3题", deps: ["d3-rag-mvp", "d2-finetune-intuition"], oneLiner: "缺知识选 RAG、缺能力选微调、单篇深读选长文" },
+          { id: "d7-ann-principle", num: "D7", level: "L3", title: "向量检索原理：ANN 与 HNSW/IVF", stars: 4, source: "面试鸭/腾讯云·IVF/HNSW/PQ", deps: ["d5-vector-db-practice"], oneLiner: "分层图跳跃 vs 聚类分桶——召回/延迟/内存三角" },
+          { id: "d8-rerank-principle", num: "D8", level: "L3", title: "Rerank 原理：Bi vs Cross-Encoder", stars: 4, source: "掘金·Rerank 全面介绍/卡码笔记", deps: ["d5-vector-db-practice"], oneLiner: "联合编码捕捉词级交互所以更准——先粗后精两段式" },
+          { id: "d9-rag-evaluation", num: "D9", level: "L3", title: "RAG 评估体系与忠实度计算", stars: 3, source: "知乎·阿里二面 RAGAS/小林笔记", deps: ["d3-rag-mvp"], oneLiner: "检索层 Recall/MRR+生成层忠实度/相关性，RAGAS 四件套" },
+          { id: "d10-graphrag-advanced", num: "D10", level: "L4", title: "GraphRAG 与高级 RAG 架构", stars: 4, source: "卡码笔记·第26/27题", deps: ["d8-rerank-principle"], oneLiner: "自反思/纠错网关/图谱检索——RAG 的智能体化演进" },
+          { id: "d11-enterprise-rag-data", num: "D11", level: "L4", title: "企业级 RAG 数据管线与权限治理", stars: 4, source: "知乎·腾讯真题（延伸）", deps: ["d4-chunking-practice"], oneLiner: "多格式接入/增量更新/密级过滤/审计——生产数据面" }
         ]
       },
       {
-        id: "E",
-        name: "Agent 智能体",
-        icon: "🤖",
-        color: "#f59e0b",
-        tagline: "让模型从『答题者』变成『干活者』：ReAct、工具与记忆",
+        id: "E", name: "Agent 智能体", icon: "🤖", color: "#f59e0b",
         points: [
-          { id: "e1-agent-anatomy", num: "E1", title: "Agent 核心架构（规划/记忆/工具）", stars: 4, source: "牛客网·大模型 Agent 面试全攻略", deps: ["c4-llm-api-practice"], oneLiner: "LLM 当大脑 + 规划、记忆、工具三件套构成智能体" },
-          { id: "e2-react-loop", num: "E2", title: "ReAct 循环", stars: 5, source: "牛客网·AI Agent 面试 Top50 必刷题（第1题）", deps: ["e1-agent-anatomy"], oneLiner: "思考→行动→观察交替进行，Agent 的基本运行节拍" },
-          { id: "e3-function-calling", num: "E3", title: "Function Calling 与参数校验", stars: 5, source: "小林面试笔记·Function Calling / 牛客网·Top50", deps: ["c5-structured-output", "e1-agent-anatomy"], oneLiner: "模型按 JSON Schema 生成工具调用参数并校验执行" },
-          { id: "e4-tool-error-loops", num: "E4", title: "工具调用异常与死循环防护", stars: 4, source: "牛客网·AI Agent 面试 Top50 必刷题", deps: ["e3-function-calling"], oneLiner: "工具失败、重试风暴、死循环的成因与工程防护" },
-          { id: "e5-agent-memory", num: "E5", title: "Agent 记忆系统", stars: 4, source: "知乎·字节面试题 Agent 记忆系统", deps: ["e1-agent-anatomy", "d3-embedding-vector-db"], oneLiner: "短期上下文 + 长期向量记忆 + 总结压缩的分层记忆设计" },
-          { id: "e6-planning-reflection", num: "E6", title: "规划与反思（Plan-and-Execute/Reflection）", stars: 3, source: "多来源间接佐证 + 内置知识", deps: ["e2-react-loop"], oneLiner: "先拆解任务再执行、执行后自我复盘修正" },
-          { id: "e7-multi-agent", num: "E7", title: "多智能体协作", stars: 3, source: "多智能体专项检索超时（内置知识）", deps: ["e2-react-loop"], oneLiner: "多个角色化 Agent 分工协作（编排/路由/讨论）的模式" },
-          { id: "e8-mcp-tools", num: "E8", title: "MCP 协议与工具生态", stars: 4, source: "腾讯云·你项目里接了 MCP / 知乎·FC、MCP、A2A 面经", deps: ["e3-function-calling"], oneLiner: "统一模型与工具连接标准的协议，工具生态的 USB-C" },
-          { id: "e9-agent-frameworks", num: "E9", title: "Agent 开发框架对比（LangChain/AutoGen/LlamaIndex）", stars: 3, source: "小林面试笔记·Agent 开发框架", deps: ["e1-agent-anatomy"], oneLiner: "主流框架的定位、抽象与选型考量" }
+          { id: "e1-agent-basics", num: "E1", level: "L1", title: "Agent 是什么：给 AI 装上手手脚", stars: 4, source: "牛客·大模型 Agent 面试全攻略", deps: ["a1-what-is-llm"], oneLiner: "聪明大脑+任务清单+笔记本+门禁卡四件套" },
+          { id: "e2-tool-calling-basics", num: "E2", level: "L1", title: "工具调用的直觉：点餐小票", stars: 4, source: "小林面试笔记·Function Calling", deps: ["e1-agent-basics"], oneLiner: "AI 只负责按格式填单，程序验单后才送厨房执行" },
+          { id: "e3-react-practice", num: "E3", level: "L2", title: "ReAct 循环实操：边想边做", stars: 5, source: "牛客·AI Agent Top50（第1题）", deps: ["e1-agent-basics"], oneLiner: "Thought→Action→Observation 循环，配终止与轨迹管理" },
+          { id: "e4-function-calling-practice", num: "E4", level: "L2", title: "Function Calling 与参数校验实操", stars: 5, source: "小林面试笔记/牛客·Top50", deps: ["e2-tool-calling-basics"], oneLiner: "工具定义三要素+应用侧校验+错误回传自修" },
+          { id: "e5-tool-error-practice", num: "E5", level: "L2", title: "工具调用异常与死循环防护实操", stars: 4, source: "牛客·AI Agent Top50", deps: ["e4-function-calling-practice"], oneLiner: "重试上限、步数/预算双阈值、指纹熔断、人工在环" },
+          { id: "e6-mcp-practice", num: "E6", level: "L2", title: "MCP 实操：工具即插即用", stars: 4, source: "腾讯云·你项目里接了 MCP", deps: ["e4-function-calling-practice"], oneLiner: "MCP Server/Client 标准接入，M×N 集成变 M+N" },
+          { id: "e7-memory-mechanism", num: "E7", level: "L3", title: "Agent 记忆机制原理", stars: 4, source: "知乎·字节面试题记忆系统", deps: ["e1-agent-basics"], oneLiner: "短期窗口+长期向量库，写入过滤与检索注入的调度学" },
+          { id: "e8-react-mechanism", num: "E8", level: "L3", title: "ReAct 机制与失败模式分析", stars: 3, source: "牛客·Top50（延伸）", deps: ["e3-react-practice"], oneLiner: "循环节拍、终止条件、轨迹裁剪——失控模式与工程刹车" },
+          { id: "e9-multi-agent-platform", num: "E9", level: "L4", title: "多 Agent 平台架构", stars: 4, source: "知乎·Agent 工业界总结", deps: ["e3-react-practice"], oneLiner: "主管-工人/流水线/辩论三模式与通信协议栈" },
+          { id: "e10-agent-eval-governance", num: "E10", level: "L4", title: "Agent 评测与生产治理体系", stars: 4, source: "阿里云·AI Agent 全栈开发面试宝典", deps: ["e8-react-mechanism"], oneLiner: "轨迹评估+业务闭环指标+Trace 治理——从 demo 到产品" }
         ]
       },
       {
-        id: "F",
-        name: "推理部署与 MLOps",
-        icon: "🚀",
-        color: "#ef4444",
-        tagline: "把模型跑起来、跑得快、跑得稳：推理优化与安全合规",
+        id: "F", name: "推理部署与 MLOps", icon: "🚀", color: "#ef4444",
         points: [
-          { id: "f1-inference-basics", num: "F1", title: "自回归解码与采样策略", stars: 4, source: "CSDN·温度/Top-P/Top-K 面试问答 / 小林面试笔记·解码策略", deps: ["a2-self-attention-qkv"], oneLiner: "逐 token 生成 + greedy/beam/top-p 采样决定输出风格" },
-          { id: "f2-kv-cache-pagedattention", num: "F2", title: "KV Cache 与 PagedAttention", stars: 5, source: "牛客网·阿里云 Agent 算法一面原题 / 知乎·KV Cache 的原理", deps: ["f1-inference-basics"], oneLiner: "缓存历史 Key/Value 加速生成；分页管理显存提升吞吐" },
-          { id: "f3-quantization", num: "F3", title: "模型量化（INT8/INT4、GPTQ/AWQ）", stars: 4, source: "小林面试笔记·量化 / 知乎·大模型面试118题（九）", deps: ["f1-inference-basics"], oneLiner: "用更低精度存储权重，省显存换速度、几乎不掉点" },
-          { id: "f4-inference-frameworks", num: "F4", title: "推理框架对比（vLLM/TensorRT-LLM/llama.cpp）", stars: 4, source: "牛客网·VLLM 必知必会 / 知乎·主流推理部署框架梳理", deps: ["f2-kv-cache-pagedattention"], oneLiner: "主流推理引擎的优化手段与选型" },
-          { id: "f5-gpu-capacity-planning", num: "F5", title: "显存估算与 GPU 选型", stars: 4, source: "知乎·训练与推理显存估算（频次很高）/ 阿里云官方文档", deps: ["f1-inference-basics"], oneLiner: "权重+KV Cache+激活的显存账本与吞吐/延迟权衡" },
-          { id: "f6-prompt-injection-defense", num: "F6", title: "Prompt 注入与越狱防护", stars: 4, source: "知乎·阿里大模型二面 Prompt 注入 / golangstar·LLM 面试系列", deps: ["c1-prompt-fundamentals"], oneLiner: "恶意指令劫持模型行为的攻击面与多层防御" },
-          { id: "f7-llm-app-observability", num: "F7", title: "LLM 应用可观测性与线上评估", stars: 3, source: "CSDN·1000道算法工程师面试题（19）/ 阿里云·AI Agent 全栈开发面试宝典", deps: ["c4-llm-api-practice"], oneLiner: "日志/指标/回归测试/A-B 实验，让 LLM 应用可运维" },
-          { id: "f8-llm-security-compliance", num: "F8", title: "内容安全与合规（输出过滤/红队）", stars: 3, source: "安全内参·提示词注入检测 / Prompt Engineering Guide 中文版（相邻来源）", deps: ["f6-prompt-injection-defense"], oneLiner: "输入输出双向过滤、红队测试与合规底线" },
-          { id: "f9-cost-optimization", num: "F9", title: "成本优化（缓存/批处理/模型路由）", stars: 3, source: "牛客网·Agent 语义缓存/模型路由题面（检索核实）", deps: ["f4-inference-frameworks"], oneLiner: "语义缓存、批处理、大小模型分流等降本手段" }
+          { id: "f1-slow-inference-basics", num: "F1", level: "L1", title: "为什么大模型跑不快：逐字接龙的代价", stars: 4, source: "小林面试笔记·解码策略", deps: ["a3-transformer-intuition"], oneLiner: "每写一个字都要把前面全部重看一遍——越长越慢越贵" },
+          { id: "f2-gpu-memory-basics", num: "F2", level: "L1", title: "显存是什么：AI 酒店的房间账", stars: 3, source: "知乎·显存估算专文", deps: ["a1-what-is-llm"], oneLiner: "模型住楼（权重）+客人占房（KV），房间不够开不了业" },
+          { id: "f3-quantization-practice", num: "F3", level: "L2", title: "模型量化认知与选型", stars: 4, source: "小林面试笔记·量化/知乎·118题（九）", deps: ["f2-gpu-memory-basics"], oneLiner: "INT8 近无损、INT4 省四倍——AWQ/GPTQ 生产选型" },
+          { id: "f4-vllm-practice", num: "F4", level: "L2", title: "推理服务化认知：vLLM 部署一条龙", stars: 4, source: "牛客·VLLM 必知必会", deps: ["f1-slow-inference-basics"], oneLiner: "吞吐王者 vLLM vs 极致延迟 TRT-LLM vs 边缘 llama.cpp" },
+          { id: "f5-injection-defense-practice", num: "F5", level: "L2", title: "Prompt 注入防护实操", stars: 4, source: "知乎·阿里二面注入/golangstar", deps: ["c1-prompt-basics"], oneLiner: "指令数据分区、最小权限、人工确认、注入检测四层" },
+          { id: "f6-kv-cache-pagedattention", num: "F6", level: "L3", title: "KV Cache 与 PagedAttention 原理", stars: 5, source: "牛客·阿里云 Agent 一面原题/知乎", deps: ["f1-slow-inference-basics"], oneLiner: "缓存历史 K/V 免重算；分页管理消灭碎片" },
+          { id: "f7-quantization-principle", num: "F7", level: "L3", title: "量化原理：GPTQ/AWQ 怎么压", stars: 4, source: "小林笔记/知乎·118题（九）", deps: ["f3-quantization-practice"], oneLiner: "误差补偿 vs 激活感知保护——4bit 的算法门道" },
+          { id: "f8-memory-planning", num: "F8", level: "L3", title: "显存估算原理与容量规划", stars: 4, source: "知乎·显存估算/阿里云官方文档", deps: ["f2-gpu-memory-basics", "f6-kv-cache-pagedattention"], oneLiner: "权重+KV+开销三笔账，定 SLO→算并发→冗余→压测" },
+          { id: "f9-cost-optimization-system", num: "F9", level: "L4", title: "全链路成本优化体系", stars: 4, source: "牛客·语义缓存/模型路由题面", deps: ["f4-vllm-practice"], oneLiner: "缓存/路由/压缩/批处理四板斧+成本质量双看板" },
+          { id: "f10-observability-system", num: "F10", level: "L4", title: "LLM 应用可观测性体系", stars: 4, source: "CSDN·1000道（19）/阿里云·宝典/LangSmith 官方", deps: ["c4-decoding-params-practice"], oneLiner: "Trace/三指标/回归灰度——给不确定的输出装仪表盘" }
         ]
       },
       {
-        id: "G",
-        name: "综合架构与面试实战",
-        icon: "🏆",
-        color: "#ec4899",
-        tagline: "终极关卡：系统设计大题与把项目讲出彩",
+        id: "G", name: "综合架构与面试实战", icon: "🏆", color: "#ec4899",
         points: [
-          { id: "g1-knowledge-qa-system", num: "G1", title: "企业知识库问答系统设计", stars: 5, source: "知乎·腾讯面试真题 RAG 知识库构建 / 掘金·万字详解面试题库 RAG 篇", deps: ["d8-rag-troubleshooting", "e4-tool-error-loops"], oneLiner: "RAG 全链路综合大题：需求→架构→数据→评估→上线" },
-          { id: "g2-agent-system-design", num: "G2", title: "Agent 应用系统设计", stars: 4, source: "知乎·Agent 面试总结（工业界干货版）/ 牛客网·AI-Agent 面试题汇总", deps: ["e6-planning-reflection", "f7-llm-app-observability"], oneLiner: "客服/数据分析 Agent 设计题的全链路拆解" },
-          { id: "g3-system-design-template", num: "G3", title: "系统设计答题模板", stars: 3, source: "牛客网·系统设计题目的回答要领", deps: ["g1-knowledge-qa-system"], oneLiner: "功能/数据/性能/成本/安全五维论证框架" },
-          { id: "g4-star-project-narrative", num: "G4", title: "项目深挖与 STAR 法表达", stars: 4, source: "CSDN·使用 STAR 法则表现自己", deps: [], oneLiner: "用情境-任务-行动-结果讲好项目故事，扛住追问" },
-          { id: "g5-interview-strategy", num: "G5", title: "高频追问、反问与临场策略", stars: 3, source: "GitHub·reverse-interview-zh", deps: ["g4-star-project-narrative"], oneLiner: "应对深挖式追问、合理的反问与临场心态" }
+          { id: "g1-star-narrative", num: "G1", level: "L2", title: "STAR 法：把项目讲成有证据链的故事", stars: 4, source: "CSDN·使用 STAR 法则表现自己", deps: [], oneLiner: "情境-任务-行动-结果，每个数字备好怎么测的" },
+          { id: "g2-interview-strategy", num: "G2", level: "L2", title: "面试临场策略与反问", stars: 3, source: "GitHub·reverse-interview-zh", deps: ["g1-star-narrative"], oneLiner: "不会的题三步兜底；反问问业务挑战不问薪资" },
+          { id: "g3-knowledge-qa-skeleton", num: "G3", level: "L3", title: "企业知识库设计的答题骨架", stars: 5, source: "知乎·腾讯面试真题/掘金·万字题库", deps: ["d3-rag-mvp", "e5-tool-error-practice"], oneLiner: "六板块：需求/架构/数据/安全/评估/成本，权限前置" },
+          { id: "g4-system-design-template", num: "G4", level: "L3", title: "系统设计六步法与 LLM 特有维度", stars: 3, source: "牛客·回答要领", deps: ["g3-knowledge-qa-skeleton"], oneLiner: "澄清→架构→链路→四维→评估→权衡，LLM 多成本与安全" },
+          { id: "g5-knowledge-qa-full", num: "G5", level: "L4", title: "终极架构题：企业知识库问答全案", stars: 5, source: "知乎·腾讯面试真题", deps: ["g3-knowledge-qa-skeleton", "d11-enterprise-rag-data"], oneLiner: "10 万文档/部门隔离/当天生效——六板块全展开" },
+          { id: "g6-agent-system-full", num: "G6", level: "L4", title: "终极架构题：Agent 系统全案", stars: 4, source: "知乎·Agent 工业界总结", deps: ["g4-system-design-template", "e9-multi-agent-platform"], oneLiner: "客服/数据分析 Agent 的六层设计+可靠性+治理" },
+          { id: "g7-architect-expression", num: "G7", level: "L4", title: "架构师的表达：权衡论证与出题能力", stars: 3, source: "牛客·回答要领（综合）", deps: ["g5-knowledge-qa-full"], oneLiner: "每个 choice 说出代价；能出题考别人=真正掌握" }
         ]
       }
     ]

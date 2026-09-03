@@ -1,0 +1,144 @@
+{
+  "id": "g1-star-narrative",
+  "title": "STAR 法：把项目讲成有证据链的故事",
+  "definition": "STAR = 情境（Situation）-任务（Task）-行动（Action）-结果（Result）。项目深挖的本质是验证据链：面试官追问『数字怎么来的』就是在敲墙——每句结论都要踩在可复现的证据上。",
+  "analogies": [
+    {
+      "icon": "🎬",
+      "name": "讲一个好故事",
+      "text": "流水账式讲述：『我们用了 RAG，效果不错』——没有冲突没有细节。STAR 讲法像电影：背景铺垫（员工每天浪费 1 小时找文档——冲突出现）→ 使命（我负责 3 个月上线知识库问答）→ 高潮（命中率只有 60%，我怎么通过切分重构提到 85%）→ 结局（解决率 75%，每周节省 800 人时）。有冲突、有行动、有数字，才有可信度。"
+    },
+    {
+      "icon": "🧱",
+      "name": "敲墙验地基",
+      "text": "你讲的每句结论（『提升 25%』）都是墙，必须踩在证据地基上：评测集是什么、基线怎么定、数字怎么测。面试官深挖就是在敲墙——敲到没有地基的地方（说不清数字来源），整面墙塌掉。准备项目=给每面墙配地基。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：深挖五连问的防御纵深",
+    "description": "点击『下一步』，看面试官连环追问与你的应答。",
+    "html": "<div class=\"d-steps\" id=\"g1-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 问：背景与你的角色</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">为什么做？你负责哪部分？</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">量化痛点+清晰责任边界（说『我』不说『我们』）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2~3 问：方案与细节</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">为什么选 RAG 不选微调？</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">选型框架+对比实验佐证；坦承失败的尝试</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 问：结果的证据链</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">85% 命中率怎么测的？</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">300 条标注测试集+Recall@10 口径+每周回归</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 5 问：反思</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">最大的坑？重来改什么？</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">早建评测集（当时盲调两周）——反思体现成长性</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#g1-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#g1-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#g1-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#g1-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🎬",
+      "name": "STAR 四要素",
+      "text": "情境（业务痛点）→任务（你的职责边界）→行动（关键决策，重点）→结果（量化影响）。"
+    },
+    {
+      "icon": "🔢",
+      "name": "结果必须量化",
+      "text": "『效果不错』零分；『命中率 60%→85%、转人工率降 30%』过线——每个数字都能答『怎么测的』。"
+    },
+    {
+      "icon": "⚔️",
+      "name": "决策胜过苦劳",
+      "text": "深挖考判断力：为什么选 A 不选 B、坑怎么发现怎么填——取舍与反思比技术名词高一个段位。"
+    },
+    {
+      "icon": "🛡️",
+      "name": "证据链预备",
+      "text": "每个结论备三层证据：数据来源、对比方式、极端追问的应答——敲墙不塌。"
+    },
+    {
+      "icon": "🔍",
+      "name": "诚实边界",
+      "text": "不熟的细节坦然承认并给推理——编造被追两层必穿，诚实+思考力反而加分。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】面试官问『你说提升 25%，数字怎么来的？』最好的回应是？",
+      "options": [
+        "『大概估的，反正确实变好了』",
+        "说清测量方法：评测集构成、基线定义、指标口径与对比时间窗",
+        "『这是我们组长的数据』",
+        "反问为什么质疑"
+      ],
+      "answer": 1,
+      "explain": "选 B。能说清评测集与基线，数字才立得住——A 自毁信任，C 推责，D 情绪化。"
+    },
+    {
+      "type": "choice",
+      "q": "STAR 的 Action 部分最该突出什么？",
+      "options": [
+        "全团队的工作量罗列",
+        "你面临的关键取舍与决策依据（为什么这么做、别的方案为什么不行）",
+        "加班的辛苦过程",
+        "时髦技术名词堆砌"
+      ],
+      "answer": 1,
+      "explain": "选 B。深挖考察判断力：决策与取舍最能体现独立思考。A 混淆贡献边界，C 感动自己，D 经不起追问。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】用 STAR 写一段项目叙述（设想一个企业知识库项目，3 分钟口述篇幅），并预判 3 个追问及应答要点。",
+      "reference": "S——公司 2000 人，制度文档散落 5 个系统，员工日均花 40 分钟找文档（量化痛点）；T——我作为 2 人小组技术负责人，从 0 到 1 搭建知识库问答，目标 3 个月自助解决率 60%；A——三个关键决策：选 RAG 而非微调（知识周更，时效与溯源论证）；自研切分（通用切分把命中率卡在 60%，排查两周后重构到 85%）；权限做在检索层前置过滤（合规红线）；R——上线 3 个月解决率 68%，日均节省 300 人时，命中率持续爬到 88%。追问一『60→85 怎么测的？』——300 条标注测试集、Recall@10 口径、与同一基线对比、每周回归，可复现；追问二『为什么不用现成开源框架？』——评估过，权限模型与切分定制不满足，借鉴其编排思想后自研；追问三『最大的坑？』——最初没建评测集盲调两周，后来评测先行效率翻倍——这个教训让我后续项目全部评测先行；此外，回答中还应明确提到「反思」。",
+      "keyPoints": [
+        {
+          "point": "S/T 量化基线+清晰职责边界",
+          "kw": [
+            "量化",
+            "基线",
+            "负责",
+            "目标"
+          ]
+        },
+        {
+          "point": "A 三个关键决策及依据",
+          "kw": [
+            "三个关键决策",
+            "rag",
+            "切分",
+            "权限",
+            "决策"
+          ]
+        },
+        {
+          "point": "R 数字可复现（测试集/口径）",
+          "kw": [
+            "解决率",
+            "测试集",
+            "recall",
+            "回归"
+          ]
+        },
+        {
+          "point": "追问应答：证据链+诚实反思",
+          "kw": [
+            "追问",
+            "教训",
+            "反思",
+            "评测先行"
+          ]
+        }
+      ],
+      "explain": "数字成链、主动暴露教训并转化为方法论——资深叙事的标志。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：STAR 法是什么？面试官为什么总追问『数字怎么来的』？",
+    "hint": "提示：故事要有冲突和结局；追问=敲墙验地基。",
+    "modelAnswer": "STAR 就是把项目讲成四幕故事：什么背景痛点、我的任务、我做了哪些关键决策、拿到什么量化结果。面试官追问数字不是刁难，是在敲墙——验证每个结论下面有没有地基：测试集怎么建、基线怎么定。所以准备项目的正确姿势是给每句结论配证据链，连踩过的坑和重来的选择都想清楚——有取舍、有数字、有反思，故事才立得住。"
+  },
+  "links": [
+    {
+      "to": "g2-interview-strategy",
+      "text": "讲好项目之后是追问攻防——下一站：临场策略与反问"
+    },
+    {
+      "to": "g5-knowledge-qa-full",
+      "text": "用 STAR 结构反向整理知识库项目——L4 的全案设计就是你最好的项目素材"
+    }
+  ],
+  "interview": [
+    {
+      "q": "介绍你最有挑战的项目/你的贡献？",
+      "stars": 4,
+      "source": "CSDN·使用 STAR 法则表现自己",
+      "tip": "2 分钟 STAR 版+每句结论备证据链，贡献说『我』不说『我们』。"
+    }
+  ],
+  "summary": "Q：STAR 四要素？（答：情境、任务、行动、结果——结果必须量化）\nQ：深挖的本质？（答：敲墙验地基——每个数字可复现）\nQ：最加分的品质？（答：诚实承认+用教训展示成长性）"
+}

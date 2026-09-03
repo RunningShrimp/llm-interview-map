@@ -1,0 +1,143 @@
+{
+  "id": "c6-context-management-practice",
+  "title": "多轮对话与上下文管理实操",
+  "definition": "上下文窗口装得下 ≠ 用得好：信息埋在长上下文中部时最容易被忽略（lost in the middle）。实操三板斧：滑动窗口留近期、摘要压缩远期、按需检索历史——多轮应用的标配。",
+  "analogies": [
+    {
+      "icon": "🗂️",
+      "name": "会议记录本",
+      "text": "300 轮的客服对话像一本厚记录本，窗口就那么几页：写满了怎么办？三种处理：撕掉最早几页（滑动窗口，快但丢历史）、把旧内容浓缩成一页纪要（摘要压缩，保大意丢细节）、把最相关的几页复印放在最前面（检索式选取）。工程中常常三招组合。"
+    },
+    {
+      "icon": "📚",
+      "name": "摊满考桌的资料",
+      "text": "把 300 页资料全摊在考桌上不等于都看得进去——人对开头结尾记得牢，中间堆料容易走神，AI 也一样（lost in the middle）。高分做法是会整理：重点放头尾、无关的撤掉、厚的写成摘要。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：关键信息放哪儿最容易被用上？",
+    "description": "切换关键条款的位置，看 AI 的利用率（绿=高，红=低）。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"c6g\" data-tab=\"p1\">放开头</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"c6g\" data-tab=\"p2\">埋中部</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"c6g\" data-tab=\"p3\">放结尾（紧邻问题）</button></div><div data-pane=\"p1\" data-group=\"c6g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\" style=\"background:#dcfce7;border-color:#10b981\">🔑 关键条款</span><span class=\"d-token\">中部 60 页资料…</span><span class=\"d-token\">问题</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag green\">开头位置：利用率高 ✅</span></div></div><div data-pane=\"p2\" data-group=\"c6g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">上下文开头</span><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">🔑 埋在中部</span><span class=\"d-token\">…30 页…</span><span class=\"d-token\">问题</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag red\">中部：最容易被忽略 ❌</span></div></div><div data-pane=\"p3\" data-group=\"c6g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">开头</span><span class=\"d-token\">…60 页…</span><span class=\"d-token hot d-pulse\" style=\"background:#dcfce7;border-color:#10b981\">🔑 紧邻问题</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag green\">紧邻问题：利用率最高 ✅（最推荐）</span></div></div><div class=\"d-note\">💡 工程口诀：系统提示放开头，最相关的资料贴着问题放，次要背景填中部。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📏",
+      "name": "窗口≠有效长度",
+      "text": "标称 128K 是能塞下；实际利用率随长度与位置衰减。"
+    },
+    {
+      "icon": "📉",
+      "name": "lost in the middle",
+      "text": "关键信息在开头/结尾表现最好，埋中部明显下降——位置即效果（U 形曲线）。"
+    },
+    {
+      "icon": "🏅",
+      "name": "位置工程",
+      "text": "最相关资料紧邻问题（结尾），系统提示放开头——零成本的免费优化。"
+    },
+    {
+      "icon": "🗜️",
+      "name": "历史三招",
+      "text": "滑动窗口（留最近 N 轮）、摘要压缩（旧历史浓缩）、检索式选取（按相关性召回）。"
+    },
+    {
+      "icon": "💰",
+      "name": "成本联动",
+      "text": "上下文长度直接决定费用与延迟——『全塞进去』是最常见的账单爆炸原因。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】300 轮客服对话超出预算，最合理的历史管理策略是？",
+      "options": [
+        "全部原文塞入每次请求",
+        "最近 10 轮原文 + 更早历史摘要 + 相关历史按需检索",
+        "只保留第一轮",
+        "每轮让用户重新自报信息"
+      ],
+      "answer": 1,
+      "explain": "选 B。『近期原文+远期摘要+相关检索』兼顾连续性、关键信息与成本——标准答案。"
+    },
+    {
+      "type": "choice",
+      "q": "RAG 召回的 5 段资料放进上下文时，最相关的应该放哪？",
+      "options": [
+        "正中间，最显眼",
+        "紧邻用户问题的结尾位置——利用率最高",
+        "随机分布",
+        "全部塞进系统提示"
+      ],
+      "answer": 1,
+      "explain": "选 B。U 形效应下紧邻问题的位置利用率最高——这是零成本的免费优化。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你们的文档问答把 200 页 PDF 全文塞进上下文：效果时好时坏、成本极高。请诊断并给出改造方案。",
+      "reference": "诊断两个根因：一是把大窗口当检索器用——200 页里与问题相关的通常只有几段，全塞既淹没关键信息又烧钱；二是位置效应——相关段落恰好落在长上下文中部时，正撞上 lost in the middle 的低谷，所以时好时坏。改造方案：第一步加检索层——PDF 切成带页码的块建向量索引，每次只召回 Top-5 相关块；第二步重排与放置——召回块用重排模型精排，最相关的紧邻问题放在上下文末尾，系统提示放开头；第三步摘要兜底——对全文生成结构化摘要作为背景层，兼顾全局性问题；第四步引用验证——要求回答标注来源页码便于核查。改造成本从每次几十万 token 降到几千，准确率因去噪与位置优化反而上升。",
+      "keyPoints": [
+        {
+          "point": "诊断：全塞淹没关键信息+撞中部低谷",
+          "kw": [
+            "lost in the middle",
+            "中部",
+            "淹没",
+            "时好时坏"
+          ]
+        },
+        {
+          "point": "改造一：切块+向量检索只取相关",
+          "kw": [
+            "相关",
+            "向量",
+            "检索",
+            "top"
+          ]
+        },
+        {
+          "point": "改造二：重排+紧邻问题放置",
+          "kw": [
+            "重排",
+            "位置",
+            "紧邻问题放",
+            "紧邻"
+          ]
+        },
+        {
+          "point": "摘要兜底+引用页码",
+          "kw": [
+            "摘要",
+            "兜底",
+            "引用",
+            "页码"
+          ]
+        }
+      ],
+      "explain": "能诊断『窗口大≠检索器』并给出检索化改造，是上下文工程的进阶标志。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么 AI 号称能读 100 万字，喂一本书还是答不好？多轮历史该怎么管？",
+    "hint": "提示：摊满考桌的资料 + 会议记录本。",
+    "modelAnswer": "装得下不等于用得上：AI 对长上下文的开头结尾记得牢，埋在中部的容易走神——所以全塞的效果时好时坏，还巨贵。多轮历史的管理像维护会议记录本：最近几轮保留原文，更早的浓缩成一页纪要，需要时再把相关的旧内容检索出来——三招组合，又省钱又不失忆。另外记住口诀：最相关的资料贴着问题放。"
+  },
+  "links": [
+    {
+      "to": "c4-decoding-params-practice",
+      "text": "上下文长度与延迟成本的联动——参数与账本回看 C4"
+    },
+    {
+      "to": "d3-rag-mvp",
+      "text": "『只把相关的给 AI』正是下一站 RAG 的核心思想——从管理走向检索"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是 lost in the middle？多轮对话历史怎么管理？",
+      "stars": 3,
+      "source": "内置知识（常作 RAG 追问）",
+      "tip": "U 形位置效应+三招组合，配一个 200 页 PDF 的案例。"
+    }
+  ],
+  "summary": "Q：lost in the middle？（答：中部信息利用率低的 U 形效应）\nQ：历史管理三招？（答：滑窗、摘要、检索式召回）\nQ：免费优化？（答：最相关的资料紧邻问题放置）"
+}

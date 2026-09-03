@@ -1,0 +1,159 @@
+{
+  "id": "f7-quantization-principle",
+  "title": "模型量化（INT8/INT4、GPTQ/AWQ）",
+  "definition": "量化把模型的权重（通常 fp16，2 字节/参数）压缩到 INT8（1 字节）甚至 INT4（0.5 字节）：显存和带宽骤降、推理变快，精度损失控制到几乎无感。主流方案 GPTQ/AWQ 做 4bit 权重量化，是消费级显卡跑大模型的关键。",
+  "analogies": [
+    {
+      "icon": "🖼️",
+      "name": "图片压缩",
+      "text": "fp16 权重像 RAW 原图：信息最全、体积巨大；INT8 像 90% 质量的 JPEG：肉眼几乎看不出差别；INT4 像 50% 质量的 WebP：细节有损但主体清晰、体积只剩四分之一。量化艺术在于『压哪儿、怎么压』——AWQ 的思路是保护重要通道（对输出影响大的权重保持高精度），就像压缩风景照时优先保住人脸清晰。"
+    },
+    {
+      "icon": "💰",
+      "name": "现金换零钱",
+      "text": "fp16 像用最小面额 1 分钱精确记账；量化到 INT4 像只用 1 元纸币记账——单笔误差最多几毛（舍入误差），但口袋里能装的钱（可加载的参数量）翻了四倍。好的量化算法（GPTQ）会聪明的分摊误差：让每笔舍入对总账（模型输出）的影响最小。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：7B 模型的量化显存账",
+    "description": "点击『下一步』，看不同精度下的显存与代价。",
+    "html": "<div class=\"d-steps\" id=\"f3-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">原始 fp16：7B 模型 ≈ 14GB</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:110px;text-align:center\">fp16 (2B)</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:100%\">14 GB</div></div></div><div class=\"d-note\">消费级 24G 卡勉强塞下，留给 KV Cache 的空间捉襟见肘。</div></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">INT8：≈ 7GB</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag\" style=\"width:110px;text-align:center\">INT8 (1B)</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:50%;background:#34d399\">7 GB</div></div></div><div class=\"d-note\">几乎无损（ perplexity 变化 <0.1），带宽减半推理加速，是最稳的默认档。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">INT4（GPTQ/AWQ）：≈ 3.5GB</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag\" style=\"width:110px;text-align:center\">INT4 (0.5B)</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:25%;background:#34d399\">3.5 GB</div></div></div><div class=\"d-note\">33B 模型也能进 24G 卡；精度损失 1~2%（AWQ 保护重要通道后更小）。代价：反量化计算开销与少数边缘任务退化。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#f3-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#f3-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#f3-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#f3-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🔬",
+      "name": "两大类别",
+      "text": "PTQ 训练后量化（不动训练，拿到模型直接压：GPTQ/AWQ/SmoothQuant——最常用）与 QAT 量化感知训练（训练中模拟量化，精度最高但成本高）。"
+    },
+    {
+      "icon": "🧠",
+      "name": "GPTQ",
+      "text": "基于近似二阶信息的逐层权重量化：一次校准数据离线压缩，4bit 下精度损失小、GPU 推理友好——社区最流行的 4bit 方案。"
+    },
+    {
+      "icon": "🛡️",
+      "name": "AWQ",
+      "text": "激活感知：观察到约 1% 的重要权重通道承受大部分激活影响，对它们保持高精度、其余量化——鲁棒性好，对分布外数据更稳。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "收益三连",
+      "text": "显存：fp16→INT4 省 4 倍（权重与 KV 同理）；速度：带宽减半加载变快，配合反量化内核推理加速；成本：消费级卡/边缘设备可跑大模型。"
+    },
+    {
+      "icon": "📉",
+      "name": "代价与边界",
+      "text": "精度：INT8 近乎无损，INT4 有 1~2% 退化（数学/代码任务更敏感）；W4A16（权重 4bit 激活 16bit）仍需反量化计算——极致速度要 W4A4 配专用内核。"
+    },
+    {
+      "icon": "🎛️",
+      "name": "选型经验",
+      "text": "生产默认：INT8 或 AWQ-INT4（精度敏感任务用 AWQ）；QLoRA 微调场景：NF4；边缘设备：INT4 + 专用推理内核（llama.cpp GGUF）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】把 7B 模型从 fp16 量化到 INT4，显存占用大约从多少变为多少？",
+      "options": [
+        "14GB → 7GB",
+        "14GB → 约 3.5GB",
+        "14GB → 1.75GB",
+        "7GB → 3.5GB"
+      ],
+      "answer": 1,
+      "explain": "选 B。fp16 每参数 2 字节 → 7B 约 14GB；INT4 每参数 0.5 字节 → 约 3.5GB，压缩 4 倍。A 是 INT8 的账；C 是 INT2 的账。"
+    },
+    {
+      "type": "choice",
+      "q": "AWQ 量化的核心思想是？",
+      "options": [
+        "所有权重统一四舍五入",
+        "识别对输出影响最大的少量权重通道保持高精度，其余量化，提升鲁棒性",
+        "用量化后的模型继续完整训练",
+        "把激活值全部压到 1bit"
+      ],
+      "answer": 1,
+      "explain": "选 B。AWQ（Activation-aware Weight Quantization）依据『激活分布决定权重重要性』，保护关键通道，因此比均匀量化更鲁棒。C 是 QAT；D 描述的不是 AWQ。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『预算只有单张 24G 消费卡，要在本地部署一个 13B 开源模型做文档问答服务。请给出量化选型与验证方案。』请作答。",
+      "reference": "显存账本：13B fp16 约 26GB 装不下；AWQ/GPTQ INT4 约 6.5GB，剩余 17GB 足够 KV Cache 支撑数千 token 上下文与十余并发，所以选 INT4 权重量化。方案细节：优先 AWQ（激活感知更鲁棒，文档问答属分布偏移较多的场景）；推理引擎用 vLLM 或 TGI 直接加载 AWQ 检查点（内核反量化友好）；如果发现 4bit 精度在长文问答上退化，回退一档用 INT8（约 13GB，仍装得下）或换 W4A16+更高 KV 精度。验证方案分两步：离线精度——用业务文档问答测试集（100 条）对比 fp16 基线，看答案一致率与 RAGAS 忠实度，退化控制在 1~2% 内可接受；性能压测——报 TTFT/TPOT/吞吐与显存峰值，确认并发目标。最后强调边界：代码与数学类任务对量化更敏感，若业务包含要先做专项评估。",
+      "keyPoints": [
+        {
+          "point": "显存账：13B fp16≈26GB 装不下，INT4≈6.5GB 留足 KV 空间",
+          "kw": [
+            "26",
+            "6.5",
+            "kv",
+            "显存"
+          ]
+        },
+        {
+          "point": "选 AWQ 并说明理由（激活感知、鲁棒）",
+          "kw": [
+            "awq",
+            "激活",
+            "鲁棒",
+            "int4"
+          ]
+        },
+        {
+          "point": "引擎与回退：vLLM/TGI 加载，退化退 INT8",
+          "kw": [
+            "vllm",
+            "int8",
+            "回退",
+            "加载"
+          ]
+        },
+        {
+          "point": "验证：离线一致率/忠实度 + TTFT/TPOT 压测，敏感任务专项评估",
+          "kw": [
+            "一致率",
+            "忠实度",
+            "ttft",
+            "tpot",
+            "压测"
+          ]
+        }
+      ],
+      "explain": "加分项：留 KV 空间的账本意识、代码数学敏感性的边界提醒；失分点：无验证方案的『直接压 4bit』。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：模型量化为什么能『把 14GB 的大模型塞进 3.5GB』？代价是什么？",
+    "hint": "提示：图片压缩类比（RAW→JPEG→WebP）+ 记账精度类比。",
+    "modelAnswer": "模型参数原本用高精度小数记录（像 RAW 原图、像用 1 分钱精确记账），量化就是改用更粗的档位记录（压缩成 JPEG、改用 1 元纸币记账）——每个数字占的空间从 2 字节变 0.5 字节，14GB 自然变 3.5GB。聪明的算法还会重点保护那些影响输出的关键数字，所以精度损失通常只有百分之一二。代价是极少数精细任务（比如复杂数学）可能退化，需要先拿测试集验一验再上线。"
+  },
+  "links": [
+    {
+      "to": "b8-lora-principle",
+      "text": "QLoRA 把量化用在训练侧（NF4 冻结基座）——同一技术在训练与推理的两个战场"
+    },
+    {
+      "to": "f6-kv-cache-pagedattention",
+      "text": "权重量化省显存之外，KV Cache 量化是长上下文的另一半显存解药"
+    },
+    {
+      "to": "f4-vllm-practice",
+      "text": "量化模型要靠推理引擎的低比特内核才能跑出速度——选型联动在 F4"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是模型量化？INT8 和 INT4 有什么区别与代价？",
+      "stars": 4,
+      "source": "小林面试笔记·量化 / 知乎·大模型面试118题（九）",
+      "tip": "压缩账本（14→3.5GB）+ 精度代价（INT8 近无损、INT4 1~2%）+ 敏感任务提醒。"
+    },
+    {
+      "q": "GPTQ 和 AWQ 的区别？生产选哪个？",
+      "stars": 4,
+      "source": "知乎·大模型面试118题（九）/ PaddleNLP 官方文档（延伸追问）",
+      "tip": "GPTQ 二阶误差补偿、AWQ 激活感知保护关键通道；生产默认 AWQ 或 INT8。"
+    }
+  ],
+  "summary": "Q：PTQ 与 QAT？（答：训练后直接压 vs 训练中模拟量化——前者便宜常用，后者精度高成本高）\nQ：GPTQ/AWQ 一句话区别？（答：GPTQ 误差补偿式逐层压缩，AWQ 按激活重要性保护关键通道）\nQ：量化收益三连？（答：显存×4、带宽减半加速、消费级卡跑大模型——代价是 1~2% 精度与敏感任务退化）"
+}

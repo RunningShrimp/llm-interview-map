@@ -1,0 +1,163 @@
+{
+  "id": "a14-attention-optimization",
+  "title": "注意力复杂度与优化方向",
+  "definition": "标准注意力两两计算所有 token 关联，复杂度 O(n²)：序列翻倍、算力翻四倍。优化分三路：少算（稀疏/滑窗）、算得巧（FlashAttention 分块）、省着存（MQA/GQA/MLA 压缩 KV Cache）。",
+  "analogies": [
+    {
+      "icon": "👥",
+      "name": "全班两两握手",
+      "text": "标准注意力像班级联谊会上每个人和所有人握手聊一遍（n² 次）：40 人要 1600 次握手，80 人就是 6400 次——人数翻倍、握手翻四倍。优化的思路：① 只跟邻座和重要的人握手（稀疏/滑窗注意力）；② 不换个会议室逐对聊，而是一次把全班组好再统一传递（FlashAttention 分块计算减少跑腿/显存读写）；③ 握手后不用人人记笔记，几个人共用一份会议纪要（MQA/GQA 共享 KV）。"
+    },
+    {
+      "icon": "📚",
+      "name": "图书管理员搬书",
+      "text": "注意力计算慢，很多时候不是算不过来，而是书（数据）在库房（显存）和桌子（计算单元）之间来回搬运太慢。FlashAttention 的思路是『把书分批抱到桌上、在桌上完成所有计算再回去』——搬运次数大减，同样的活干得更快。这揭示了优化的一条铁律：大模型时代 IO（搬数据）常常比计算本身更贵。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：序列长度翻倍，注意力开销翻几倍？",
+    "description": "拖动滑杆改变序列长度，观察注意力矩阵格子数（计算量）与 KV Cache 显存的增速。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:8px\"><input type=\"range\" min=\"4\" max=\"16\" value=\"8\" data-output=\"#a10-n\" data-suffix=\" 个 token\"><span>滑动改变序列长度 N = <b id=\"a10-n\">8 个 token</b></span></div><div class=\"demo-box\" style=\"padding:10px\"><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag\">N=4 → 关联 16 次</span><span class=\"d-token hot d-pulse\">N=8 → 64 次（×4）</span><span class=\"d-token\">N=16 → 256 次（×16）</span></div></div><div class=\"d-note\">💡 序列翻倍，两两关联计算翻四倍（平方增长）；KV Cache 虽只随 N 线性增长，却是显存大头——这就是长上下文贵的原因。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📐",
+      "name": "复杂度账本",
+      "text": "注意力矩阵是 n×n：计算与中间存储 O(n²)；上下文 4K→32K，单层注意力计算涨 64 倍——长文本的贵有数学必然性。"
+    },
+    {
+      "icon": "🪟",
+      "name": "少算：稀疏/滑窗",
+      "text": "让每个 token 只关注局部窗口或少数重要位置（Longformer 滑窗、Sparse Transformer），把 O(n²) 降到 O(n·w)。"
+    },
+    {
+      "icon": "⚡",
+      "name": "算得巧：FlashAttention",
+      "text": "不改变数学结果，通过分块计算 + online softmax 减少 HBM 显存读写，速度与可处理长度大增——精度无损，已是训练推理标配内核。"
+    },
+    {
+      "icon": "🗜️",
+      "name": "省着存：MQA/GQA/MLA",
+      "text": "KV Cache 是推理显存大头：MQA 所有头共享一份 KV；GQA 分组共享（LLaMA-2/3 用）；MLA 低秩潜压缩（DeepSeek）——推理侧最热考点。"
+    },
+    {
+      "icon": "💾",
+      "name": "KV Cache 视角",
+      "text": "长序列推理的瓶颈常是显存带宽而非算力：KV 大小 ∝ 层数×头数×head_dim×序列长——这正是 F2 的入口。"
+    },
+    {
+      "icon": "🧭",
+      "name": "答题框架",
+      "text": "面试答优化题按『算力 O(n²) → 稀疏化/线性注意力 → IO 优化 FlashAttention → KV 压缩 GQA/MLA → 工程层 PagedAttention/量化』分层展开。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】标准 Self-Attention 关于序列长度 n 的计算复杂度是？序列从 1K 增到 4K，注意力计算量变为几倍？",
+      "options": [
+        "O(n)，4 倍",
+        "O(n²)，16 倍",
+        "O(n log n)，8 倍",
+        "O(n²)，4 倍"
+      ],
+      "answer": 1,
+      "explain": "选 B。注意力要算所有 token 两两关联，复杂度 O(n²)；长度 4 倍 → 计算量 4²=16 倍。这正是长上下文昂贵、需要各种优化的根源。"
+    },
+    {
+      "type": "choice",
+      "q": "FlashAttention 的提速原理是？",
+      "options": [
+        "用稀疏掩码跳过大部分 token 的计算",
+        "把 KV 压缩到更低的数值精度",
+        "分块计算 + online softmax，减少高带宽显存（HBM）读写，结果数学上不变",
+        "用多个 GPU 并行计算注意力"
+      ],
+      "answer": 2,
+      "explain": "选 C。FlashAttention 是 IO 感知的精确注意力：数据分块驻留高速缓存完成计算，避免中间 n×n 矩阵往返显存——快且精度无损。A 是稀疏注意力的路数；B 是量化的路数。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『我们的对话应用把上下文从 4K 升到 32K 后，推理成本暴涨。从注意力机制角度分析原因，并给出至少三个优化方向。』请作答。",
+      "reference": "原因：标准注意力计算量是 O(n²)，序列 8 倍意味着单层注意力计算约 64 倍；同时 KV Cache 随序列线性增长，32K 的 KV 显存可能超过模型权重本身，推理从算力瓶颈转为显存带宽瓶颈。优化方向：① KV 压缩：用 GQA/MQA/MLA 结构的模型或推理引擎支持，把 KV 显存降到几分之一；② 稀疏/滑窗注意力：多数 token 只需局部窗口，全量长程注意力只留给关键位置（如 Longformer 式窗口、StreamingLLM）；③ 内核与工程层：升级 FlashAttention 减少显存读写，配合 PagedAttention 管理显存碎片、连续批处理提高吞吐；④ 业务层：历史对话做摘要压缩、检索式截断（只保留与当前问题相关的历史），等效缩短 n。优先级上先做业务层压缩与 KV 压缩，收益最直接。",
+      "keyPoints": [
+        {
+          "point": "指出 O(n²) 计算增长与 KV Cache 显存增长双瓶颈",
+          "kw": [
+            "o(n",
+            "kv cache",
+            "显存"
+          ]
+        },
+        {
+          "point": "方向一：GQA/MQA/MLA 等 KV 压缩",
+          "kw": [
+            "gqa",
+            "mqa",
+            "mla"
+          ]
+        },
+        {
+          "point": "方向二：稀疏/滑窗注意力减少计算",
+          "kw": [
+            "稀疏",
+            "滑窗",
+            "窗口"
+          ]
+        },
+        {
+          "point": "方向三：FlashAttention/PagedAttention 等内核与工程优化",
+          "kw": [
+            "flashattention",
+            "pagedattention",
+            "内核"
+          ]
+        },
+        {
+          "point": "方向四：业务层上下文压缩/摘要截断",
+          "kw": [
+            "摘要",
+            "截断",
+            "压缩",
+            "历史"
+          ]
+        }
+      ],
+      "explain": "加分项：说出『瓶颈从算力转移到显存带宽』、给出优化优先级；失分点：只会说『换个更强的 GPU』。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么长文章喂给大模型特别贵？大家都在怎么省钱？",
+    "hint": "提示：用全班两两握手讲 O(n²)，再各用一句话带过少算/算巧/省存三条路。",
+    "modelAnswer": "注意力让每个词都要和其他所有词打一遍交道，文章翻倍、交道就要翻四倍，这是平方级的成本；而且读过的词都要记笔记（KV Cache），越读越占内存。省钱三条路：一是少握手，只跟邻近和重要的人聊（稀疏滑窗）；二是握手方式变聪明，少跑腿少搬运（FlashAttention）；三是笔记合写，几个人共用一份（GQA/MLA 这类 KV 压缩）。"
+  },
+  "links": [
+    {
+      "to": "a7-self-attention-qkv",
+      "text": "O(n²) 的账单来自 Self-Attention 的两两关联计算，机制回顾看这一篇"
+    },
+    {
+      "to": "f6-kv-cache-pagedattention",
+      "text": "KV Cache 的存与管是本页『省着存』路线的完整展开，PagedAttention 在等着你"
+    },
+    {
+      "to": "c6-context-management-practice",
+      "text": "长上下文的另一面是『喂得起也要用得好』——lost in the middle 是效果侧的坑"
+    }
+  ],
+  "interview": [
+    {
+      "q": "注意力为什么是 O(n²)？有哪些优化方向？",
+      "stars": 4,
+      "source": "知乎·MHA+KV Cache / GitHub·大模型基础必考题107题",
+      "tip": "先算清平方账，再按少算/算巧/省存三层报菜名，展示知识框架而非零散名词。"
+    },
+    {
+      "q": "FlashAttention 和 GQA 分别优化了什么？KV Cache 为什么是长文本推理的瓶颈？",
+      "stars": 4,
+      "source": "知乎·手写 MHA 还得带 KV Cache（LLM手撕代码合集）",
+      "tip": "FlashAttention 优化 IO、GQA 压缩 KV 存储；瓶颈迁移到显存带宽是高分点。"
+    }
+  ],
+  "summary": "Q：注意力复杂度为什么是 O(n²)？（答：n 个 token 两两计算关联，矩阵 n×n）\nQ：三条优化路线分别是什么？（答：少算——稀疏/滑窗；算得巧——FlashAttention 分块减 IO；省着存——MQA/GQA/MLA 压缩 KV）\nQ：长文本推理的瓶颈常从算力转向什么？（答：显存与带宽——KV Cache 随序列线性膨胀所致）"
+}

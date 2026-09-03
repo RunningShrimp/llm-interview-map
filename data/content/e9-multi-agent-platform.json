@@ -1,0 +1,85 @@
+{
+  "id": "e9-multi-agent-platform",
+  "title": "多 Agent 平台架构",
+  "definition": "多 Agent 平台 = 把多个角色化 Agent 组织成有编排、有通信、有治理的系统：主管-工人/流水线/辩论三种编排模式，结构化消息协议，注册发现与权限审计。用组织成本换专业深度与可控性。",
+  "analogies": [
+    {
+      "icon": "🏥",
+      "name": "医院组织学",
+      "text": "单 Agent 像全科医生包圆看病开药——什么都懂一点，任务一多就顾此失彼（上下文互相干扰）。多 Agent 平台像一家医院：分诊台（路由）派单、各科专家（专用 Agent）看诊、质控科（评估 Agent）抽查、病历系统（共享记忆）同步信息。开医院的好处是专业与可控，代价是沟通成本与管理复杂度——所以小诊所够用就别建医院。"
+    },
+    {
+      "icon": "🏢",
+      "name": "微服务化对照",
+      "text": "多 Agent 平台的演进像后端从单体到微服务：拆分（按职责拆 Agent）、通信（结构化消息/事件）、治理（注册发现、限流、审计、灰度）。微服务时代的教训同样适用：拆分是为了解决组织复杂度，不是为了时髦——单体能解决就别拆。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：三种编排模式怎么选",
+    "description": "切换任务形态，看三种编排的适用与代价。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"e9g\" data-tab=\"m1\">主管-工人式</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"e9g\" data-tab=\"m2\">流水线接力</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"e9g\" data-tab=\"m3\">群聊辩论</button></div><div data-pane=\"m1\" data-group=\"e9g\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">主管：拆解派单汇总</span><span class=\"d-token\">专家 A/B/C 并行执行</span></span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag green\">适合：目标多变、子任务并行 ｜ 代价：主管是单点，要做兜底</span></div></div><div data-pane=\"m2\" data-group=\"e9g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">解析 → 分析 → 写作 → 审核 →</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag green\">适合：固定 SOP 流程 ｜ 代价：一段堵全线堵，扩展性弱</span></div></div><div data-pane=\"m3\" data-group=\"e9g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">生成者 ⇄ 批评者 多轮辩论</span></div><div class=\"d-row\" style=\"justify-content:center;margin-top:6px\"><span class=\"d-tag amber\">适合：关键决策质量优先 ｜ 代价：token 成倍，轮数要封顶</span></div></div>"
+  },
+  "keyPoints": [
+    { "icon": "🎯", "name": "拆分的理由", "text": "上下文隔离（各 Agent 只装自己需要的）、职责专业化、环节可独立测试——三条都成立才拆。" },
+    { "icon": "👔", "name": "三种编排", "text": "主管-工人（可控、适合多变目标）、流水线（固定 SOP）、群聊辩论（质量优先、成本高）。" },
+    { "icon": "📡", "name": "通信协议栈", "text": "结构化消息卡（任务/结果）、共享黑板状态、A2A 跨系统协作——消息带上下文防重复询问。" },
+    { "icon": "🏭", "name": "平台治理", "text": "Agent 注册与发现、权限与审计、限流熔断、灰度发布——后端微服务的治理经验全部适用。" },
+    { "icon": "⚖️", "name": "代价清单", "text": "通信 token 翻倍、错误在交接链传播放大、调试复杂度陡增——用单 Agent 解决就别上多 Agent。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【架构题】以下哪个信号最不支持『升级为多 Agent 系统』？",
+      "options": [
+        "单 Agent 提示词超 3000 字、工具超 15 个，意图互相干扰",
+        "不同职责需要差异化的工具与安全策略",
+        "当前任务用一个 Agent + 提示词分区就能稳定完成",
+        "需要独立的质检环节"
+      ],
+      "answer": 2,
+      "explain": "选 C。多 Agent 是组织成本换专业收益：现有方案稳定就别拆——反过度设计是架构师的基本素养。"
+    },
+    {
+      "type": "choice",
+      "q": "多 Agent 系统中『错误传播』指什么？最有效的缓解是？",
+      "options": [
+        "错误在交接链上逐级放大——上游一个小错经多环节变成大错；每个交接点设校验与质控",
+        "模型参数出错",
+        "网络传输丢包",
+        "无法缓解"
+      ],
+      "answer": 1,
+      "explain": "选 A。流水线越长错误越放大：交接点校验（结构化校验+质控 Agent）是标准缓解，类似微服务的边界校验。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】设计『研发效能平台』的多 Agent 架构：需求→代码→测试→文档全流程辅助。请给出架构分层、通信设计与三条治理底线。",
+      "reference": "架构分层：路由层（主管 Agent：解析需求、拆解派单、汇总交付）；执行层四个专家 Agent——需求分析 Agent（澄清与验收标准）、编码 Agent（带代码工具与仓库只读权限）、测试 Agent（生成用例+执行沙箱）、文档 Agent（基于前两者产物生成文档）；治理层——评测 Agent 抽查各环节产物质量、人工确认闸门（合并代码、对外发布）。通信设计：统一任务卡结构（id/输入/验收标准/状态），Agent 间传递结构化结果卡；共享黑板存项目上下文（需求文档、代码版本），避免长轨迹重复传递；跨流程事件走消息队列。三条治理底线：一是权限最小化——编码 Agent 无生产环境权限，所有写操作走审批；二是全链路 Trace——每个任务卡的流转、每次工具调用落审计日志，出问题可回放；三是成本护栏——单任务 token 预算上限与编排深度上限，防止级联失控。最后附决策说明：本平台多 Agent 化的理由充分（四类职责工具与安全策略差异大、需要独立质检），若只有单一编码辅助需求，单 Agent 加工具分区即可。",
+      "keyPoints": [
+        { "point": "分层：路由/专家四件套/治理质检", "kw": ["主管", "专家", "质检", "分层", "路由"] },
+        { "point": "通信：任务卡+结果卡+共享黑板", "kw": ["任务卡", "结果卡", "黑板", "结构化", "上下文"] },
+        { "point": "底线一：权限最小化+写操作审批", "kw": ["权限", "最小", "审批", "生产"] },
+        { "point": "底线二三：全链路 Trace+成本护栏", "kw": ["trace", "审计", "预算", "上限", "护栏"] }
+      ],
+      "explain": "分层+通信+治理底线齐备，并交代多 Agent 化的判断依据——架构师答卷的完整形态。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：多 Agent 平台是什么？什么时候值得建？",
+    "hint": "提示：医院组织学 + 微服务化对照。",
+    "modelAnswer": "多 Agent 平台就是给 AI 开医院：分诊台派单、各科专家看诊、质控科抽查，Agent 之间用标准化『病历卡』通信，还有注册、权限、审计这些管理制度。好处是专业分工、每个环节可控可测；代价是沟通成本翻倍、错误会在交接链上放大。判断标准和建公司一样：当单体的上下文已经互相干扰、各职责需要不同工具与安全策略、还必须有独立质检时才值得建——能用小诊所解决就别开医院。"
+  },
+  "links": [
+    { "to": "g6-agent-system-full", "text": "下一站终极架构题：把本关的平台架构放进完整系统设计中" },
+    { "to": "e1-agent-basics", "text": "回到 L1：平台里的每个成员都是那个『装上手手脚的实习生』" }
+  ],
+  "interview": [
+    {
+      "q": "设计一个多 Agent 平台架构，你会怎么分层？",
+      "stars": 4,
+      "source": "知乎·Agent 工业界总结/网易面经（v2 检索证实）",
+      "tip": "编排选型+通信协议+治理底线三层，附反过度设计的判断。"
+    }
+  ],
+  "summary": "Q：三种编排？（答：主管-工人、流水线、辩论——按任务形态选）\nQ：通信设计？（答：结构化消息卡+共享黑板+A2A）\nQ：什么时候不拆？（答：单 Agent+分区能稳定解决时）"
+}

@@ -1,0 +1,146 @@
+{
+  "id": "a7-self-attention-qkv",
+  "title": "Self-Attention 与 QKV",
+  "definition": "Self-Attention（自注意力）让句中每个词发出查询 Q（我想找什么），与所有词的键 K（我的特征标签）比对相似度，再按相似度加权吸收各词的值 V（实际内容），实现全句互相关联。",
+  "analogies": [
+    {
+      "icon": "📚",
+      "name": "图书馆按相关度摘抄",
+      "text": "你（Query，检索词）去图书馆查资料：管理员把你手里的检索词，和书架上每本书书脊的标签（Key）比对相关度；你并不是只借最相关的那一本，而是按相关度比例，把好几本书的内容（Value）各摘一点合成笔记。句子里每个词都轮流当一次『检索者』、其余词当『被检索的书』——因为查的是自己这个句子，所以叫 Self（自）注意力。"
+    },
+    {
+      "icon": "💐",
+      "name": "相亲会的三张卡片",
+      "text": "把一场相亲会想象成一次注意力计算：每位嘉宾带三张卡——愿望清单（Query，我想找什么样的人）、胸牌（Key，我的条件标签）、自我介绍（Value，我的真实内容）。匹配度 = 清单与胸牌的契合程度；最终每个人吸收的不是『最匹配那一个人』的表达，而是按契合度加权听完全场介绍。Softmax 就是把各自的契合度换算成总和为 1 的『关注比例』。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：一步 Self-Attention 是怎么算的",
+    "description": "以『它』指代谁为例，点击『下一步』走完 打分→缩放→Softmax→加权求和 四步，看清 √d_k 缩放发生在哪一步。",
+    "html": "<div class=\"d-steps\" id=\"a2-steps\"><div class=\"d-step active\"><div class=\"d-note\" style=\"margin:0 0 10px\">第 1 步 · 打分：用目标词的 Q 与所有词的 K 做点积（dot product），衡量『我该多关注你』</div><div class=\"d-row\" style=\"justify-content:center;gap:8px\"><span class=\"d-token\">猫</span><span class=\"d-token\">追</span><span class=\"d-token\">老鼠</span><span class=\"d-token hot d-pulse\">它</span></div><div class=\"d-row\" style=\"justify-content:center;gap:12px;margin-top:12px\"><span class=\"d-card d-anim\">Q<sub>它</sub>·K<sub>猫</sub> = <b>8</b></span><span class=\"d-card d-anim-late\">Q<sub>它</sub>·K<sub>追</sub> = <b>1</b></span><span class=\"d-card d-anim-late\">Q<sub>它</sub>·K<sub>老鼠</sub> = <b>5</b></span></div><div class=\"d-note\">💡 分数只代表原始匹配强度，还没归一化——此时维度越高分数会越大，埋下隐患。</div></div><div class=\"d-step\"><div class=\"d-note\" style=\"margin:0 0 10px\">第 2 步 · 缩放：全部除以 √d_k（本例 d_k=4，即除以 2）</div><div class=\"d-row\" style=\"justify-content:center;gap:12px\"><span class=\"d-card d-anim\">8 ÷ 2 = <b>4.0</b></span><span class=\"d-card d-anim\">1 ÷ 2 = <b>0.5</b></span><span class=\"d-card d-anim-late\">5 ÷ 2 = <b>2.5</b></span></div><div class=\"d-note\">💡 为什么除以 √d_k：维度大时 Q·K 点积的方差随维度增大，分数过大会把 Softmax 推进饱和区、梯度趋近 0；除以 √d_k 让分数方差回到约 1，训练才稳定。</div></div><div class=\"d-step\"><div class=\"d-note\" style=\"margin:0 0 10px\">第 3 步 · Softmax：把分数变成总和为 1 的注意力权重</div><div style=\"max-width:420px;margin:0 auto\"><div class=\"d-row\" style=\"align-items:center;gap:8px\"><span style=\"width:48px\">猫</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:77%\"></div></div><b>77%</b></div><div class=\"d-row\" style=\"align-items:center;gap:8px;margin-top:8px\"><span style=\"width:48px\">追</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:2%\"></div></div><b>2%</b></div><div class=\"d-row\" style=\"align-items:center;gap:8px;margin-top:8px\"><span style=\"width:48px\">老鼠</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:17%\"></div></div><b>17%</b></div><div class=\"d-row\" style=\"align-items:center;gap:8px;margin-top:8px\"><span style=\"width:48px\">它</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:4%\"></div></div><b>4%</b></div></div><div class=\"d-note\">💡 模型自动学出：『它』最该关注『猫』（指代对象），其次『老鼠』——注意力权重就是可解释性的来源。</div></div><div class=\"d-step\"><div class=\"d-note\" style=\"margin:0 0 10px\">第 4 步 · 加权求和：按权重把各词的 V 汇总成『它』的新表示</div><svg viewBox=\"0 0 640 120\" style=\"width:100%;max-width:640px\"><defs><marker id=\"a2-arrow\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L7,3 L0,6 Z\" fill=\"#4f6ef7\"/></marker></defs><text x=\"40\" y=\"30\" font-size=\"14\">V猫 (77%)</text><text x=\"200\" y=\"30\" font-size=\"14\">V老鼠 (17%)</text><text x=\"380\" y=\"30\" font-size=\"14\">V它 (4%)</text><text x=\"520\" y=\"30\" font-size=\"14\">V追 (2%)</text><line x1=\"60\" y1=\"40\" x2=\"290\" y2=\"85\" class=\"d-flow-line\" stroke=\"#4f6ef7\" stroke-width=\"2.5\" marker-end=\"url(#a2-arrow)\"/><line x1=\"230\" y1=\"40\" x2=\"300\" y2=\"85\" class=\"d-flow-line\" stroke=\"#8b5cf6\" stroke-width=\"1.5\" marker-end=\"url(#a2-arrow)\"/><line x1=\"410\" y1=\"40\" x2=\"315\" y2=\"85\" class=\"d-flow-line\" stroke=\"#10b981\" stroke-width=\"1\" marker-end=\"url(#a2-arrow)\"/><line x1=\"550\" y1=\"40\" x2=\"325\" y2=\"88\" class=\"d-flow-line\" stroke=\"#cbd5e1\" stroke-width=\"0.8\" marker-end=\"url(#a2-arrow)\"/><rect x=\"240\" y=\"88\" width=\"160\" height=\"26\" rx=\"13\" fill=\"#eef2ff\" stroke=\"#4f6ef7\"/><text x=\"252\" y=\"106\" font-size=\"13\">『它』的输出向量</text></svg><div class=\"d-note\">输出 = 0.77·V猫 + 0.17·V老鼠 + …，公式总览：Attention(Q,K,V) = softmax(QKᵀ/√d_k)·V</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#a2-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#a2-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#a2-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#a2-steps\">🔄 重播动画</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧩",
+      "name": "QKV 三份拷贝",
+      "text": "同一个词向量分别乘三个权重矩阵 W_Q、W_K、W_V，得到 Query（查询）、Key（键）、Value（值），三者分工不同。"
+    },
+    {
+      "icon": "📐",
+      "name": "公式与 √d_k 缩放",
+      "text": "Attention(Q,K,V)=softmax(QKᵀ/√d_k)V；维度大时点积方差大，会令 Softmax 饱和、梯度消失，除以 √d_k 把方差拉回约 1。"
+    },
+    {
+      "icon": "🎭",
+      "name": "Self vs Cross",
+      "text": "Self-Attention 的 Q、K、V 来自同一序列（自己查自己）；Cross-Attention 只有 Q 来自解码端，K/V 来自另一个序列（如编码器输出）。"
+    },
+    {
+      "icon": "🚧",
+      "name": "两种掩码",
+      "text": "Padding mask 挡住补齐位置不让它参与打分；Causal mask（因果掩码）挡住未来词，保证解码生成时不偷看答案。"
+    },
+    {
+      "icon": "📈",
+      "name": "O(n²) 的代价",
+      "text": "每对 token 都要两两算分，计算与显存均随序列长度平方增长，这是长文本优化的头号目标（详见 A10）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】为什么注意力分数要除以 √d_k？",
+      "options": [
+        "为了把分数变成整数，方便存储",
+        "维度大时点积方差随 d_k 增大，分数过大会使 Softmax 进入饱和区、梯度接近 0；除以 √d_k 让分数方差回到约 1",
+        "为了保证所有注意力权重之和等于 1（这是 Softmax 的职责）",
+        "为了减少注意力层的参数量（缩放不涉及参数）"
+      ],
+      "answer": 1,
+      "explain": "选 B。Q·K 点积的方差与维度 d_k 成正比，维度越高分数越极端，Softmax 会输出接近 one-hot 的结果、梯度趋近 0；除以 √d_k 恰好把方差归一到约 1。C 错：权重和为 1 是 Softmax 完成的；D 错：缩放只是一个除法，不涉及任何参数。"
+    },
+    {
+      "type": "choice",
+      "q": "在 Encoder-Decoder 翻译模型里，解码器生成中文词时经过的 Cross-Attention 层，其 Q、K、V 分别来自哪里？",
+      "options": [
+        "全部来自解码器当前状态的线性变换",
+        "Q 来自解码器当前状态，K 和 V 来自编码器的输出",
+        "Q 来自编码器输出，K 和 V 来自解码器当前状态",
+        "全部来自编码器的输出"
+      ],
+      "answer": 1,
+      "explain": "选 B。Cross-Attention 的定义就是『拿生成端的 Q 去查询输入端的 K/V』：解码器带着『我已生成到哪、接下来想要什么』的 Q，去编码器输出的 K/V 里检索相关信息。这正是 Encoder 信息进入 Decoder 的唯一桥梁；Self-Attention 则三者同源。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官说：『请从 QKV 出发讲清楚一步 Self-Attention 的完整计算流程，解释为什么要除以 √d_k，并说清它与 Cross-Attention 的本质区别。』请写出你的回答。",
+      "reference": "我按四步讲：1）投影：每个词向量 x 分别乘 W_Q、W_K、W_V，得到查询 Q、键 K、值 V；2）打分：目标词的 Q 与所有词的 K 做点积，得到原始相似度分数；3）缩放：分数除以 √d_k——因为维度越高点积方差越大，过大的分数会把 Softmax 推进饱和区、梯度趋近于零，除以 √d_k 恰好让方差回到约 1，深层训练才稳定；4）归一化与聚合：Softmax 把分数变成和为 1 的权重，再对所有词的 V 加权求和，得到该词融合全句信息的新表示。与 Cross-Attention 的本质区别在 Q 的来源：Self-Attention 的 Q、K、V 同源，是序列内部自己查自己；Cross-Attention 只有用 Q 来自解码端，K/V 来自编码器输出——即『拿着生成进度去查询输入序列』，是 Encoder 信息流入 Decoder 的桥梁，也是多模态里文本查询图像特征的方式。",
+      "keyPoints": [
+        {
+          "point": "讲清 QKV 投影与点积打分",
+          "kw": [
+            "W_Q",
+            "点积"
+          ]
+        },
+        {
+          "point": "讲清 √d_k 缩放与梯度饱和的原因",
+          "kw": [
+            "√d_k",
+            "梯度"
+          ]
+        },
+        {
+          "point": "讲清 Softmax 归一化与加权求和",
+          "kw": [
+            "softmax",
+            "加权求和"
+          ]
+        },
+        {
+          "point": "讲清 Cross-Attention 的 Q/K/V 来源差异",
+          "kw": [
+            "cross-attention",
+            "编码器",
+            "解码"
+          ]
+        }
+      ],
+      "explain": "加分项：主动写出完整公式 softmax(QKᵀ/√d_k)V、提到 padding mask 与 causal mask、或把 Cross-Attention 延伸到多模态融合；失分点：把缩放原因说成『防止数值溢出』（真正机制是 Softmax 饱和导致梯度消失），或把 Cross-Attention 的三者来源说反。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向同学解释：Self-Attention 里的 Q、K、V 各扮演什么角色？为什么打分后必须先除以 √d_k 再做 Softmax？",
+    "hint": "提示：用『查资料』类比——检索词、书脊标签、书的内容；再想想分数过大时 Softmax 会发生什么。",
+    "modelAnswer": "每个词把自己变成三种角色：Q 是我想找什么，K 是我有什么标签，V 是我真正的内容。目标词拿自己的 Q 和所有词的 K 打分，分越高说明越相关；分数过 Softmax 变成总和为 1 的关注比例，再按比例把大家的 V 加权汇总。中间要除以 √d_k，是因为维度越高点积分数越大，Softmax 会变成几乎只看一个词的极端分布，梯度就没法回传了，除一下把分数拉回正常范围。"
+  },
+  "links": [
+    {
+      "to": "a8-multi-head-attention",
+      "text": "单头注意力只有一种视角，多头把它拆成多组并行视角，分别捕捉句法、指代等不同关系"
+    },
+    {
+      "to": "a14-attention-optimization",
+      "text": "两两打分的代价是 O(n²) 复杂度，KV Cache、GQA/MLA、FlashAttention 都是冲着这条瓶颈去的"
+    },
+    {
+      "to": "a9-positional-encoding-rope",
+      "text": "注意力对词序完全不敏感（打乱句子注意力结果不变），位置编码正是补上这个缺口的关键组件"
+    }
+  ],
+  "interview": [
+    {
+      "q": "Self-Attention 的原理和公式是什么？为什么 Attention 里要除以 √d_k？",
+      "stars": 5,
+      "source": "牛客网·大模型常考面试题100道",
+      "tip": "先写公式 softmax(QKᵀ/√d_k)V，再从『点积方差随维度增大 → Softmax 饱和 → 梯度消失』三段式解释缩放，最后补一句两类 mask。"
+    },
+    {
+      "q": "Self-Attention 和 Cross-Attention 的区别？",
+      "stars": 3,
+      "source": "CSDN·2026 字节大模型岗面经汇总",
+      "tip": "一句话抓住本质：Q、K、V 是否同源。Cross-Attention 的 Q 来自解码端、K/V 来自另一序列（编码器或多模态分支），并举例翻译与图文融合。"
+    }
+  ],
+  "summary": "Q：Self-Attention 公式是什么？（答：Attention(Q,K,V)=softmax(QKᵀ/√d_k)V——点积打分、缩放、Softmax 归一、加权求和 V）\nQ：除以 √d_k 的真实原因？（答：维度大时点积方差大、分数过大使 Softmax 饱和梯度消失，缩放让方差回到约 1）\nQ：Self 与 Cross-Attention 的本质区别？（答：Q、K、V 是否同源——Cross 的 Q 来自解码端，K/V 来自编码器等其他序列）"
+}

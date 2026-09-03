@@ -1,0 +1,144 @@
+{
+  "id": "b4-lora-practice",
+  "title": "LoRA 上手：一张卡调大模型",
+  "definition": "LoRA 让你不用租 GPU 集群也能微调：冻结原模型，只训练旁边一对小矩阵（参数不到 1%）。QLoRA 再把底座压到 4bit——单卡 24G 就能调 13B 模型。应用工程师的微调入门首选。",
+  "analogies": [
+    {
+      "icon": "🧥",
+      "name": "西装加马甲",
+      "text": "全参微调是把整套西装拆了重做（改全部权重，要大裁缝铺）；LoRA 是西装原样不动，只加一件可拆卸的马甲（小矩阵）适配新场合——马甲便宜（参数 <1%），风格改变立竿见影，不同场合换不同马甲（一个基座挂多个任务）。QLoRA 更进一步：把西装压缩打包（4bit 量化），连衣柜都省了。"
+    },
+    {
+      "icon": "🎚️",
+      "name": "三个旋钮",
+      "text": "LoRA 实操主要拧三个旋钮：秩 r（马甲厚度，常用 8~64，越厚学得越多越费卡）、alpha（影响力，常取 r 的两倍）、挂载位置（常挂注意力的 q/k/v/o 投影）。旋钮没有万能值：从 r=16 起步，看验证集效果调。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：LoRA 的参数账",
+    "description": "拖动滑杆改秩 r，看一个 4096×4096 权重层的可训练参数变化。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:8px\"><input type=\"range\" min=\"4\" max=\"64\" value=\"16\" data-output=\"#b4-r\" data-suffix=\"\"><span>秩 r = <b id=\"b4-r\">16</b>（参数 = 2×4096×r）</span></div><div class=\"demo-box\" style=\"padding:12px\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px;text-align:center\">全参微调该层</span><span class=\"d-tag amber\">16,777,216 个参数 ❄️❄️❄️</span></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px;text-align:center\">LoRA：只训 A+B</span><span class=\"d-tag green d-pulse\">r=16 时 131,072 个（0.78%）</span></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:170px;text-align:center\">显存感受</span><span class=\"d-tag\">全参要集群 ｜ LoRA 单卡 24G（QLoRA）</span></div></div></div><div class=\"d-note\">💡 拖动感受：r 翻倍参数翻倍——在『学得动』与『花得起』之间找平衡。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "❄️",
+      "name": "冻结+小马甲",
+      "text": "基座全冻结，只训旁路低秩矩阵 A、B——显存与算力需求骤降。"
+    },
+    {
+      "icon": "🎚️",
+      "name": "三旋钮",
+      "text": "r（容量）、alpha（缩放）、挂载模块——从 r=16/alpha=32 起步按验证集调。"
+    },
+    {
+      "icon": "🧊",
+      "name": "QLoRA 省上省",
+      "text": "基座 4bit 量化+双重量化+分页优化器：13B 模型单卡 24G 可调。"
+    },
+    {
+      "icon": "🔀",
+      "name": "热插拔",
+      "text": "一个基座挂多个 LoRA 适配器（几十 MB/个），按业务切换——部署的最大卖点。"
+    },
+    {
+      "icon": "🛡️",
+      "name": "不易学傻",
+      "text": "基座冻结，通用能力被物理保留——比全参微调更抗灾难性遗忘。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】单卡 24G 想微调 13B 模型，推荐的组合是？",
+      "options": [
+        "全参微调 + 减 batch",
+        "QLoRA：4bit 量化底座 + LoRA 高精度训练",
+        "只训练 Embedding 层",
+        "放弃微调"
+      ],
+      "answer": 1,
+      "explain": "选 B。显存大头是冻结底座——4bit 压到约 6.5G，LoRA 部分以高精度小参数训练，13B 单卡可跑。"
+    },
+    {
+      "type": "choice",
+      "q": "公司有客服、法务、代码三个任务都要微调，LoRA 的部署优势是？",
+      "options": [
+        "训练更快",
+        "一个基座挂三个小适配器（各几十 MB），按请求热切换",
+        "不需要 GPU",
+        "可以不用数据"
+      ],
+      "answer": 1,
+      "explain": "选 B。三份全参模型要 3 倍存储与运维；LoRA 适配器各几十 MB、共享基座——多业务的工程最优解。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你要给 7B 客服模型做业务微调：只有一台 4090（24G）、3000 条数据。请给出完整训练方案（方法、超参起点、验证与常见坑）。",
+      "reference": "方案：用 QLoRA（4bit 底座 + LoRA）在 4090 上训练，13B 都够用，7B 绰绰有余。超参起点：r=16、alpha=32、挂 attention 的 q/k/v/o 投影；学习率 1e-4 量级（LoRA 可以比全参大）、2~3 个 epoch、batch 按显存调配合梯度累积。流程：数据按 SFT 规范三段式整理并留 200 条验证集 → 训练时监控验证损失，曲线回升即早停 → 训完在验证集对比基座：业务问题答得对不对、通用能力有没有掉（通用题抽查）→ 满意后导出适配器。常见坑：一，学习率过大导致模型胡言——降 lr 或减 epoch；二，只看训练损失不看验证——过拟合而不自知；三，数据格式与推理时模板不一致——训练用什么对话模板，上线就用什么；四，忘配合并方式——适配器要么运行时动态加载，要么合并回权重再部署。整条链路一天内可跑通。",
+      "keyPoints": [
+        {
+          "point": "选 QLoRA 并说明理由（24G 约束）",
+          "kw": [
+            "qlora",
+            "4bit",
+            "LoRA ",
+            "lora"
+          ]
+        },
+        {
+          "point": "超参起点：r/alpha/挂载/学习率/epoch",
+          "kw": [
+            "r",
+            "alpha",
+            "学习率",
+            "epoch",
+            "q/k/v"
+          ]
+        },
+        {
+          "point": "验证集+通用能力抽查防学傻",
+          "kw": [
+            "验证",
+            "通用",
+            "抽查",
+            "早停"
+          ]
+        },
+        {
+          "point": "坑：lr 过大/只看训练损失/模板不一致/合并方式",
+          "kw": [
+            "学习率",
+            "过拟合",
+            "模板",
+            "合并"
+          ]
+        }
+      ],
+      "explain": "能给出可执行的完整链路（含坑），就是 L2 微调工程师的合格线。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：LoRA 为什么『小马拉得动大车』？QLoRA 又省在哪？",
+    "hint": "提示：西装马甲 + 压缩打包。",
+    "modelAnswer": "微调要改的东西其实不多，LoRA 就让原模型全部睡觉，只在旁边加一对小矩阵学『这次要补的差异』——要训练的参数不到 1%，小显卡转得动，而且原模型没动过、本事不忘，不同任务还能换不同马甲。QLoRA 更狠一步：把睡觉的大模型用 4bit 压缩存放，显存直接砍到零头——所以一张游戏卡就能调百亿参数的模型。"
+  },
+  "links": [
+    {
+      "to": "b8-lora-principle",
+      "text": "L3 拆开马甲看原理：低秩分解 ΔW=BA 的数学与参数账"
+    },
+    {
+      "to": "b3-sft-data-practice",
+      "text": "工具就绪后，决定成败的是上一站的数据工程"
+    }
+  ],
+  "interview": [
+    {
+      "q": "LoRA 微调的流程和关键超参？",
+      "stars": 5,
+      "source": "知乎/掘金·LoRA 专项面经",
+      "tip": "r/alpha/挂载/学习率给具体起点，强调验证集与通用能力抽查。"
+    }
+  ],
+  "summary": "Q：LoRA 三旋钮？（答：秩 r、alpha、挂载模块——r=16 起步）\nQ：QLoRA 省什么？（答：4bit 底座让 13B 进单卡 24G）\nQ：部署优势？（答：一个基座挂多个适配器热切换）"
+}
