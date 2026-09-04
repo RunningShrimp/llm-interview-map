@@ -27,7 +27,7 @@
       "explain": "算子层 IO 优化与 KV 结构压缩互补共存——这是高频陷阱对比题。"
     },
     {
-      "ref": "b10-rlvr-grpo",
+      "ref": "h2-rlvr-grpo",
       "q": "GRPO 用什么替代了 PPO 的价值模型（critic）？",
       "options": [
         "更大的奖励模型",

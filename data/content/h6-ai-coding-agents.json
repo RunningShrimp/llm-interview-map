@@ -1,0 +1,144 @@
+{
+  "id": "h6-ai-coding-agents",
+  "title": "AI Coding 智能体（Claude Code/Cursor 类）",
+  "definition": "AI Coding 智能体 = 自主操作代码库的开发 Agent：读仓库、改多文件、跑测试、自我修错、提交 PR（Claude Code/Cursor/Codex 类）。它既是 2026 最热的产品形态，也是 Agent 工程的最佳教科书。",
+  "analogies": [
+    {
+      "icon": "🧑‍💻",
+      "name": "从副驾驶到正式员工",
+      "text": "AI 编程的三代进化：Copilot 时代是『副驾驶』——你写代码它补全（单轮补全）；Chat 时代是『顾问』——你贴代码它给建议（对话建议）；Agent 时代是『正式员工』——给它一张需求票，它自己读仓库、开分支、改代码、跑测试、修到绿、提 PR 等你审。从补全到接需求，跨度就是 Agent 化。"
+    },
+    {
+      "icon": "🔍",
+      "name": "它就是 Agent 四件套的活教材",
+      "text": "拆解 Claude Code 会发现全是这门课的内容：规划（先把需求拆成改动清单）、记忆（CLAUDE.md 项目记忆 + 会话状态）、工具（读文件/改文件/执行命令/搜索）、ReAct（改完跑测试，报错回读修复循环）。学它不只是学工具，是把前面所有关卡通通复习一遍。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：Coding Agent 的一次任务循环",
+    "description": "点击『下一步』，看它如何自主完成一个小需求。",
+    "html": "<div class=\"d-steps\" id=\"h6-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：理解需求 + 探索仓库</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">需求：给登录页加验证码校验</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">搜索登录相关文件 → 读现有模式</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：规划 + 实施</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">改动清单：前端校验 + 后端接口 + 测试</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">逐文件修改（带 diff）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：测试 → 修错 → 循环</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">测试失败：未 import 依赖</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">读报错 → 修复 → 重跑 ✓</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 步：交付待审</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">提交分支 + PR 说明 → 人类代码评审 ✅</span></div><div class=\"d-note\">人始终在环里：Agent 干活，人类把关——这也是它敢被放出来的原因。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#h6-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#h6-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#h6-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#h6-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧑‍💻",
+      "name": "三代进化",
+      "text": "补全（Copilot）→ 对话建议（Chat）→ 自主任务（Agent）：自主性与任务粒度逐级放大。"
+    },
+    {
+      "icon": "🧰",
+      "name": "核心能力环",
+      "text": "读仓库 → 规划改动 → 多文件编辑 → 跑测试 → 依报错自修 → 交付待审——每步都是 L2/L3 学过的机制。"
+    },
+    {
+      "icon": "📓",
+      "name": "项目记忆",
+      "text": "CLAUDE.md 类项目说明文件让 Agent 记住团队规范（构建命令/代码风格）——上下文工程的落地样本。"
+    },
+    {
+      "icon": "🛡️",
+      "name": "安全边界",
+      "text": "沙箱执行命令、diff 可见、PR 评审、危险操作确认——编码 Agent 是『人类在环』设计的标杆。"
+    },
+    {
+      "icon": "💼",
+      "name": "面试新考点",
+      "text": "2026 面试新问法：『用过 Coding Agent 吗？它哪里好用哪里翻车？』——考的是真实使用体感与边界认知。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】Coding Agent（Claude Code 类）与上一代 Copilot 补全的本质区别是？",
+      "options": [
+        "模型更大",
+        "任务粒度：从单行补全升级为『接需求→读仓库→多文件修改→跑测试自修→提 PR』的自主任务循环",
+        "不用提示词",
+        "只支持 Python"
+      ],
+      "answer": 1,
+      "explain": "选 B。本质是 Agent 化：规划、多步执行、自我验证闭环——补全只是它的一个子能力。"
+    },
+    {
+      "type": "choice",
+      "q": "Coding Agent 改完代码后『跑测试→读报错→修复→重跑』的循环，对应本课哪个机制？",
+      "options": [
+        "RAG 检索循环",
+        "ReAct + 反思：行动结果（测试输出）作为观察信号驱动下一步",
+        "温度采样",
+        "前缀缓存"
+      ],
+      "answer": 1,
+      "explain": "选 B。测试输出就是 Observation——失败信号驱动修复行动，是 ReAct+Reflection 的工程范本。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】团队想引入 Coding Agent 提效，但担心：①改坏生产代码；②引入安全漏洞；③代码风格失控。请给出安全的引入方案（分阶段）。",
+      "reference": "分三阶段渐进。阶段一（只读+建议）：Agent 只读仓库、产出改动建议与 diff，人类手动应用——积累信任基线，同时沉淀 CLAUDE.md（构建命令、代码规范、禁区）让 Agent 学会团队规矩。阶段二（沙箱内自主）：Agent 在隔离分支+沙箱环境自主改码与跑测试，强制通过 CI（单测/安全扫描如 SAST/依赖审计）才能合并，人类做 PR 评审——用机器门禁兜住安全与质量。阶段三（扩大范围）：低风险模块（测试补齐、文档、重构）全自主，核心模块保持人类主导，并监控 Agent PR 的返工率与缺陷逃逸率。贯穿三条铁律：生产部署永远人类确认、危险命令（删库/改配置）走确认闸、所有改动留 diff 可审计。核心观点：Coding Agent 的引入不是开关，是把『人类在环』逐级外移的信任建设过程。",
+      "keyPoints": [
+        {
+          "point": "阶段一：只读建议+项目记忆沉淀",
+          "kw": [
+            "只读",
+            "diff",
+            "建议"
+          ]
+        },
+        {
+          "point": "阶段二：沙箱自主+CI 门禁（含安全扫描）",
+          "kw": [
+            "沙箱",
+            "ci",
+            "安全扫描",
+            "合并",
+            "评审"
+          ]
+        },
+        {
+          "point": "阶段三：按风险分级扩大范围+监控返工率",
+          "kw": [
+            "低风险",
+            "监控",
+            "返工",
+            "缺陷"
+          ]
+        },
+        {
+          "point": "三铁律：生产人工确认/危险命令闸/留痕",
+          "kw": [
+            "确认",
+            "危险",
+            "审计",
+            "diff",
+            "人类在环"
+          ]
+        }
+      ],
+      "explain": "分阶段信任建设+机器门禁具体化——AI Coding 架构题的成熟答法。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：Claude Code 这类工具和以前的代码补全有什么本质不同？",
+    "hint": "提示：副驾驶 → 正式员工。",
+    "modelAnswer": "以前的补全是副驾驶：你开车它递扳手，写一行补一行。现在的 Coding Agent 是正式员工：你给它一张需求票，它自己去读整个代码库、列改动计划、一次改好几个文件、跑测试，测试挂了它自己看报错改到绿，最后提个 PR 等你审。你会发现它把 Agent 的全套机制都用上了——规划、记忆（项目规范文件）、工具（读写文件跑命令）、测试反馈循环——所以它也是学 Agent 工程最好的活教材。"
+  },
+  "links": [
+    {
+      "to": "h3-context-engineering-practice",
+      "text": "它处理超长会话的 compaction 绝技——下一站上下文工程前沿实践"
+    },
+    {
+      "to": "e3-react-practice",
+      "text": "它的自主循环就是 L2 学的 ReAct——测试报错正是 Observation"
+    }
+  ],
+  "interview": [
+    {
+      "q": "用过 AI Coding 智能体吗？它的能力边界在哪里？",
+      "stars": 4,
+      "source": "面灵AI 2026 题库/CSDN 2026 大厂真题（v3 检索证实：面试出现中）",
+      "tip": "真实使用体感（好用/翻车案例）+ 边界认知 + 安全引入方案。"
+    }
+  ],
+  "summary": "Q：三代进化？（答：补全→对话建议→自主任务循环）\nQ：测试循环对应什么机制？（答：ReAct+反思——Observation 驱动修复）\nQ：引入铁律？（答：分阶段信任建设，生产人类确认、机器门禁兜底）"
+}

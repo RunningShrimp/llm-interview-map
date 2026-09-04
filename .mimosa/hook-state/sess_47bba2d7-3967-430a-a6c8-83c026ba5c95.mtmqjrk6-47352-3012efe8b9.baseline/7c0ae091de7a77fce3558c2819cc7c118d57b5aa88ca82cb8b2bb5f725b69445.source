@@ -36,9 +36,9 @@ const orderIdx = {};
 ORDER.forEach((e, i) => { orderIdx[e.p.id] = i; });
 
 /* ---------- 1. 矩阵结构 ---------- */
-const MODULE_RANGES = { A: [10, 14], B: [10, 13], C: [8, 11], D: [9, 13], E: [9, 13], F: [9, 12], G: [6, 9], H: [4, 8] };
+const MODULE_RANGES = { A: [10, 15], B: [10, 14], C: [8, 11], D: [9, 13], E: [9, 13], F: [9, 12], G: [6, 9] };
 const LEVEL_MIN = 10;
-if (!S || !Array.isArray(S.modules) || S.modules.length !== 8) err("大纲：模块数应为 8");
+if (!S || !Array.isArray(S.modules) || S.modules.length !== 7) err("大纲：模块数应为 7");
 if (!Array.isArray(S.levels) || S.levels.length !== 4) err("大纲：层级数应为 4");
 const levelCount = { L1: 0, L2: 0, L3: 0, L4: 0 };
 const seenIds = new Set();
@@ -60,9 +60,7 @@ Object.keys(levelCount).forEach(k => {
   if (levelCount[k] < LEVEL_MIN) err(`大纲：层级 ${k} 仅 ${levelCount[k]} 点（要求 ≥${LEVEL_MIN}）`);
 });
 const total = ORDER.length;
-if (total < 65 || total > 95) err(`大纲：总点数 ${total} 超出 65-95`);
-const frontierCount = ORDER.filter(e => e.p.frontier).length;
-if (frontierCount < 10) err(`大纲：🆕 前沿点数 ${frontierCount}（要求 ≥10）`);
+if (total < 60 || total > 90) err(`大纲：总点数 ${total} 超出 60-90`);
 ORDER.forEach(e => {
   (e.p.deps || []).forEach(d => {
     if (!allIds.has(d)) err(`大纲：${e.p.id} 依赖不存在 ${d}`);
@@ -181,7 +179,7 @@ const checkAllBoss = !filter;
 if (checkAllBoss) ["L1", "L2", "L3", "L4"].forEach(checkBoss);
 
 console.log("=== 矩阵校验 ===");
-console.log(`总点数 ${total}（65-95）｜ 🆕前沿 ${frontierCount} ｜ 层级分布 L1:${levelCount.L1} L2:${levelCount.L2} L3:${levelCount.L3} L4:${levelCount.L4}（每级 ≥${LEVEL_MIN}）`);
+console.log(`总点数 ${total}（60-90）｜ 层级分布 L1:${levelCount.L1} L2:${levelCount.L2} L3:${levelCount.L3} L4:${levelCount.L4}（每级 ≥${LEVEL_MIN}）`);
 S.modules.forEach(m => {
   const r = MODULE_RANGES[m.id];
   const ok = m.points.length >= r[0] && m.points.length <= r[1];

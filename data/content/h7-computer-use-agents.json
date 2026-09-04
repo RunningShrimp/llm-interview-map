@@ -1,0 +1,145 @@
+{
+  "id": "h7-computer-use-agents",
+  "title": "计算机使用与多模态 Agent",
+  "definition": "Computer Use 类 Agent 让模型直接操作图形界面：截图→理解屏幕→移动光标/点击/输入→再截图验证，循环完成——不依赖 API 也能驱动任何软件（趋势观察）。",
+  "analogies": [
+    {
+      "icon": "🖥️",
+      "name": "外包给远方实习生",
+      "text": "普通工具调用像给实习生配好的门禁卡（有 API 就走 API）；Computer Use 像雇了一位远程实习生坐在一台电脑前：他看屏幕截图理解界面，像人一样移动鼠标、点击按钮、填表单——没有系统愿意给他开 API 也没关系，只要人能用这个软件，他就能用。代价：慢、易点错、且需要防他点错危险按钮。"
+    },
+    {
+      "icon": "🎮",
+      "name": "看屏幕打游戏",
+      "text": "多模态 Agent 玩图形界面像玩家打游戏：每一帧截图是它的『眼睛』（视觉模型理解按钮在哪），动作空间是鼠标键盘（它的『手』），任务进度靠下一帧截图验证。难点不在看懂一帧，而在多帧之间的规划与纠错——点错了要能从新截图里发现并挽回。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一次 Computer Use 的感知-行动循环",
+    "description": "点击『下一步』，看 Agent 如何在无 API 的老系统里完成报销填报。",
+    "html": "<div class=\"d-steps\" id=\"h7-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 拍：截图感知</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">截图 → 视觉模型定位：『报销申请』按钮在右下角</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 拍：行动</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">click(x=1120, y=640)</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">type(发票号) → click(提交)</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 拍：截图验证 + 纠错</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">新截图：弹窗『金额超限』</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">理解原因 → 拆成两张提交 ✓</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">边界与铁律</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">有 API 优先 API</span><span class=\"d-tag amber\">危险按钮（删除/支付）人工确认</span><span class=\"d-tag\">操作全程录像留痕</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#h7-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#h7-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#h7-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#h7-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "👁️",
+      "name": "感知-行动循环",
+      "text": "截图（视觉理解）→ 决策（坐标与动作）→ 执行 → 再截图验证——多模态模型的 Agent 化应用。"
+    },
+    {
+      "icon": "🔓",
+      "name": "价值：无 API 也自动化",
+      "text": "老系统、第三方软件、没有接口的场景——只要人能点，Agent 就能操作，覆盖率无敌。"
+    },
+    {
+      "icon": "🐢",
+      "name": "代价：慢且脆",
+      "text": "每步一次截图推理（秒级），界面一变就失效——有 API 优先 API，GUI 是最后手段。"
+    },
+    {
+      "icon": "⚠️",
+      "name": "安全敏感",
+      "text": "能点任何按钮意味着能点『删除』——危险操作白名单+人工确认+全程录像三件套必备。"
+    },
+    {
+      "icon": "🔮",
+      "name": "状态：趋势观察",
+      "text": "官方产品已发布但生产案例少；面试多为开放讨论题——诚实评估当前可靠性边界。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】Computer Use Agent 的工作循环是？",
+      "options": [
+        "直接调用系统 API",
+        "截图感知 → 决策坐标动作 → 执行 → 再截图验证，循环到任务完成",
+        "语音控制",
+        "重新开发系统"
+      ],
+      "answer": 1,
+      "explain": "选 B。以截图为眼睛、鼠标键盘为手的多模态循环——不依赖 API 的通用自动化路线。"
+    },
+    {
+      "type": "choice",
+      "q": "企业要自动化一个只有网页界面、无 API 的老报销系统，以下策略最合理的是？",
+      "options": [
+        "Computer Use Agent 直接上生产",
+        "先评估能否给老系统补 API/用 RPA；确需 Computer Use 则限白名单操作+人工确认+录屏审计",
+        "放弃自动化",
+        "让 AI 猜按钮位置"
+      ],
+      "answer": 1,
+      "explain": "选 B。『有 API 优先 API、GUI 是最后手段』+ 安全三件套——既能落地又不出事。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】老板要求：『用 Computer Use Agent 把财务小姐姐从每月手工对账里解放出来。』请给出可行性评估框架与分阶段落地方案。",
+      "reference": "可行性先评估三件事：①任务确定性——对账规则是否明确固定（模糊判断多的任务不适合当前水平的 GUI Agent）；②界面稳定性——系统 UI 是否频繁改版（每次改版都要重新校准）；③风险等级——对账涉及资金数据，误操作的代价多大。分阶段方案：阶段一 Shadow 模式——Agent 与人工并行，Agent 的每步操作只记录不执行，人工复核它的『计划操作序列』来度量准确率（这是趋势观察期最稳的验证法）；阶段二半自动——低风险步骤（读取、比对、填表）自动执行，提交动作人工点击；阶段三视准确率数据决定是否放开。全程录屏留痕、危险按钮白名单、失败自动暂停转人工。另外务必对比替代方案：如果财务系统厂商能导出对账 CSV，写个脚本可能比 GUI Agent 便宜十倍且稳定——架构师要先问『为什么不用 API』再选最重的锤子。 另外务必对比替代方案：如果财务系统厂商能导出对账 CSV，写个脚本可能比 GUI Agent 便宜十倍且稳定——架构师要先问『为什么不用 RPA』再选最重的锤子；涉及资金确认等危险动作必须加人工确认闸。",
+      "keyPoints": [
+        {
+          "point": "评估：确定性/界面稳定/风险等级",
+          "kw": [
+            "确定性",
+            "稳定",
+            "改版",
+            "风险",
+            "评估"
+          ]
+        },
+        {
+          "point": "Shadow 模式验证准确率",
+          "kw": [
+            "shadow",
+            "并行",
+            "复核",
+            "准确率"
+          ]
+        },
+        {
+          "point": "半自动：低风险自动+提交人工",
+          "kw": [
+            "半自动",
+            "白名单",
+            "确认",
+            "录屏"
+          ]
+        },
+        {
+          "point": "先问『为什么不用 API』",
+          "kw": [
+            "api",
+            "rpa",
+            "脚本",
+            "替代",
+            "对比"
+          ]
+        }
+      ],
+      "explain": "可行性框架+Shadow 起步+替代方案对比——对趋势观察期技术的成熟判断。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：Computer Use Agent 是怎么操作电脑的？为什么说它是最后手段？",
+    "hint": "提示：远程实习生看屏幕干活。",
+    "modelAnswer": "它像一位坐在电脑前的远程实习生：每一步先截图『看』屏幕，用视觉模型理解界面，然后像人一样移动鼠标、点击、打字，再截图检查有没有点对，错了就挽回。它的价值是不需要软件配合——没有 API 的老系统也能自动化。但它慢（每步都要看图思考）、脆（界面一变就懵）、危险（什么按钮都够得着），所以有 API 一定优先 API，用它必须加白名单、人工确认和录屏。"
+  },
+  "links": [
+    {
+      "to": "e3-react-practice",
+      "text": "感知-行动循环的节拍依然是 ReAct——只是工具变成了屏幕"
+    },
+    {
+      "to": "e4-function-calling-practice",
+      "text": "有 API 的场景，工具调用仍是正解——GUI 是无 API 时的兜底"
+    }
+  ],
+  "interview": [
+    {
+      "q": "了解 Computer Use 类 Agent 吗？什么场景适合用？",
+      "stars": 3,
+      "source": "Anthropic Computer Use/OpenAI Operator 官方（趋势观察）",
+      "tip": "循环机制+『无 API 场景的兜底』定位+安全三件套，诚实评估可靠性。"
+    }
+  ],
+  "summary": "Q：工作循环？（答：截图→决策→执行→验证）\nQ：核心价值？（答：无 API 软件的通用自动化——覆盖率无敌）\nQ：为什么是最后手段？（答：慢、脆、危险面大——安全三件套必备）"
+}

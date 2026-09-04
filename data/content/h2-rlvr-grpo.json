@@ -1,6 +1,6 @@
 {
-  "id": "b10-rlvr-grpo",
-  "title": "对齐前沿：RLVR/GRPO 与推理模型",
+  "id": "h2-rlvr-grpo",
+  "title": "RLVR 与 GRPO 对齐前沿",
   "definition": "对齐的最新演进：RLVR 用『可验证奖励』（答案对错程序判定）替代人类偏好；GRPO 用组内相对优势替代 PPO 的价值模型。两者合流催生了 DeepSeek-R1 式推理模型——刷题刷出的深度思考能力。",
   "analogies": [
     {
@@ -20,11 +20,31 @@
     "html": "<div class=\"d-steps\" id=\"b10-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：一道题采样一组（G=4）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-card\">答①</span><span class=\"d-card\">答②</span><span class=\"d-card\">答③</span><span class=\"d-card\">答④</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：可验证奖励判卷</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">① 正确 1.0</span><span class=\"d-tag green\">② 正确 1.0</span><span class=\"d-tag red\">③ 错误 0</span><span class=\"d-tag amber\">④ 无过程 0.6</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：组内平均当基线</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-card d-pulse\" style=\"border-color:#10b981\">①② 高于均值 ↗ 强化</span><span class=\"d-card d-shake\" style=\"border-color:#ef4444\">③ 低于均值 ↘ 抑制</span></div><div class=\"d-note\">价值模型下岗：基线就是组平均分——显存与调参复杂度大降。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#b10-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#b10-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#b10-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#b10-steps\">🔄 重播</button></div>"
   },
   "keyPoints": [
-    { "icon": "👥", "name": "GRPO 组采样", "text": "同一提示采样一组回答，组内奖励标准化为相对优势——替代 PPO 的 critic。" },
-    { "icon": "✅", "name": "RLVR 可验证奖励", "text": "数学验答案、代码跑测试、格式查规则——奖励客观可判定，不再依赖人类品味。" },
-    { "icon": "🧠", "name": "推理能力涌现", "text": "长链反思、自我检查等行为在 RLVR 大规模强化下自发出现——R1 的核心叙事。" },
-    { "icon": "🏗️", "name": "R1 流水线", "text": "R1-Zero 纯 RL → R1 加冷启动 SFT+多阶段 RL → 蒸馏给小模型。" },
-    { "icon": "⚠️", "name": "适用边界", "text": "只覆盖结果可验证的领域（数学/代码）；开放对话仍需偏好方法；防奖励投机。" }
+    {
+      "icon": "👥",
+      "name": "GRPO 组采样",
+      "text": "同一提示采样一组回答，组内奖励标准化为相对优势——替代 PPO 的 critic。"
+    },
+    {
+      "icon": "✅",
+      "name": "RLVR 可验证奖励",
+      "text": "数学验答案、代码跑测试、格式查规则——奖励客观可判定，不再依赖人类品味。"
+    },
+    {
+      "icon": "🧠",
+      "name": "推理能力涌现",
+      "text": "长链反思、自我检查等行为在 RLVR 大规模强化下自发出现——R1 的核心叙事。"
+    },
+    {
+      "icon": "🏗️",
+      "name": "R1 流水线",
+      "text": "R1-Zero 纯 RL → R1 加冷启动 SFT+多阶段 RL → 蒸馏给小模型。"
+    },
+    {
+      "icon": "⚠️",
+      "name": "适用边界",
+      "text": "只覆盖结果可验证的领域（数学/代码）；开放对话仍需偏好方法；防奖励投机。"
+    }
   ],
   "exercises": [
     {
@@ -56,10 +76,44 @@
       "q": "【架构题】面试官：『DeepSeek-R1 为什么用 GRPO 而不是 PPO？请从算法与工程两个角度分析，并说明 RLVR 的适用边界与风险。』请作答。",
       "reference": "算法角度：R1 的目标是数学、代码这类可验证任务，奖励可由程序判定（答案校验、测试通过率），不需要人类偏好建模；PPO 要同时维护策略、参考、奖励、价值四个模型，其中价值模型与策略同规模且训练难稳；GRPO 对每个问题采样一组回答，用组内奖励的均值和标准差做标准化得到相对优势，直接取消价值模型，信号也更贴合『同一题内比谁做得好』的任务本质。工程角度：省掉 critic 意味着显存降半量级、超参大幅减少、训练更稳定，能把算力堆到更大规模的组采样与更多轮 RL 上——这是 R1 能跑长链推理 RL 的前提。RLVR 边界与风险：只覆盖结果可验证的领域，开放对话与创意写作仍需人类或模型偏好（RLAIF）；风险是奖励投机——模型学会输出判分器喜欢的格式而推理过程并不可靠，需要过程奖励与格式奖励约束；另外 R1-Zero 纯 RL 起步可读性差，生产版加了冷启动 SFT 与可读性奖励。",
       "keyPoints": [
-        { "point": "算法面：组采样相对优势取消 critic", "kw": ["组", "相对优势", "critic", "价值模型"] },
-        { "point": "RLVR 契合可验证任务", "kw": ["可验证", "数学", "代码", "测试", "奖励"] },
-        { "point": "工程面：显存/超参/稳定性支撑大规模 RL", "kw": ["显存", "超参", "稳定", "大规模"] },
-        { "point": "边界与风险：开放任务不适用+奖励投机", "kw": ["边界", "开放", "投机", "格式", "过程奖励"] }
+        {
+          "point": "算法面：组采样相对优势取消 critic",
+          "kw": [
+            "组",
+            "相对优势",
+            "critic",
+            "价值模型"
+          ]
+        },
+        {
+          "point": "RLVR 契合可验证任务",
+          "kw": [
+            "可验证",
+            "数学",
+            "代码",
+            "测试",
+            "奖励"
+          ]
+        },
+        {
+          "point": "工程面：显存/超参/稳定性支撑大规模 RL",
+          "kw": [
+            "显存",
+            "超参",
+            "稳定",
+            "大规模"
+          ]
+        },
+        {
+          "point": "边界与风险：开放任务不适用+奖励投机",
+          "kw": [
+            "边界",
+            "开放",
+            "投机",
+            "格式",
+            "过程奖励"
+          ]
+        }
       ],
       "explain": "算法+工程双视角+边界风险三段齐，是对齐前沿题的满分结构。"
     }
@@ -70,8 +124,14 @@
     "modelAnswer": "GRPO 让模型对同一道题一口气写十几份答卷，程序自动判卷（数学对答案、代码跑测试），组内互相排名：高于平均的写法被鼓励，低于平均的被抑制——不用再养一个预测『该得几分』的模型，省一大笔。因为数学和代码能自动判对错，模型可以无限刷题，刷着刷着自己学会了反复检查、换思路重试这些推理习惯——R1 的聪明就是这么刷出来的。"
   },
   "links": [
-    { "to": "b7-ppo-vs-dpo", "text": "GRPO 是 PPO 阵营的轻量化改造——回到 L3 对比两条简化路线" },
-    { "to": "c7-cot-principle", "text": "RLVR 训出的长链反思正是思维链的进阶形态——推理的提示词版与训练版" }
+    {
+      "to": "b7-ppo-vs-dpo",
+      "text": "GRPO 是 PPO 阵营的轻量化改造——回到 L3 对比两条简化路线"
+    },
+    {
+      "to": "c7-cot-principle",
+      "text": "RLVR 训出的长链反思正是思维链的进阶形态——推理的提示词版与训练版"
+    }
   ],
   "interview": [
     {

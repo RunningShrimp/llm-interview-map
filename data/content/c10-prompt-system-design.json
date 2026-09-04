@@ -1,7 +1,7 @@
 {
   "id": "c10-prompt-system-design",
-  "title": "复杂 Prompt 体系设计",
-  "definition": "资深岗的 Prompt 考题从『写一条好提示词』升级为『设计一套提示词体系』：角色分层、组件复用、版本化与评测门禁、灰度发布——把提示词当代码治理（Prompt-as-Code）。",
+  "title": "Context Engineering 体系设计",
+  "definition": "Context Engineering（上下文工程）把提示词工程升级为体系：分层管理模型每一步看见的全部信息——系统提示分层、上下文预算、组件复用、版本化与评测门禁，即 Prompt-as-Code。",
   "analogies": [
     {
       "icon": "🏛️",
@@ -44,6 +44,11 @@
       "icon": "🎛️",
       "name": "灰度与观测",
       "text": "先 5~10% 流量对比线上指标，配合 Trace 观察真实行为，达标全量。"
+    },
+    {
+      "icon": "🪆",
+      "name": "上下文分层管理",
+      "text": "红线层/角色层/任务层/动态层之外，还要管理工具结果与历史的进出——每步『看见什么』是设计对象。"
     }
   ],
   "exercises": [
@@ -133,7 +138,7 @@
   ],
   "interview": [
     {
-      "q": "复杂产品里怎么管理提示词体系？怎么避免改 A 坏 B？",
+      "q": "什么是 Context Engineering？你们怎么设计与管理提示词/上下文体系？",
       "stars": 4,
       "source": "Interview Coder Q38（How do you version a system prompt）/JavaBetter·Prompt 分层架构（v2 检索证实）",
       "tip": "分层+组件化+评测门禁+版本灰度，配『改 A 坏 B』案例。"

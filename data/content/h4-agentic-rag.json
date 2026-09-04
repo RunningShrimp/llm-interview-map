@@ -1,0 +1,143 @@
+{
+  "id": "h4-agentic-rag",
+  "title": "Agentic RAG 与自主检索智能体",
+  "definition": "Agentic RAG 让 Agent 接管检索决策：自己判断要不要查、查什么、查几轮、结果够不够——把固定 RAG 流水线升级为会规划-检索-反思的自主智能体。2025-2026 RAG 演进的主线。",
+  "analogies": [
+    {
+      "icon": "🧑‍🔬",
+      "name": "图书管理员升级为研究员",
+      "text": "标准 RAG 像一位按流程办事的图书管理员：你递来问题，他查一次书、抄一段、交卷——流程固定。Agentic RAG 像一位研究员：先分析问题需要查什么、拆成几个子问题，查完评估『这些资料够吗』，不够就换个关键词再查或换个库，直到有把握才动笔写答案——检索策略由他自己规划。"
+    },
+    {
+      "icon": "🔀",
+      "name": "从流水线到决策者",
+      "text": "传统 RAG 的每一步都是写死的（检索→拼装→生成）；Agentic RAG 把『检索』变成 Agent 工具箱里的一个工具：查不查、查几轮、查哪个库、要不要反思重查——都由模型在 ReAct 循环里自主决定。能力上限更高，成本与延迟也更高——架构师要会算这笔账。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：固定流水线 vs 自主检索",
+    "description": "同一个多跳问题，看两种模式的检索路径差异。",
+    "html": "<div class=\"d-steps\" id=\"h4-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">标准 RAG：一查定终身</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">问：A 政策负责人的部门预算是多少？</span><span class=\"d-arrow\">→</span><span class=\"d-tag red\">单次检索命中不全 → 硬答 ❌</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">Agentic RAG：规划-检索-反思循环</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag\">① Thought：拆成 3 个子问题</span><span class=\"d-token hot d-pulse\">② 检索：A 政策负责人是谁 ✓</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.3s\">③ 检索：该负责人所在部门 ✓</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.6s\">④ 检索：该部门预算 ✓</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">反思与收敛</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">③ 结果模糊</span><span class=\"d-arrow\">→</span><span class=\"d-tag amber\">自我评估：证据不足 → 改写重查 ✓</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">证据齐 → 汇总作答（标注 3 处来源）</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#h4-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#h4-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#h4-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#h4-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧭",
+      "name": "检索即工具",
+      "text": "把向量检索/BM25/Web 搜索都注册为 Agent 工具，查不查、查什么由模型在循环中决策。"
+    },
+    {
+      "icon": "🔁",
+      "name": "反思循环",
+      "text": "每轮检索后自评：资料够吗、相关吗？不足则改写查询重查——Self-RAG/CRAG 思想的 Agent 化。"
+    },
+    {
+      "icon": "🪜",
+      "name": "多跳分解",
+      "text": "复杂问题自动拆子问题链，逐跳检索传递中间结论——多跳问题的标准解。"
+    },
+    {
+      "icon": "🔀",
+      "name": "多源路由",
+      "text": "不同子问题路由到不同源（内部库/Web/结构化 SQL）——按需选择信息渠道。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "代价核算",
+      "text": "延迟与 token 成倍于固定 RAG；简单问题应路由回标准 RAG——Agentic 只用于值得的场景。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】Agentic RAG 与标准 RAG 的本质区别是？",
+      "options": [
+        "向量库不同",
+        "检索决策权：从固定流水线交给 Agent 自主规划（查不查/查几轮/够不够）",
+        "用了更大的模型",
+        "不需要 Embedding"
+      ],
+      "answer": 1,
+      "explain": "选 B。Agentic RAG 的『Agentic』正指检索策略由模型在循环中自主决策——Self-RAG/CRAG 的演进形态。"
+    },
+    {
+      "type": "choice",
+      "q": "生产系统中，Agentic RAG 最合理的应用姿势是？",
+      "options": [
+        "所有问题全部走 Agentic 流程",
+        "简单事实问题路由到标准 RAG，多跳/模糊/复杂问题才升级 Agentic",
+        "彻底废弃标准 RAG",
+        "只用于图片检索"
+      ],
+      "answer": 1,
+      "explain": "选 B。Agentic 的延迟与成本是标准 RAG 的数倍——按问题复杂度分级路由才是架构师答案。"
+    },
+    {
+      "type": "scenario",
+      "q": "【架构题】企业知识库在多跳问题（『A 政策负责人的部门预算』）上表现差。请对比『升级 Agentic RAG』与『查询分解+迭代检索』两条路线，并给出推荐。",
+      "reference": "两条路线同源不同形。路线一查询分解+迭代检索：工程上确定性更强——用规划提示词把问题拆成子问题链，逐跳检索传递中间结论，失败模式可预期（卡在哪一跳一目了然），成本低、延迟可控；适合子问题结构相对可预测的业务。路线二 Agentic RAG：检索决策完全交给 Agent——灵活性最高，能处理规划器没想到的分支（中途发现需要查第三个库），但延迟与 token 成本数倍、行为需要护栏（最大轮数、来源白名单）。推荐：先上路线一（确定性高、两周可落地），把『多跳』场景的 80% 解决掉；对剩下 20% 规划器覆盖不了的复杂问题，用 Agentic RAG 兜底——即『分解为主、Agent 兜底』的分级架构。评估上两条路线共用多跳测试集，指标：最终答案正确率 + 平均检索轮数 + 单问成本，用数据定分流阈值。",
+      "keyPoints": [
+        {
+          "point": "路线一：分解+迭代（确定性强、成本低）",
+          "kw": [
+            "分解",
+            "子问题",
+            "迭代",
+            "确定性"
+          ]
+        },
+        {
+          "point": "路线二：Agent 自主检索（灵活、贵）",
+          "kw": [
+            "agent",
+            "灵活",
+            "轮数",
+            "成本"
+          ]
+        },
+        {
+          "point": "分级架构：分解为主、Agent 兜底",
+          "kw": [
+            "分级",
+            "兜底",
+            "主"
+          ]
+        },
+        {
+          "point": "共用测试集+三指标定阈值",
+          "kw": [
+            "测试集",
+            "正确率",
+            "轮数",
+            "成本",
+            "阈值"
+          ]
+        }
+      ],
+      "explain": "同源对比+分级推荐+数据定阈值——前沿架构题的成熟答法。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：Agentic RAG 比普通 RAG 聪明在哪？代价是什么？",
+    "hint": "提示：图书管理员升级为研究员。",
+    "modelAnswer": "普通 RAG 是按流程办事的管理员：查一次、抄一段、交卷——问题复杂就查不全。Agentic RAG 是研究员：自己规划要查什么、拆成几个子问题，查完自评『证据够不够』，不够就换关键词再查或换库，够了才动笔。代价是它爱琢磨——每一轮都是真金白银的模型调用和延迟，所以生产上要分级：简单问题走老流程，难题才请研究员出山。"
+  },
+  "links": [
+    {
+      "to": "d10-graphrag-advanced",
+      "text": "GraphRAG 与高级 RAG 是本关的成熟地基——Self-RAG/CRAG 思想在此"
+    },
+    {
+      "to": "e3-react-practice",
+      "text": "自主检索的运行节拍就是 ReAct——L2 的循环在这里指挥检索"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是 Agentic RAG？和标准 RAG 怎么选？",
+      "stars": 4,
+      "source": "Hugging Face Blog / 卡码笔记·第26题（v3 检索证实：面试出现中）",
+      "tip": "决策权转移+多跳案例+分级路由，体现成本意识。"
+    }
+  ],
+  "summary": "Q：本质区别？（答：检索决策权从流水线交给 Agent）\nQ：能力来源？（答：规划-检索-反思循环 + 多跳分解）\nQ：生产姿势？（答：简单走标准 RAG，复杂升级 Agentic——分级路由）"
+}

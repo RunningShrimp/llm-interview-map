@@ -1,0 +1,80 @@
+{
+  "id": "h1-test-time-scaling",
+  "title": "推理模型与测试时扩展（R1/o 系列）",
+  "definition": "测试时扩展（Test-Time Scaling）= 回答问题时给模型更多『思考算力』：推理模型（DeepSeek-R1、OpenAI o 系列）先生成长思维链再给答案——思考越久越准，用推理成本换准确率。",
+  "analogies": [
+    {
+      "icon": "📝",
+      "name": "考试多打草稿",
+      "text": "普通模型像抢答选手：问题读完立刻作答；推理模型像允许打草稿的考生——先列已知、尝试思路、检查一遍再写答案。难题上草稿纸越用越多、正确率越高，简单题草稿几行就够。『测试时扩展』研究的正是：草稿纸给多少最划算。"
+    },
+    {
+      "icon": "🧮",
+      "name": "两条扩展曲线",
+      "text": "传统 Scaling Law 说『训练越久越聪明』（训练时扩展）；2024 年后发现了第二条曲线：『推理时想得越久越聪明』——同一个模型，推理时多生成 10 倍思考 token，数学成绩还能再涨。这就是 o 系列与 R1 的理论根基。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：思考预算 vs 准确率 vs 成本",
+    "description": "拖动滑杆调整思考预算，观察难题准确率与推理成本的权衡。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:8px\"><input type=\"range\" min=\"0\" max=\"100\" value=\"30\" data-output=\"#h1-b\" data-suffix=\"\"><span>思考预算 = <b id=\"h1-b\">30</b>%</span></div><div class=\"demo-box\" style=\"padding:12px\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:150px;text-align:center\">难题准确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:calc(30% + 60% * var(--v) / 100);background:#34d399\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:150px;text-align:center\">简单题准确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:calc(88% + 8% * var(--v) / 100);background:#60a5fa\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:150px;text-align:center\">推理成本</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-pulse\" style=\"width:calc(10% + 88% * var(--v) / 100);background:#f59e0b\"></div></div></div></div></div><div class=\"d-note\">💡 难题受益陡峭、简单题收益平缓、成本线性上涨——所以生产系统要做『思考预算路由』：难题多想、简单题快答。</div>"
+  },
+  "keyPoints": [
+    { "icon": "🧠", "name": "长思维链", "text": "推理模型生成中间推理 token（验证、回溯、多路径尝试），再输出最终答案——答案质量随思考长度提升。" },
+    { "icon": "📈", "name": "测试时扩展定律", "text": "推理性能随测试时计算量对数提升——与训练时扩展互补的第二条扩展曲线。" },
+    { "icon": "🎛️", "name": "思考预算可控", "text": "o 系列的 reasoning_effort、R1 的思考长度——按题目难度分配算力是工程关键。" },
+    { "icon": "⚡", "name": "代价", "text": "思考 token 也是钱与延迟：简单任务用推理模型是浪费——路由策略（难=推理模型，易=普通模型）。" },
+    { "icon": "🧩", "name": "与 CoT 的关系", "text": "提示词 CoT 是『请它写过程』；推理模型是被 RL 训练出内化的深度思考——后者质量高一个量级。" }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】推理模型（R1/o 系列）相比普通模型的核心差异是？",
+      "options": [
+        "参数量更大",
+        "先生成长思维链再作答：用测试时计算换复杂任务的准确率",
+        "训练数据更多",
+        "不需要对齐"
+      ],
+      "answer": 1,
+      "explain": "选 B。推理模型的本质是测试时扩展：思考 token 是可分配的计算资源，难题收益显著。"
+    },
+    {
+      "type": "choice",
+      "q": "以下哪个任务最不该用推理模型（思考预算拉满）？",
+      "options": ["奥数证明题", "把这句话翻译成英文", "复杂代码调试", "多步数据分析师推理"],
+      "answer": 1,
+      "explain": "选 B。简单翻译不需要深度思考——拉满预算只会增加延迟与成本，无准确率收益；难题才划算。"
+    },
+    {
+      "type": "scenario",
+      "q": "【架构题】你们要上线『数学辅导 + 日常问答』二合一产品：底层同时有普通模型与推理模型。请设计思考预算的路由策略与成本护栏。",
+      "reference": "策略分三层：第一层意图路由——分类器/规则先判任务类型：闲聊、翻译、格式转换走普通模型（零思考预算）；多步数学、代码调试、逻辑推理走推理模型，且按预估难度分档设 reasoning_effort（中档默认、竞赛题拉满）。第二层动态预算——首轮推理模型输出中若出现『多次自我修正』的信号，说明题目难，允许追加思考轮；简单信号（一步直答）则截断。第三层成本护栏——单请求思考 token 上限、日预算熔断，推理调用的账单单独观测（思考 token 不可见但计费！要专门监控 reasoning_tokens 指标）。配套验证：建『难题集+简单题集』双测试集，路由策略的目标准确率是『难题不降分、简单题不多花钱』——用数据调路由阈值，别拍脑袋。",
+      "keyPoints": [
+        { "point": "意图路由：简单走普通模型、难题走推理模型", "kw": ["路由", "意图", "普通模型", "推理模型"] },
+        { "point": "思考预算分档（reasoning_effort/难度）", "kw": ["预算", "effort", "分档", "难度"] },
+        { "point": "成本护栏：思考 token 计费与监控", "kw": ["思考 token", "计费", "监控", "上限", "熔断"] },
+        { "point": "双测试集验证路由阈值", "kw": ["测试集", "难题", "简单题", "阈值"] }
+      ],
+      "explain": "路由+预算+护栏三层齐备，并点出『思考 token 不可见但计费』的坑——前沿题的满分结构。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：推理模型为什么『想得越久越聪明』？什么时候不该用它？",
+    "hint": "提示：考试打草稿；草稿也是时间。",
+    "modelAnswer": "推理模型像被允许打草稿的考生：答题前先在草稿纸上列思路、试错、回头检查——难题上草稿越多分越高，这叫测试时扩展。但草稿也是时间：简单题问它『把这句翻译成英文』，它打三千字草稿纯属浪费钱和时间。所以好的系统像个懂行的监考官：难题发大草稿纸，简单题让它直接写答案。"
+  },
+  "links": [
+    { "to": "c7-cot-principle", "text": "推理模型的内化思考正是 CoT 的训练进化版——L3 机制在此" },
+    { "to": "h2-rlvr-grpo", "text": "这种深度思考能力从哪来？下一站：RLVR 与 GRPO 的对齐引擎" }
+  ],
+  "interview": [
+    {
+      "q": "什么是测试时扩展？推理模型和普通模型怎么选？",
+      "stars": 4,
+      "source": "DeepSeek-R1 论文 / OpenAI o1 博客（v3 检索证实）",
+      "tip": "两条扩展曲线+思考预算路由，附成本数字。"
+    }
+  ],
+  "summary": "Q：测试时扩展是什么？（答：推理时算力换准确率的第二条扩展曲线）\nQ：代价？（答：思考 token 的钱与延迟——简单任务不划算）\nQ：工程要点？（答：难度路由 + 预算分档 + 思考 token 监控）"
+}

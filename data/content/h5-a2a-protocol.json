@@ -1,0 +1,143 @@
+{
+  "id": "h5-a2a-protocol",
+  "title": "A2A 协议与多 Agent 互操作",
+  "definition": "A2A 是 Google 发起、捐入 Linux Foundation 的开放协议：让不同框架的 Agent 互相发现、委托任务、回报状态——MCP 连工具，A2A 连 Agent（趋势观察）。",
+  "analogies": [
+    {
+      "icon": "🌐",
+      "name": "Agent 界的 HTTP",
+      "text": "各家 Agent 像早期孤岛式的即时通讯软件——互相加不了好友。A2A 之于 Agent，就像 HTTP 之于网站：定义了统一的『能力名片』（Agent Card：我是谁、会做什么）、『任务委托』（Task：结构化下发与状态回报）和『消息格式』——任何符合协议的 Agent 都能与任何其他 Agent 协作，不管底层用什么框架。"
+    },
+    {
+      "icon": "🤝",
+      "name": "外包协作合同",
+      "text": "MCP 像公司给员工配的标准工具台（内部怎么接工具）；A2A 像公司之间的外包合同（对等组织如何委托任务）：甲方 Agent 把任务连同验收标准发给乙方 Agent，乙方用自己的团队（自己的工具、自己的模型）完成，按协议回报进度与产物。甲方不需要知道乙方内部用什么框架。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：A2A 的一次跨厂商协作",
+    "description": "点击『下一步』，看两家不同框架的 Agent 如何完成一次委托。",
+    "html": "<div class=\"d-steps\" id=\"h5-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：发现——读取对方的能力名片</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">主 Agent（框架 X）</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">GET /.well-known/agent.json</span><span class=\"d-arrow\">→</span><span class=\"d-card\">差旅 Agent（框架 Y）：会订机票酒店</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：委托任务（结构化 Task）</div><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><span class=\"d-card mono\" style=\"font-size:12px\">task: \"预订 9/10 北京→上海，靠窗，经济舱\"\n验收：出票成功 + 行程单</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：状态回报 + 产物交付</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">working → input-required（需要护照信息）</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">completed + 行程单附件 ✅</span></div><div class=\"d-note\">双方框架不同、模型不同——协议让它们像同事一样协作。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#h5-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#h5-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#h5-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#h5-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🪪",
+      "name": "Agent Card 能力名片",
+      "text": "标准位置暴露能力声明（会做什么/如何调用/鉴权方式）——跨框架发现的基础。"
+    },
+    {
+      "icon": "📦",
+      "name": "Task 任务模型",
+      "text": "任务有生命周期（submitted→working→input-required→completed/failed），支持长任务与多轮补信息。"
+    },
+    {
+      "icon": " opaque",
+      "name": "Opaque 协作",
+      "text": "委托方不需要知道对方的内部实现（模型/工具/框架）——能力边界即接口。"
+    },
+    {
+      "icon": "🧭",
+      "name": "与 MCP 的分工",
+      "text": "MCP：Agent↔工具（垂直连接）；A2A：Agent↔Agent（水平协作）——互补而非竞争。"
+    },
+    {
+      "icon": "🔮",
+      "name": "状态：趋势观察",
+      "text": "协议已进入 Linux Foundation、主流框架开始支持，但面试真题尚少——关注生态落地速度。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】A2A 与 MCP 的分工是？",
+      "options": [
+        "完全重复的两套协议",
+        "MCP 连接 Agent 与工具/资源（垂直），A2A 连接 Agent 与 Agent（水平协作）",
+        "MCP 连 Agent 与 Agent，A2A 连工具",
+        "A2A 用于训练"
+      ],
+      "answer": 1,
+      "explain": "选 B。垂直的工具接入层与水平的智能体协作层互补——这是 A2A 题的标准采分点。"
+    },
+    {
+      "type": "choice",
+      "q": "A2A 的『Opaque 协作』指什么？",
+      "options": [
+        "通信加密不可见",
+        "委托方无需了解对方的内部实现（框架/模型/工具），只依赖能力名片与任务协议交互",
+        "任务内容保密",
+        "匿名 Agent"
+      ],
+      "answer": 1,
+      "explain": "选 B。能力边界即接口：正是这种实现无关性，让不同框架的 Agent 可以自由协作。"
+    },
+    {
+      "type": "scenario",
+      "q": "【架构题】你的公司有自研客服 Agent（框架 X），需要接入合作伙伴的差旅 Agent（框架 Y）帮客户订票。请设计基于 A2A 的集成方案与两条风险控制。",
+      "reference": "集成方案：第一步能力发现——读取差旅 Agent 的 Agent Card（能力清单、调用方式、鉴权要求），确认其支持订票任务与所需参数；第二步任务委托——按 A2A Task 结构下发『预订航班』任务，附结构化需求（行程、偏好、预算上限）与验收标准；第三步生命周期管理——处理状态回报：working（处理中）时向客户展示进度，input-required（需要护照信息）时桥接我方用户补充信息再继续，completed 时验收产物（行程单）并计费归档。风险控制两条：一，能力与边界验证——上线前用沙箱任务验证对方 Agent 的真实能力与响应格式（名片可能夸大），并设任务超时与失败重试策略；二，数据与责任边界——客户敏感信息（证件号）最小化披露，合同明确责任划分（出票错误由谁担责），全程任务留痕可审计。补充判断：A2A 尚处趋势观察期——若合作方仅此一家，先用双方约定的私有 API 更快；接入多家异构 Agent 时 A2A 的标准化收益才显现。",
+      "keyPoints": [
+        {
+          "point": "发现：Agent Card 能力名片",
+          "kw": [
+            "agent card",
+            "发现",
+            "能力",
+            "名片"
+          ]
+        },
+        {
+          "point": "委托：Task 结构化+验收标准",
+          "kw": [
+            "task",
+            "委托",
+            "验收",
+            "结构化"
+          ]
+        },
+        {
+          "point": "生命周期：input-required 桥接用户",
+          "kw": [
+            "生命周期",
+            "input",
+            "桥接",
+            "状态"
+          ]
+        },
+        {
+          "point": "风险：能力验证+数据责任边界+成熟度判断",
+          "kw": [
+            "验证",
+            "沙箱",
+            "责任",
+            "趋势观察"
+          ]
+        }
+      ],
+      "explain": "方案落地+风险控制+成熟度判断三段齐——前沿协议题的稳妥答法。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：A2A 是什么？它和 MCP 为什么不冲突？",
+    "hint": "提示：Agent 界的 HTTP + 外包合同。",
+    "modelAnswer": "A2A 是给 AI Agent 定的『互联互通标准』，像 Agent 界的 HTTP：每家 Agent 挂一张能力名片，别人按标准把任务委托过来，它按协议回报进度和结果——不同公司、不同框架的 Agent 从此能互相合作。它和 MCP 不冲突：MCP 管的是 Agent 怎么接工具（配设备），A2A 管 Agent 之间怎么组队干活（签外包合同）——一个垂直一个水平。"
+  },
+  "links": [
+    {
+      "to": "e9-multi-agent-platform",
+      "text": "平台内部的 Agent 编排（E9）与跨组织的 A2A 互操作——内外两层"
+    },
+    {
+      "to": "e6-mcp-practice",
+      "text": "MCP 连工具、A2A 连 Agent——回到 L2 复习垂直接入层"
+    }
+  ],
+  "interview": [
+    {
+      "q": "了解 A2A 协议吗？它和 MCP 怎么分工？",
+      "stars": 3,
+      "source": "A2A 官方文档（Linux Foundation）/知乎面经（趋势观察）",
+      "tip": "HTTP 类比+垂直/水平分工+诚实标注协议成熟度。"
+    }
+  ],
+  "summary": "Q：A2A 是什么？（答：Agent 互联开放标准——能力名片+任务生命周期）\nQ：与 MCP 分工？（答：MCP 连工具（垂直），A2A 连 Agent（水平））\nQ：成熟度？（答：趋势观察——多厂商异构接入时收益最大）"
+}

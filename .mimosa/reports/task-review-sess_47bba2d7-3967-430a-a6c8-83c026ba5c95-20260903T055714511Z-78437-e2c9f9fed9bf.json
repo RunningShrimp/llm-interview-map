@@ -1,0 +1,733 @@
+{
+  "schema_version": "mimosa-task-review/v2",
+  "run_id": "20260903T055714511Z-78437-e2c9f9fed9bf",
+  "run_status": "inconclusive",
+  "errors": [
+    {
+      "stage": "scan",
+      "target": "data/syllabus.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "js/app.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "tools/validate.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    }
+  ],
+  "coverage": {
+    "schema_version": "mimosa-hook-coverage/v1",
+    "status": "partial",
+    "scope": "hook_observed_diff",
+    "baseline": {
+      "complete": true,
+      "captured_files": 6,
+      "candidate_limit": 5000,
+      "truncated": false,
+      "enumeration_error_count": 0,
+      "snapshot_error_count": 0,
+      "compensated_target_count": 3
+    },
+    "change_tracking": {
+      "touched_observed": 3,
+      "touched_retained": 3,
+      "truncated": false,
+      "bash_mutation": true,
+      "bash_discovered": 3,
+      "bash_discovery_limit": 80,
+      "bash_discovery_truncated": false
+    },
+    "candidates": {
+      "eligible_files": 3,
+      "selected_files": 3,
+      "limit": 20,
+      "truncated": false
+    },
+    "scanning": {
+      "required_files": 3,
+      "scanned_files": 0,
+      "skipped_files": 0,
+      "failed_files": 3,
+      "project_checks_required": 0,
+      "project_checks_completed": 0
+    },
+    "notification": {
+      "eligible_findings": 0,
+      "detailed_findings": 0,
+      "detail_limit": 3,
+      "truncated": false
+    },
+    "reason_counts": {
+      "scanner_failed": 3,
+      "project_check_failed": 3,
+      "finding_ledger_read_failed": 1
+    },
+    "reasons": [
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "data/syllabus.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "tools/validate.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "data/syllabus.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "tools/validate.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "finding_ledger_read_failed",
+        "stage": "finding-ledger",
+        "target": ".",
+        "detail": "file:///Users/didi/.zcode/cli/plugins/cache/zcode-plugins-official/mimosa/1.0.3/payload/dist/cli.js:3 const path = require(\"node:path\"); ^ ReferenceError: require is not defined in ES module scope, you can use import instead This file is being treated as an ES module because it has a '.js' file exte",
+        "affects_completion": false
+      }
+    ],
+    "reasons_truncated": false
+  },
+  "generated_at": "2026-09-03T05:57:14.511Z",
+  "session_id": "sess_47bba2d7-3967-430a-a6c8-83c026ba5c95",
+  "target": ".",
+  "revision": "2ec81d95de41e095d93ff09837436f0c26df0947",
+  "rules_version": "unavailable",
+  "diff_hash": "f36e7361a7e9a9aaf7ab22f6a20e133c7cf352f77e71f6602df322670d08e757",
+  "diff": {
+    "algorithm": "sha256",
+    "changed_file_count": 3,
+    "changed_files": [
+      {
+        "file": "data/syllabus.js",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 1
+          },
+          {
+            "start": 5,
+            "end": 5
+          },
+          {
+            "start": 7,
+            "end": 16
+          },
+          {
+            "start": 19,
+            "end": 19
+          },
+          {
+            "start": 21,
+            "end": 34
+          },
+          {
+            "start": 38,
+            "end": 38
+          },
+          {
+            "start": 40,
+            "end": 50
+          },
+          {
+            "start": 54,
+            "end": 54
+          },
+          {
+            "start": 56,
+            "end": 66
+          },
+          {
+            "start": 70,
+            "end": 70
+          },
+          {
+            "start": 72,
+            "end": 82
+          },
+          {
+            "start": 86,
+            "end": 86
+          },
+          {
+            "start": 88,
+            "end": 97
+          },
+          {
+            "start": 101,
+            "end": 101
+          },
+          {
+            "start": 103,
+            "end": 112
+          },
+          {
+            "start": 116,
+            "end": 116
+          },
+          {
+            "start": 118,
+            "end": 124
+          }
+        ],
+        "before_hash": "2d39f6e1f7c2c25d08172d3d62201c5e0f97b692974841045227b37b3bf8b95d",
+        "after_hash": "214ab82aed95f79b15a99fd66556d0f277bc74fb8540a3215430e35d453ccbb7"
+      },
+      {
+        "file": "js/app.js",
+        "ranges": [
+          {
+            "start": 2,
+            "end": 6
+          },
+          {
+            "start": 31,
+            "end": 36
+          },
+          {
+            "start": 38,
+            "end": 45
+          },
+          {
+            "start": 48,
+            "end": 48
+          },
+          {
+            "start": 53,
+            "end": 54
+          },
+          {
+            "start": 56,
+            "end": 60
+          },
+          {
+            "start": 73,
+            "end": 86
+          },
+          {
+            "start": 88,
+            "end": 102
+          },
+          {
+            "start": 104,
+            "end": 104
+          },
+          {
+            "start": 113,
+            "end": 117
+          },
+          {
+            "start": 119,
+            "end": 119
+          },
+          {
+            "start": 128,
+            "end": 128
+          },
+          {
+            "start": 130,
+            "end": 131
+          },
+          {
+            "start": 136,
+            "end": 168
+          },
+          {
+            "start": 170,
+            "end": 175
+          },
+          {
+            "start": 181,
+            "end": 188
+          },
+          {
+            "start": 193,
+            "end": 201
+          },
+          {
+            "start": 203,
+            "end": 218
+          },
+          {
+            "start": 220,
+            "end": 232
+          },
+          {
+            "start": 235,
+            "end": 235
+          },
+          {
+            "start": 238,
+            "end": 245
+          },
+          {
+            "start": 247,
+            "end": 248
+          },
+          {
+            "start": 250,
+            "end": 251
+          },
+          {
+            "start": 253,
+            "end": 257
+          },
+          {
+            "start": 259,
+            "end": 259
+          },
+          {
+            "start": 264,
+            "end": 307
+          },
+          {
+            "start": 309,
+            "end": 312
+          },
+          {
+            "start": 316,
+            "end": 317
+          },
+          {
+            "start": 321,
+            "end": 321
+          },
+          {
+            "start": 325,
+            "end": 335
+          },
+          {
+            "start": 338,
+            "end": 338
+          },
+          {
+            "start": 341,
+            "end": 341
+          },
+          {
+            "start": 344,
+            "end": 345
+          },
+          {
+            "start": 348,
+            "end": 350
+          },
+          {
+            "start": 353,
+            "end": 353
+          },
+          {
+            "start": 355,
+            "end": 355
+          },
+          {
+            "start": 357,
+            "end": 372
+          },
+          {
+            "start": 375,
+            "end": 375
+          },
+          {
+            "start": 378,
+            "end": 396
+          },
+          {
+            "start": 399,
+            "end": 401
+          },
+          {
+            "start": 404,
+            "end": 406
+          },
+          {
+            "start": 408,
+            "end": 412
+          },
+          {
+            "start": 414,
+            "end": 422
+          },
+          {
+            "start": 424,
+            "end": 424
+          },
+          {
+            "start": 427,
+            "end": 427
+          },
+          {
+            "start": 429,
+            "end": 436
+          },
+          {
+            "start": 438,
+            "end": 440
+          },
+          {
+            "start": 442,
+            "end": 445
+          },
+          {
+            "start": 453,
+            "end": 453
+          },
+          {
+            "start": 455,
+            "end": 455
+          },
+          {
+            "start": 461,
+            "end": 461
+          },
+          {
+            "start": 466,
+            "end": 472
+          },
+          {
+            "start": 474,
+            "end": 483
+          },
+          {
+            "start": 486,
+            "end": 493
+          },
+          {
+            "start": 495,
+            "end": 495
+          },
+          {
+            "start": 502,
+            "end": 502
+          },
+          {
+            "start": 504,
+            "end": 506
+          },
+          {
+            "start": 511,
+            "end": 511
+          },
+          {
+            "start": 530,
+            "end": 530
+          },
+          {
+            "start": 538,
+            "end": 538
+          },
+          {
+            "start": 547,
+            "end": 561
+          },
+          {
+            "start": 564,
+            "end": 566
+          },
+          {
+            "start": 569,
+            "end": 571
+          },
+          {
+            "start": 573,
+            "end": 578
+          },
+          {
+            "start": 580,
+            "end": 619
+          },
+          {
+            "start": 621,
+            "end": 644
+          },
+          {
+            "start": 646,
+            "end": 676
+          },
+          {
+            "start": 681,
+            "end": 710
+          },
+          {
+            "start": 712,
+            "end": 724
+          },
+          {
+            "start": 726,
+            "end": 726
+          },
+          {
+            "start": 728,
+            "end": 731
+          },
+          {
+            "start": 733,
+            "end": 734
+          },
+          {
+            "start": 745,
+            "end": 745
+          },
+          {
+            "start": 757,
+            "end": 762
+          },
+          {
+            "start": 764,
+            "end": 767
+          },
+          {
+            "start": 773,
+            "end": 773
+          },
+          {
+            "start": 778,
+            "end": 790
+          },
+          {
+            "start": 806,
+            "end": 821
+          },
+          {
+            "start": 827,
+            "end": 827
+          },
+          {
+            "start": 830,
+            "end": 830
+          },
+          {
+            "start": 833,
+            "end": 834
+          },
+          {
+            "start": 845,
+            "end": 846
+          },
+          {
+            "start": 852,
+            "end": 852
+          },
+          {
+            "start": 859,
+            "end": 860
+          },
+          {
+            "start": 876,
+            "end": 877
+          },
+          {
+            "start": 881,
+            "end": 881
+          }
+        ],
+        "before_hash": "8cf42b1fcdc250e631ff4d7321d7ce45d25e2a2db8ae8f7696b474aa4a7ad941",
+        "after_hash": "77ccde0d4bc9dda2eb686409615e4c2bf36e2b05e8f3476bc118370b81b0c295"
+      },
+      {
+        "file": "tools/validate.js",
+        "ranges": [
+          {
+            "start": 3,
+            "end": 6
+          },
+          {
+            "start": 23,
+            "end": 44
+          },
+          {
+            "start": 50,
+            "end": 53
+          },
+          {
+            "start": 55,
+            "end": 55
+          },
+          {
+            "start": 59,
+            "end": 67
+          },
+          {
+            "start": 71,
+            "end": 71
+          },
+          {
+            "start": 74,
+            "end": 75
+          },
+          {
+            "start": 80,
+            "end": 80
+          },
+          {
+            "start": 84,
+            "end": 84
+          },
+          {
+            "start": 86,
+            "end": 89
+          },
+          {
+            "start": 92,
+            "end": 100
+          },
+          {
+            "start": 102,
+            "end": 103
+          },
+          {
+            "start": 106,
+            "end": 106
+          },
+          {
+            "start": 108,
+            "end": 109
+          },
+          {
+            "start": 111,
+            "end": 111
+          },
+          {
+            "start": 113,
+            "end": 113
+          },
+          {
+            "start": 115,
+            "end": 116
+          },
+          {
+            "start": 118,
+            "end": 118
+          },
+          {
+            "start": 120,
+            "end": 120
+          },
+          {
+            "start": 124,
+            "end": 125
+          },
+          {
+            "start": 127,
+            "end": 127
+          },
+          {
+            "start": 131,
+            "end": 131
+          },
+          {
+            "start": 134,
+            "end": 149
+          },
+          {
+            "start": 151,
+            "end": 151
+          },
+          {
+            "start": 154,
+            "end": 171
+          },
+          {
+            "start": 175,
+            "end": 187
+          },
+          {
+            "start": 189,
+            "end": 192
+          },
+          {
+            "start": 196,
+            "end": 196
+          },
+          {
+            "start": 198,
+            "end": 198
+          }
+        ],
+        "before_hash": "62e7b42c619cd552b78c34fef3168e6ae306eb6f8d191ce3947877d2b878a083",
+        "after_hash": "4143870682ca0fce008b4dd195567790b2a77c46bfde9d295f3380aa2e278ba3"
+      }
+    ]
+  },
+  "timing": {
+    "started_at": "2026-09-03T05:57:14.229Z",
+    "completed_at": "2026-09-03T05:57:14.511Z",
+    "duration_ms": 282,
+    "measurement": "hook_wall_clock"
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "model_calls": 0,
+    "measurement": "known-zero"
+  },
+  "telemetry": {
+    "schemaVersion": "mimosa-gate-telemetry/v1",
+    "profile": "gate",
+    "operation": "Stop",
+    "outcome": "partial/INCONCLUSIVE",
+    "latencyMs": 282,
+    "peakMemoryBytes": 114999296,
+    "memoryMeasurement": "max-observed-process-rss",
+    "scannedFiles": 0,
+    "cache": {
+      "hits": 0,
+      "misses": 0,
+      "measurement": "not-applicable"
+    },
+    "denyCount": 0,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0,
+      "modelCalls": 0,
+      "measurement": "known-zero"
+    }
+  },
+  "finding_count": 0,
+  "rewake_finding_count": 0,
+  "evidence_boundary": {
+    "scan": "candidate",
+    "static_fix_verification": "observed_static_only",
+    "runtime_verification": "not_performed"
+  },
+  "finding_events": [],
+  "findings": [],
+  "artifacts": {
+    "immutable_report": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95-20260903T055714511Z-78437-e2c9f9fed9bf.json",
+    "latest_report": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95.json",
+    "history_summary": ".mimosa/history/run-20260903T055714511Z-78437-e2c9f9fed9bf.json"
+  }
+}

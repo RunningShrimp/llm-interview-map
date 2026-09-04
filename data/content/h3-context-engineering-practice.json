@@ -1,0 +1,142 @@
+{
+  "id": "h3-context-engineering-practice",
+  "title": "Context Engineering 前沿实践",
+  "definition": "Context Engineering（上下文工程）是 2025 年取代『提示词工程』的体系化学科：不只写指令，而是管理模型每一步『看见什么』——压缩（compaction）、记忆工具、子代理隔离、按需检索，是长任务 Agent 的生命线。",
+  "analogies": [
+    {
+      "icon": "🎬",
+      "name": "导演的取景框",
+      "text": "提示词工程是『写好台词』；上下文工程是『导演决定每个镜头拍进什么』：Agent 干 50 步长任务时，每一步模型看见的上下文就是取景框——把关键目标永远留在框内、把过期的细节移出、需要时再调回来。取景框管得好，长任务不迷路；管不好，模型在第 30 步忘了第 1 步要干嘛。"
+    },
+    {
+      "icon": "🧹",
+      "name": "Claude Code 的整理术",
+      "text": "编程 Agent（如 Claude Code）处理超长会话的秘诀是 compaction：对话接近窗口上限时，把历史压缩成结构化摘要（保留目标、已完成项、关键决策、未完成项），再带着『干净的书桌』继续干——这正是上下文工程的招牌实践。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：四种前沿上下文模式",
+    "description": "切换四种模式，看它们分别解决长任务中的什么问题。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"h3g\" data-tab=\"m1\">Compaction 压缩</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"h3g\" data-tab=\"m2\">记忆工具</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"h3g\" data-tab=\"m3\">子代理隔离</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"h3g\" data-tab=\"m4\">按需取回</button></div><div data-pane=\"m1\" data-group=\"h3g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">98% 窗口占用 ⚠</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">压缩成结构化摘要 → 干净书桌继续干</span></div></div><div data-pane=\"m2\" data-group=\"h3g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">笔记写进外部文件（memory tool）</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">跨会话存活，窗口外持久</span></div></div><div data-pane=\"m3\" data-group=\"h3g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">主 Agent 只收子代理的『报告』</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">搜索的 5 万字原始内容不污染主上下文</span></div></div><div data-pane=\"m4\" data-group=\"h3g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">文档太长不预读</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">给路径+行号范围，要用时再取（just-in-time）</span></div></div><div class=\"d-note\">💡 核心思想：上下文是稀缺资源，像管理内存一样管理它——这就是『Engineering』的含义。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧹",
+      "name": "Compaction 压缩",
+      "text": "窗口临满时把历史压缩成结构化摘要（目标/已完成/未完成/关键决策），保留干活能力。"
+    },
+    {
+      "icon": "📓",
+      "name": "记忆工具外置",
+      "text": "重要事实写进外部文件（memory tool），跨会话持久、按需读回——窗口外的第二大脑。"
+    },
+    {
+      "icon": "🪆",
+      "name": "子代理隔离",
+      "text": "让子代理去『翻资料山』，主 Agent 只收摘要报告——防止海量原始内容污染主上下文。"
+    },
+    {
+      "icon": "⏰",
+      "name": "Just-in-Time 取回",
+      "text": "不预读大文档，只存引用路径（文件+行号），需要时才取——按需供给胜过预加载。"
+    },
+    {
+      "icon": "🧭",
+      "name": "与提示词工程的边界",
+      "text": "提示词工程管『怎么说』，上下文工程管『每步看见什么』——后者是 Agent 时代的主战场。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】Context Engineering 与 Prompt Engineering 的关系是？",
+      "options": [
+        "完全相同的两种叫法",
+        "上下文工程是超集：不只优化指令文本，而是系统性地管理模型每一步看到的全部信息（工具结果/历史/记忆/检索）",
+        "互相替代",
+        "上下文工程只针对多模态"
+      ],
+      "answer": 1,
+      "explain": "选 B。Agent 的上下文包含系统提示、历史、工具结果、检索内容——管理这一切的学科就是上下文工程，提示词只是其中一块。"
+    },
+    {
+      "type": "choice",
+      "q": "『子代理上下文隔离』解决的核心问题是？",
+      "options": [
+        "子代理跑得太慢",
+        "防止子任务的海量原始内容（如 5 万字搜索结果）污染主 Agent 的上下文",
+        "子代理不服从指挥",
+        "节省模型调用"
+      ],
+      "answer": 1,
+      "explain": "选 B。子代理在独立上下文中翻完资料山，只向主 Agent 汇报结论——主上下文保持干净，长任务不迷路。"
+    },
+    {
+      "type": "scenario",
+      "q": "【架构题】你的编程 Agent 在 2 小时的重构任务中『越干越糊涂』：重复读文件、忘记最初需求。请用上下文工程给出系统性改造方案。",
+      "reference": "症状是长任务上下文退化的典型表现。改造四件：第一，compaction——窗口占用超 80% 时自动触发压缩：把历史折叠为『原始需求 / 已完成项及关键决策 / 未完成项 / 当前焦点』四段结构化摘要，压缩前先把重要细节写入外部记忆文件；第二，计划外置——重构计划写进一个 plan.md（记忆工具），每完成一项就打勾更新，模型每步都能从文件重读目标，不依赖长历史回忆；第三，子代理隔离——『读大量代码找引用』这类重上下文操作交给子代理，只回传『涉及哪些文件哪些行』的结论；第四，just-in-time 读取——不预读整个代码库，文件路径+行号常驻上下文，用到时精确读取。验证：同一批重构任务对比改造前后的步骤成功率与目标漂移率（中途偏离需求的次数）——上下文工程的效果必须可度量。",
+      "keyPoints": [
+        {
+          "point": "compaction 结构化压缩",
+          "kw": [
+            "compaction",
+            "压缩",
+            "摘要",
+            "窗口"
+          ]
+        },
+        {
+          "point": "计划/记忆外置（plan 文件+打勾）",
+          "kw": [
+            "记忆",
+            "外置",
+            "plan",
+            "文件",
+            "打勾"
+          ]
+        },
+        {
+          "point": "子代理隔离重上下文操作",
+          "kw": [
+            "子代理",
+            "隔离"
+          ]
+        },
+        {
+          "point": "just-in-time 精确读取+效果度量",
+          "kw": [
+            "行号",
+            "读取",
+            "度量",
+            "漂移"
+          ]
+        }
+      ],
+      "explain": "四种模式对位四种症状，并要求效果可度量——上下文工程架构题的满分结构。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：Context Engineering 和写好提示词差在哪？为什么长任务 Agent 特别需要它？",
+    "hint": "提示：导演取景框 + Claude Code 的整理术。",
+    "modelAnswer": "写提示词是雕一段台词；上下文工程是当导演——决定模型每一步的镜头里装什么。长任务的 Agent 像连轴转的工人：干到第 50 步，桌上堆满废纸（旧的工具输出、过期的细节），早忘了老板最初要什么。所以要用四招：快满时把桌面清成一张摘要卡（压缩）、重要的事写进笔记本（记忆外置）、脏活累活派小弟去干只听汇报（子代理隔离）、大文件不预读要用再翻（按需取回）。管理好每个镜头，长任务才不迷路。"
+  },
+  "links": [
+    {
+      "to": "c10-prompt-system-design",
+      "text": "体系设计的治理底座（版本化/评测门禁）——本关在其上管理动态上下文"
+    },
+    {
+      "to": "e7-memory-mechanism",
+      "text": "记忆外置的原理根基——L3 的记忆机制是本关模式的地基"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是 Context Engineering？和 Prompt Engineering 什么区别？",
+      "stars": 4,
+      "source": "Anthropic 官方工程博客（v3 检索证实：面试出现中）",
+      "tip": "超集关系+四种模式+长任务案例，体现实战而非名词。"
+    }
+  ],
+  "summary": "Q：上下文工程管什么？（答：模型每一步看见的全部信息——不止提示词）\nQ：四种前沿模式？（答：压缩、记忆外置、子代理隔离、按需取回）\nQ：为什么长任务必需？（答：上下文是稀缺资源，管理不当必迷路）"
+}

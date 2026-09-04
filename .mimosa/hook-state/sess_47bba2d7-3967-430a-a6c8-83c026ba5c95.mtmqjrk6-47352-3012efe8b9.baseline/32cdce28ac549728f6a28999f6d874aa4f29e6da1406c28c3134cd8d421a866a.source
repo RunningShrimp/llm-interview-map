@@ -291,7 +291,7 @@
               return (i > 0 ? '<svg class="flow-arrow" width="14" height="26" viewBox="0 0 14 26"><line class="d-flow-line" x1="7" y1="0" x2="7" y2="18" stroke="currentColor" stroke-width="2"/><polygon points="2,16 12,16 7,25" fill="currentColor"/></svg>' : "") +
                 '<a class="tree-node' + (isDone ? " done" : "") + '" href="#/knowledge/' + p.id + '">' +
                   '<span class="tn-badge" style="background:' + m.color + '">' + p.num + "</span>" +
-                  '<span class="tn-body"><span class="tn-title">' + esc(p.title) + (p.frontier ? ' <span class="f-badge">🆕</span>' : '') + "</span>" +
+                  '<span class="tn-body"><span class="tn-title">' + esc(p.title) + "</span>" +
                   '<span class="tn-meta"><span class="stars">' + starHtml(p.stars) + "</span><span> +" + S.xp.visit + " XP</span></span></span>" +
                   '<span class="tn-check">' + (isDone ? "✓" : "") + "</span></a>";
             }).join("") +
@@ -402,9 +402,7 @@
         '<header class="k-head" style="--mod:' + m.color + '">' +
           "<h1>" + p.num + " · " + esc(p.title) + "</h1>" +
           '<div class="k-meta"><span class="stars">' + starHtml(p.stars) + "</span>" +
-            '<span class="badge">' + p.level + " 层级</span>" +
-            (p.frontier ? '<span class="badge f-badge">🆕 2026 前沿</span>' : "") +
-            "<span>来源：" + esc(p.source) + "</span>" +
+            '<span class="badge">' + p.level + " 层级</span><span>来源：" + esc(p.source) + "</span>" +
             "<span>前置依赖：" + depsHtml + "</span></div>" +
         "</header>" +
         '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🍼</span>小白定义</div><p>' + esc(c.definition) + "</p></section>" +
