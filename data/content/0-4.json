@@ -1,0 +1,145 @@
+{
+  "id": "0-4",
+  "title": "Transformer 直觉版：AI 怎么读句子",
+  "definition": "Transformer 是大模型的『身体』：注意力让每个词环顾全句找相关词，几十层流水线反复加工，残差是安全绳、归一化是稳定器。读得又快又好，是它撑起所有大模型的原因。",
+  "analogies": [
+    {
+      "icon": "📖",
+      "name": "会议纪要员",
+      "text": "老式模型像只能顺着念稿的记录员，听到第 100 句早忘了第 1 句；Transformer 像拿到全场会议记录的纪要员：写每个要点时可以同时回看全场记录，把相关内容一次性关联起来。『孩子们在放风筝』里的『风筝』和『放』一眼就配上了对——这就是注意力的直觉。"
+    },
+    {
+      "icon": "🏭",
+      "name": "流水线工厂",
+      "text": "原材料（词）进厂后走几十道工序：每道工序先『开会讨论』（注意力：词与词交换信息），再『各自深加工』（前馈网络），每道工序都系着安全绳（残差：保证不丢信息）、配稳定器（归一化：保持数值不飘）。几十层下来，词就从『字面』被加工成了『含义』。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：给句子里的词配对",
+    "description": "点击不同词语，看『注意力』如何把相关的词配对（绿色高亮为被关注对象）。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"a3g\" data-tab=\"w1\">看『追』</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a3g\" data-tab=\"w2\">看『它』</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a3g\" data-tab=\"w3\">看『老鼠』</button></div><div class=\"demo-box\" style=\"padding:14px\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">猫</span><span class=\"d-token\">追</span><span class=\"d-token\">老鼠</span><span class=\"d-token\">，</span><span class=\"d-token\">它</span><span class=\"d-token\">很</span><span class=\"d-token\">饿</span></div></div><div data-pane=\"w1\" data-group=\"a3g\"><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-token hot d-pulse\">追 → 看『猫』『老鼠』</span><span class=\"d-tag\">谁追谁？动作需要主语和宾语</span></div></div><div data-pane=\"w2\" data-group=\"a3g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-token hot d-pulse\">它 → 看『猫』</span><span class=\"d-tag green\">指代消解：『它』指的是猫（不是老鼠）</span></div></div><div data-pane=\"w3\" data-group=\"a3g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;margin-top:8px\"><span class=\"d-token hot d-pulse\">老鼠 → 看『追』『它很饿』</span><span class=\"d-tag amber\">被动关系 + 语境补充</span></div></div><div class=\"d-note\">💡 每个词都同时看全句并按相关度『吸取信息』——重复几十层，模型就理解了整句话。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "👀",
+      "name": "注意力：该看哪",
+      "text": "每个词环顾全句，按相关度吸收其他词的信息——这是 Transformer 的灵魂。"
+    },
+    {
+      "icon": "🏭",
+      "name": "几十层流水线",
+      "text": "理解不是一步到位，是几十层『交流+加工』反复迭代出来的。"
+    },
+    {
+      "icon": "🪢",
+      "name": "安全绳与稳定器",
+      "text": "残差连接保证信息不丢，归一化保证数值稳定——深层网络才训得动。"
+    },
+    {
+      "icon": "🔢",
+      "name": "位置号码牌",
+      "text": "并行处理不分先后，所以要给每个词发位置编码补词序。"
+    },
+    {
+      "icon": "⚡",
+      "name": "并行快",
+      "text": "所有词同时算（老方法要逐词排队），这是大模型能做大的工程前提。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】句子『猫追老鼠，它很饿』里，AI 要弄清『它』指谁，靠的是哪种机制？",
+      "options": [
+        "把句子背下来",
+        "注意力：『它』环顾全句找到关联最强的『猫』",
+        "查字典",
+        "问用户"
+      ],
+      "answer": 1,
+      "explain": "选 B。指代消解正是注意力的拿手好戏：每个词按相关度关注其他词，『它』的注意力集中到『猫』上。"
+    },
+    {
+      "type": "choice",
+      "q": "『位置号码牌』（位置编码）为什么必须存在？",
+      "options": [
+        "为了模型好看",
+        "因为所有词是同时并行计算的，本身不分先后，必须额外注入词序",
+        "为了省电",
+        "为了让句子变长"
+      ],
+      "answer": 1,
+      "explain": "选 B。并行意味着『猫追狗』和『狗追猫』在注意力眼里本来一样，位置编码是补回词序的唯一通道。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】用『会议纪要员』和『流水线』两个类比，向完全不懂 AI 的朋友解释 Transformer 是怎么读懂一句话的（3 分钟讲清）。",
+      "reference": "我先讲会议纪要员：老式模型像顺着念稿子的记录员，念到后面忘了前面；Transformer 像拿到全场会议记录的纪要员，写每个要点时都能回看全场记录，把相关的内容一次性关联上——比如『它很饿』的『它』，一眼就能对上前面提到的『猫』。再讲流水线：句子里的每个词像原材料进厂，经过几十道工序——每道工序先开小组会（注意力：词与词交换信息），再各自深加工（前馈网络），每道工序都系着安全绳（残差连接，保证信息不丢）、配稳定器（归一化，数值不飘）。几十层之后，词从字面被加工成含义，模型就『读懂』了整句话。最后点一句：因为所有词是同时处理的，还要给每个词发位置号码牌记住顺序——这就是 Transformer 高效又强大的全部直觉。",
+      "keyPoints": [
+        {
+          "point": "纪要员类比：注意力=同时回看全场记录",
+          "kw": [
+            "纪要员",
+            "回看全场记录",
+            "关联"
+          ]
+        },
+        {
+          "point": "流水线类比：几十层交流+加工",
+          "kw": [
+            "流水线",
+            "几十道工序",
+            "小组会",
+            "深加工"
+          ]
+        },
+        {
+          "point": "安全绳与稳定器（残差/归一化）的作用",
+          "kw": [
+            "安全绳",
+            "残差连接",
+            "稳定器",
+            "归一化"
+          ]
+        },
+        {
+          "point": "位置号码牌补词序",
+          "kw": [
+            "位置号码牌",
+            "同时处理",
+            "顺序"
+          ]
+        }
+      ],
+      "explain": "L1 场景题考的是『两个类比都用上、讲得通』，出现术语时必须随手解释。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：AI 读懂一句话靠什么？为什么要几十层？",
+    "hint": "提示：纪要员 + 流水线，层=反复迭代的理解。",
+    "modelAnswer": "靠注意力：每个词都会环顾整句，把跟自己相关的词的信息吸收进来，比如『它』会紧紧盯住前面的『猫』。但看一遍只够理解皮毛，所以要几十层流水线反复加工——第一层弄清词搭配，中间层弄清语法，高层弄清语义，像纪要员一遍遍修订笔记，最后才真正读懂。"
+  },
+  "links": [
+    {
+      "to": "0-5",
+      "text": "Transformer 就是接龙机器的身体——接龙时怎么『看懂』句子由它决定"
+    },
+    {
+      "to": "0-4c",
+      "text": "L3 你将看到『环顾全句』的数学原理：正是 L1 类比里『纪要员看全场』的 QKV 机制"
+    },
+    {
+      "to": "3-7",
+      "text": "这种并行读入的机制也决定了它的生成节奏——为什么大模型跑不快"
+    }
+  ],
+  "interview": [
+    {
+      "q": "用自己的话介绍 Transformer 的整体结构（不需要公式）？",
+      "stars": 5,
+      "source": "牛客·大模型常考100道（第1题）",
+      "tip": "L1 档位：注意力+几十层流水线+残差/归一化+位置编码四点讲直觉即可，L3 再上公式。"
+    }
+  ],
+  "summary": "Q：注意力在干嘛？（答：每个词环顾全句、按相关度吸收信息）\nQ：为什么要几十层？（答：理解是逐层迭代的——字面→语法→语义）\nQ：为什么需要位置编码？（答：并行计算不分先后，词序要额外注入）"
+}

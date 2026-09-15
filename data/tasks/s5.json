@@ -1,0 +1,25 @@
+{
+  "stage": "S5",
+  "project": "多 Agent 内容/研究团队",
+  "intro": "rodmap 阶段5 里程碑：把单 Agent 扩展为一支分工明确的团队——主管（Planner）分配任务，研究员并行检索，写作员汇总成稿，评审员质检。重点：证明「多 Agent 比单 Agent 好」而不是默认堆砌。",
+  "steps": [
+    { "title": "定义角色与通信协议", "detail": "3~4 个角色各写独立 system 提示词；规定消息结构 {from, to, task, result}；主管负责任务分配与汇总。" },
+    { "title": "实现主管-工人编排", "detail": "主管把研究问题拆成 2~3 个子任务 → 研究员 Agent 并行执行（各自独立上下文）→ 结果回传主管 → 写作员成稿。" },
+    { "title": "加评审环节", "detail": "评审 Agent 按清单（引用真实性/覆盖度/逻辑）给修改意见，写作员据此修订一轮。" },
+    { "title": "做对比实验", "detail": "同一组 5 个研究问题，分别用单 Agent 与多 Agent 跑，记录：质量人工评分、总 token、总耗时、失败率。" },
+    { "title": "写下取舍结论", "detail": "基于数据回答「这个场景多 Agent 值不值」——这是面试里最有说服力的一段话。" }
+  ],
+  "checklist": [
+    "各角色提示词独立、职责单一，通信消息结构化",
+    "子任务真正并行执行，且各 Agent 上下文互相隔离",
+    "有评审-修订闭环，最终稿经过至少一轮质检",
+    "单 Agent vs 多 Agent 对比实验有数据表（质量/token/耗时）",
+    "结论明确：什么任务值得多 Agent、什么任务纯浪费——有数据支撑"
+  ],
+  "arch": "<div class='d-col' style='gap:6px;align-items:center'><div class='d-card' style='text-align:center'>🧑‍✈️ 主管 Agent<br><span class='d-note'>拆解 · 分配 · 汇总</span></div><div class='d-arrow'>↓（结构化消息）</div><div class='d-row' style='gap:8px;flex-wrap:wrap;justify-content:center'><div class='d-card' style='text-align:center'>🔍 研究员 A<br><span class='d-note'>子任务1 · 独立上下文</span></div><div class='d-card' style='text-align:center'>🔍 研究员 B<br><span class='d-note'>子任务2 · 并行</span></div></div><div class='d-arrow'>↓（结果回传）</div><div class='d-row' style='gap:8px;flex-wrap:wrap;justify-content:center'><div class='d-card' style='text-align:center'>✍️ 写作员<br><span class='d-note'>汇总成稿</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🕵️ 评审员<br><span class='d-note'>质检 → 修订一轮</span></div></div></div>",
+  "tips": [
+    "多 Agent 的第一大成本是 token（官方经验约 15×）：对比实验里 token 列一定最难看，这本身就是结论的一部分",
+    "子 Agent 之间不要直接对话，全部经主管中转——通信失控是多 Agent 项目翻车主因",
+    "若对比实验显示单 Agent 更好，如实写进结论：面试官更欣赏诚实的权衡"
+  ]
+}

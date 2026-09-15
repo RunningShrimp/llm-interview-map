@@ -1,0 +1,25 @@
+{
+  "stage": "S3",
+  "project": "知识库问答 Agent",
+  "intro": "rodmap 阶段3 里程碑：把 20~50 篇私有文档变成可问答的知识库——切分、向量化、检索、引用生成，并用检索指标与忠实度评估回答质量。这是 RAG 工程师面试的标配项目。",
+  "steps": [
+    { "title": "文档接入与切分", "detail": "选 20+ 篇带结构的文档（Markdown/PDF），按标题层级切分，块 300~500 字、重叠 15%，每块附来源元数据。" },
+    { "title": "向量化与检索", "detail": "Embedding 模型向量化入库（FAISS/Chroma 任一）；检索 top-5；有余力再加 BM25 混合与 RRF 融合。" },
+    { "title": "引用式生成", "detail": "提示词要求「仅根据资料回答，引用 [编号] 标注来源，资料不足时明确说不知道」——幻觉防线从提示词开始。" },
+    { "title": "双指标评估", "detail": "检索层：标 10 个问题的应命中块，算 Recall@5；生成层：人工按忠实度/相关性给 10 个答案打分，记录坏例。" },
+    { "title": "坏例分析与调优", "detail": "对答错的 3 个案例做归因（没检回/检回了没读懂/资料本身没有），针对性调一项参数后复测。" }
+  ],
+  "checklist": [
+    "块切分带结构感知与来源元数据，检索结果能回溯到原文位置",
+    "回答带 [编号] 引用，且资料中没有的内容会说「不知道」",
+    "检索 Recall@5 与人工忠实度评分两张表都有数据",
+    "至少 3 个坏例完成归因并做过一轮针对性调优",
+    "README 写清链路图与复现步骤"
+  ],
+  "arch": "<div class='d-col' style='gap:6px'><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>📚 私有文档</div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>✂️ 结构化切分<br><span class='d-note'>300-500字 · 重叠15% · 带来源</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🧲 Embedding 入库<br><span class='d-note'>FAISS/Chroma</span></div></div><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>❓ 用户提问</div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🔍 Top-5 检索<br><span class='d-note'>可选：BM25 混合</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>💬 引用式生成<br><span class='d-note'>[编号] 标注 · 不知道就说</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>📏 双指标评估<br><span class='d-note'>Recall@5 · 忠实度</span></div></div></div>",
+  "tips": [
+    "先做检索评估再做生成评估：检索不准，生成怎么调提示词都没用",
+    "「资料不足时说不知道」必须显式写进提示词并用无答案问题实测",
+    "块里保留来源与章节标题，引用正确率会明显提升"
+  ]
+}

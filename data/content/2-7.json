@@ -1,0 +1,161 @@
+{
+  "id": "2-7",
+  "title": "单 Agent 四大架构模式：工具型/RAG型/工作流型/自主型",
+  "definition": "拿到任务先看『任务形状』：一次调用能办→工具型；要先查资料→RAG 型；路径固定→工作流型；路径开放、要边做边决定→自主型。四模式是组件与自由度的递进，不是高级与否之分。",
+  "analogies": [
+    {
+      "icon": "🏥",
+      "name": "医院分诊台：先看病人再定流程",
+      "text": "医院不会给所有病人上同一套流程：量个体温开盒药就走（工具型——一次检查一次处理）；疑难杂症先翻病历和文献再下诊断（RAG 型——先检索再生成）；入职体检按固定套餐一站走完（工作流型——路径写死，可控可复）；跨科会诊、边查边改诊断方案（自主型——模型现场决定下一步）。架构选型的本质就是分诊：先看清任务长什么样，再决定派哪种流程——不存在『最先进』，只存在『最合身』。"
+    },
+    {
+      "icon": "🍳",
+      "name": "后厨的四种做法",
+      "text": "热一份包子——直接加热（工具型）；做一道不熟的菜——先翻菜谱再动手（RAG 型）；连锁店出餐——按 SOP 流水线走（工作流型）；主厨拿到今天的时令食材——现场决定菜单（自主型）。自由度越大越能应付意外，但也越贵、越看人（模型）发挥。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：四模式对比板",
+    "description": "点上方页签切换四种模式，对比各自的组件流、适用场景与翻车点；对照着找你手头任务的位置。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='justify-content:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'><button class='d-btn active' data-act='d-tab' data-group='d27m' data-tab='p-tool'>🧰 工具型</button><button class='d-btn' data-act='d-tab' data-group='d27m' data-tab='p-rag'>📚 RAG 型</button><button class='d-btn' data-act='d-tab' data-group='d27m' data-tab='p-flow'>🏭 工作流型</button><button class='d-btn' data-act='d-tab' data-group='d27m' data-tab='p-auto'>🤖 自主型</button></div><div data-pane='p-tool' data-group='d27m'><div class='d-row' style='justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:10px'><span class='d-token'>用户请求</span><span class='d-arrow'>→</span><span class='d-token hot'>LLM</span><span class='d-arrow'>→</span><span class='d-token'>选工具</span><span class='d-arrow'>→</span><span class='d-token'>调用一次</span><span class='d-arrow'>→</span><span class='d-token'>组织回答</span></div><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:8px'><span class='d-tag green'>适用：天气/汇率/查库存等一次调用可解的问答</span><span class='d-tag red'>翻车点：任务要 5 步以上协作时，无循环的单发调用力不从心</span></div><div class='d-note'>最省钱的模式：LLM 只负责『听懂+选工具』，没有循环与记忆，延迟低、好测试。</div></div><div data-pane='p-rag' data-group='d27m' class='d-hidden'><div class='d-row' style='justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:10px'><span class='d-token'>用户提问</span><span class='d-arrow'>→</span><span class='d-token hot'>检索知识库</span><span class='d-arrow'>→</span><span class='d-token'>拼上下文</span><span class='d-arrow'>→</span><span class='d-token'>生成带引用的回答</span></div><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:8px'><span class='d-tag green'>适用：企业知识问答、文档客服——答案在公司资料里</span><span class='d-tag red'>翻车点：检索不到/检索错 → 答非所问；知识库不更新 → 答案过期</span></div><div class='d-note'>RAG 型的命门在检索质量：生成端只能忠于检索结果，查错了就一路错到底。</div></div><div data-pane='p-flow' data-group='d27m' class='d-hidden'><div class='d-row' style='justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:10px'><span class='d-token'>请求</span><span class='d-arrow'>→</span><span class='d-token'>步骤 1（代码定死）</span><span class='d-arrow'>→</span><span class='d-token hot'>节点内 LLM 干活</span><span class='d-arrow'>→</span><span class='d-token'>步骤 2</span><span class='d-arrow'>→</span><span class='d-token'>输出</span></div><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:8px'><span class='d-tag green'>适用：审批链、报表生成、数据管道——路径能画成流程图</span><span class='d-tag red'>翻车点：需求一变就要改代码；没覆盖到的分支直接卡死</span></div><div class='d-note'>LLM 只是流水线上的工人，路径由代码预先定义——可控、可测、可审计，企业生产环境的主力模式。</div></div><div data-pane='p-auto' data-group='d27m' class='d-hidden'><div class='d-row' style='justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:10px'><span class='d-token'>目标</span><span class='d-arrow'>→</span><span class='d-token hot'>ReAct 循环：想→做→看</span><span class='d-arrow'>→</span><span class='d-token'>Reflection 反思兜底</span><span class='d-arrow'>→</span><span class='d-token'>达标输出</span></div><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:8px'><span class='d-tag green'>适用：开放任务——调研、修 bug、多源汇总，路径没法预先写出</span><span class='d-tag red'>翻车点：死循环、成本高、行为不可预测——必须配步数熔断</span></div><div class='d-note'>三范式选型口诀在这里合流：单步灵活看 ReAct、长任务不跑偏看 Plan-and-Execute、输出质量靠 Reflection——质量这条线通常并入自主型的讨论。</div></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🗺️",
+      "name": "任务形状先行",
+      "text": "选型第一步不是选框架，是画任务路径：固定→工作流；查资料→RAG；单发调用→工具型；开放多步→自主。"
+    },
+    {
+      "icon": "🧰",
+      "name": "工具型：一次调用",
+      "text": "LLM+函数调用，无循环无记忆；简单问答场景性价比之王，延迟低、易测试。"
+    },
+    {
+      "icon": "📚",
+      "name": "RAG 型：先查再答",
+      "text": "检索外部知识拼进上下文再生成；知识新鲜度与检索质量定生死，生成端只忠于检索结果。"
+    },
+    {
+      "icon": "🏭",
+      "name": "工作流型：代码定路径",
+      "text": "路径由代码预先定义，LLM 只在节点内干活；可控可测可审计，是生产环境的主力。"
+    },
+    {
+      "icon": "🤖",
+      "name": "自主型：模型定路径",
+      "text": "模型自己决定下一步（ReAct 循环+反思兜底）；自由度最大，成本与失控风险也最大。"
+    },
+    {
+      "icon": "📐",
+      "name": "三范式选型口诀",
+      "text": "ReAct 管单步灵活、Plan-and-Execute 管长任务不跑偏、Reflection 管输出质量——质量线可并入自主型讨论。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【选型题】企业客服要回答『我们公司的退货政策是什么』这类问题，答案都在内部文档里，最适合的架构模式是？",
+      "options": [
+        "工具型：调一个 get_weather 工具",
+        "RAG 型：检索内部文档拼上下文再生成",
+        "自主型：让模型自己决定查什么",
+        "不接模型，让客服背下来"
+      ],
+      "answer": 1,
+      "explain": "选 B。答案存在于固定资料中、需要保持更新与可溯源——这正是 RAG 型的主场：检索→拼上下文→带引用生成。"
+    },
+    {
+      "type": "choice",
+      "q": "【选型题】每周固定从 3 张表拉数、按同样 5 个步骤生成报表，同事建议『直接上最先进的自主 Agent』，你怎么看？",
+      "options": [
+        "同意，自主 Agent 最先进，代表技术方向",
+        "应该用工具型，一次调用生成整份报表",
+        "路径固定能画成流程图，工作流型更合适：可控、可审计、便宜",
+        "哪种都行，架构选择不影响结果"
+      ],
+      "answer": 2,
+      "explain": "选 C。任务形状决定架构：路径固定的工作流场景上自主 Agent，等于为用不上的灵活性支付更高的成本与失控风险。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】团队要做『周报生成机器人』：数据源固定三张表、每周步骤完全一致。同事说『必须用自主 Agent 才显得专业』。请给出你的选型结论与理由，并说明什么条件下才值得升级。",
+      "reference": "结论：先看任务形状——数据源固定、步骤每周一致、路径完全能画成流程图，这是典型工作流型场景，选工作流而不是自主 Agent。理由一：可控性——代码预定义路径，哪步坏了看日志就能定位到具体节点，LLM 只在节点内干活；自主 Agent 的路径由模型现场决定，调试与回归测试都难。理由二：成本——自主型每一步都是一次 LLM 决策调用，token 与延迟成倍涨，而工作流只在必要节点调模型。理由三：三范式口诀在这里不加分——不需要单步灵活（ReAct 的活儿），没有长任务跑偏问题（Plan-and-Execute 的活儿），输出质量靠固定模板加校验规则就能保证（Reflection 的活儿让规则干了）。升级条件：当数据源变得不可预测、需要模型现场决定查什么、步骤数事先无法确定时，再把该环节升级为自主型，并在其上加反思兜底与步数熔断。",
+      "keyPoints": [
+        {
+          "point": "判据：任务形状与流程图",
+          "kw": [
+            "任务形状",
+            "流程图"
+          ]
+        },
+        {
+          "point": "可控性理由：路径可定位、好调试",
+          "kw": [
+            "可控",
+            "日志",
+            "调试"
+          ]
+        },
+        {
+          "point": "成本理由：token 与延迟",
+          "kw": [
+            "成本",
+            "token",
+            "延迟"
+          ]
+        },
+        {
+          "point": "三范式口诀逐条对照",
+          "kw": [
+            "react",
+            "plan-and-execute",
+            "reflection"
+          ]
+        },
+        {
+          "point": "升级条件与兜底",
+          "kw": [
+            "升级",
+            "反思",
+            "熔断"
+          ]
+        }
+      ],
+      "explain": "先亮结论再给理由是面试标准姿势；能把三范式口诀逐条对照着说『为什么这里都用不上』，比背口诀本身高一个档位。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向新同事解释：四大单 Agent 架构模式分别是什么？拿到一个新需求时怎么快速判断用哪种？",
+    "hint": "提示：医院分诊类比——先看病人（任务）长什么样，再定流程。",
+    "modelAnswer": "四种模式是自由度的递进：量个体温开盒药（工具型，一次调用解决）；翻病历文献再诊断（RAG 型，先检索再回答）；体检套餐按固定流程走（工作流型，路径代码写死、可控可审计）；跨科会诊现场判断（自主型，模型自己决定下一步）。拿到需求先画任务路径：路径能写死就是工作流，答案在资料里就加检索，一次调用能搞定就别加循环——只有路径没法预先写出、要边做边决定的开放任务，才值得上自主型，同时配好反思与步数熔断。"
+  },
+  "links": [
+    {
+      "to": "2-6",
+      "text": "L3 你将看到：自主型架构的质量兜底层正是上一关的反思机制——自由度最高的模式，最需要 Reflexion 防翻车"
+    },
+    {
+      "to": "1-4b",
+      "text": "L3 你将看到：RAG 型的组件流正是 1.4b 搭的那条最小链路——解析、切分、检索、引用生成原样嵌进 Agent 架构里"
+    },
+    {
+      "to": "2-7b",
+      "text": "学完本考点后你会发现：『工作流还是自主』这道最后一问需要专门一把尺子——下一关给判据与劝退清单"
+    }
+  ],
+  "interview": [
+    {
+      "q": "ReAct / Plan-and-Execute / Reflection / Multi-Agent 各自适用什么场景？",
+      "stars": 4,
+      "source": "JavaGuide 题库议题（2025）",
+      "tip": "用三范式口诀作答：ReAct 管单步灵活、Plan-and-Execute 管长任务不跑偏、Reflection 管输出质量；Multi-Agent 留到协调开销能被并行收益覆盖时再上，并强调默认单 Agent。"
+    },
+    {
+      "q": "单 Agent 的四种架构模式（工具型/RAG 型/工作流型/自主型）怎么对比与组合？",
+      "stars": 3,
+      "source": "The AI Engineer·ReAct vs Plan-and-Execute vs ReWOO vs Reflexion（2025）+ DataCamp LangGraph 五架构模式（2025）",
+      "tip": "按任务形状横向对比：组件构成、适用场景、翻车点三列各说一句；强调它们常组合使用——比如工作流骨架的某些节点内跑自主循环。"
+    }
+  ],
+  "summary": "Q：四大模式的分界线是什么？（答：任务形状——单发调用/查资料/路径固定/路径开放，对应工具型/RAG 型/工作流型/自主型）\nQ：三范式选型口诀？（答：ReAct 单步灵活、Plan-and-Execute 长任务不跑偏、Reflection 输出质量）\nQ：哪种适合生产环境主力？（答：路径能画成流程图时优先工作流型——可控可测可审计）"
+}

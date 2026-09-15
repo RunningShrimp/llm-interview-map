@@ -1,0 +1,25 @@
+{
+  "stage": "S6",
+  "project": "自选生产级 Agent 项目（作品集终稿）",
+  "intro": "rodmap 阶段6 里程碑：从你的实战中选一个方向做深做透——RAG 知识库、数据分析 Agent 或工作流自动化——按生产标准完成开发、评估、红队与运维，并整理成可对外展示的作品集。这是准专家的毕业设计。",
+  "steps": [
+    { "title": "选题与范围收敛", "detail": "选一个真实痛点场景；写下 1 句问题定义 + 3 条可量化成功指标（如准确率≥85%、p95<20s、单次成本<$0.1）。" },
+    { "title": "生产标准开发", "detail": "复用前几关成果（任务卡 S3/S4 的链路与护栏），补齐：错误处理、权限控制、配置化提示词版本管理。" },
+    { "title": "评估与红队", "detail": "评估集≥50 条并跑出基线分；按 OWASP LLM Top10 做一轮红队清单自测（注入/越权/敏感信息），记录发现与修复。" },
+    { "title": "部署与演练", "detail": "部署到公网可访问（云函数/小服务器均可），压一轮并发；做一次故障演练（断网/超预算）验证降级与告警。" },
+    { "title": "作品集整理", "detail": "产出四件套：架构图、指标表（含评估与红队结果）、3 分钟演示视频或在线 Demo、复盘文档（踩坑与取舍）。" }
+  ],
+  "checklist": [
+    "问题定义含 3 条可量化指标，且全部实测达标或有差距分析",
+    "评估集≥50 条，基线分与迭代分数有记录",
+    "红队自测覆盖 OWASP LLM Top10 主要类目，发现的问题已修复",
+    "公网可访问，故障演练（断网/超预算）有降级与告警记录",
+    "作品集四件套齐全：架构图、指标表、演示、复盘文档"
+  ],
+  "arch": "<div class='d-col' style='gap:6px'><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>🎯 场景问题<br><span class='d-note'>3 条量化指标</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🏗️ 生产开发<br><span class='d-note'>护栏 · 权限 · 配置化</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>📏 评估基线<br><span class='d-note'>50+ 评估集</span></div></div><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>🕵️ 红队自测<br><span class='d-note'>OWASP Top10 清单</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🚀 部署+故障演练<br><span class='d-note'>压测 · 降级 · 告警</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🎖️ 作品集四件套<br><span class='d-note'>架构图·指标·演示·复盘</span></div></div></div>",
+  "tips": [
+    "范围收敛比功能多更重要：一个 85 分的窄场景项目胜过三个 60 分的大而全",
+    "复盘文档里「我放弃了 X 方案因为 Y」的段落是面试官最爱看的部分",
+    "演示视频控制在 3 分钟：问题→架构→Demo→指标，一镜到底"
+  ]
+}

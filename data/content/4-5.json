@@ -1,0 +1,160 @@
+{
+  "id": "4-5",
+  "title": "工作流自动化 Agent：权限、幂等与审计",
+  "definition": "工作流自动化 Agent 按固定流程替人执行业务动作：发邮件、建工单、同步数据。企业敢用的前提是三大支柱——幂等（重复请求不重复执行）、人审闸门（高危动作先挂起等批准）、审计日志（每笔动作可追责），外加失败恢复与权限模型。",
+  "analogies": [
+    {
+      "icon": "🎫",
+      "name": "外卖订单号 = 幂等键",
+      "text": "你在 App 手滑连点两下『提交订单』，结果只送来一份餐——因为两次请求带着同一个订单号，商家系统一看『这号已受理』就直接返回第一份的结果。幂等键（idempotency key）就是这个订单号：每次业务动作生成唯一钥匙，重试时带着同一把钥匙，服务端查表发现已办过，就不再执行第二遍。没有它，网络超时后的自动重试 = 给客户发两封邮件、下两笔单。"
+    },
+    {
+      "icon": "🖊️",
+      "name": "出纳盖章 = 人审闸门",
+      "text": "公司报销流程里，出纳再熟练，超过一万元的付款也必须主管签字才放行。人审闸门（approval gates）就是这道签字：Agent 把要执行的动作准备好后先挂起，等人批准再执行。2026 年的企业选型框架已把它当硬指标——高危动作先挂起等人批准，并与 SOC 2/GDPR/HIPAA 这类合规要求对齐，谁批的、何时批的一并写进审计日志。"
+    },
+    {
+      "icon": "📼",
+      "name": "行车记录仪 = 审计日志",
+      "text": "行车记录仪不拦事故，但事故后能说清谁的责任。审计日志同理：谁在何时让 Agent 执行了什么、参数是什么、结果如何，一条不落。它和幂等是天生一对——去重表命中、重试、人工审批每个环节都要留痕，出了『邮件发重了』的事故，翻日志就能还原是哪个环节失效。"
+    },
+    {
+      "icon": "📮",
+      "name": "挂号信专用信箱 = 死信队列",
+      "text": "邮递员三次上门都没人签收，这封信不会被扔掉，而是投进『无法投递』专用信箱，等人来处理。失败恢复同理：失败自动重试几次，仍失败就进死信队列（专门存放处理不了的消息的队列），再由人工兜底接手——既不丢任务，也不无限空转。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一封邮件的幂等生命周期 + 重复请求代价对比",
+    "description": "上半：一步步走完一封报价邮件的幂等生命周期——从生成幂等键到网络超时、带键重试、去重表命中，全程不重发；下半：拖滑杆调『重复请求比例』，对比有无幂等键时的重复执行量差距。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='align-items:center;gap:8px'><b>📧 一次邮件发送任务的幂等生命周期</b><span class='d-tag' style='margin-left:auto;flex:none'>一步步点右边按钮</span></div><div class='d-steps' id='d45-mail' style='margin-top:10px'><div class='d-step active'><div class='d-row' style='margin-bottom:4px'><span class='d-tag' style='width:120px;text-align:center;flex:none'>📨 请求到达</span><b>Agent 决定发报价邮件</b></div><div class='d-note'>任务进入执行队列。接下来每一步都在回答 rodmap 的关键问题：怎么保证这条消息绝不被重复执行？</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag' style='width:120px;text-align:center;flex:none'>🔑 生成幂等键</span><b>先登记，后执行</b></div><div class='d-note'>用业务自然键（客户ID+账期+动作类型）拼出唯一幂等键，先写进去重表登记——顺序很关键：不登记就发送，等于裸奔。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag' style='width:120px;text-align:center;flex:none'>📤 首次发送</span><b>邮件服务开始投递</b></div><div class='d-note'>邮件服务收到请求，状态机把该键标记为「处理中」，开始投递。一切正常的话，这里就该结束了——但网络不承诺。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag red' style='width:120px;text-align:center;flex:none'>⚡ 网络超时</span><b>响应丢失的危险时刻</b></div><div class='d-note'>回执在中途丢了——邮件可能发出去了，也可能没发。此刻如果直接重发，客户就会收到两封；什么都不做又可能漏发。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:120px;text-align:center;flex:none'>🔁 带键重试</span><b>同一把钥匙再试</b></div><div class='d-note'>系统自动重试，请求带着同一个幂等键——换一把新钥匙就等于告诉服务端「这是另一个任务」，幂等前功尽弃。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:120px;text-align:center;flex:none'>🔍 去重表命中</span><b>已办过，返回首次结果</b></div><div class='d-note'>服务端查去重表：该键已是「已发送」——直接返回第一次的投递结果，不再投递第二封。重试成功了，但客户毫无感知。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag green' style='width:120px;text-align:center;flex:none'>✅ 幂等达成</span><b>两次请求，一次投递</b></div><div class='d-note d-pulse'>客户只收到一封邮件；两次请求、一次投递全程写进审计日志。超时不可怕，重复才可怕——这就是幂等的全部意义。</div></div></div><div class='d-row' style='margin-top:10px;gap:10px;align-items:center'><button class='d-btn' data-act='d-prev' data-steps='#d45-mail' disabled>← 退一步</button><b data-steps-indicator='#d45-mail'>1 / 7</b><button class='d-btn' data-act='d-next' data-steps='#d45-mail'>下一步 →</button></div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px'><b>📉 重复请求比例</b><input type='range' min='0' max='40' value='10' style='flex:1;min-width:180px' data-output='#d45-r' data-suffix='%'><b id='d45-r' style='min-width:56px;text-align:right'>10%</b></div><div class='d-note' style='margin-bottom:8px'>假设每天 2000 次自动化任务，其中因网络抖动产生重复请求的比例（拖动看看）：</div><div class='d-vs'><div class='d-card'><b>无幂等键：重复照做</b><div class='d-bar'><div class='d-fill d-shake' style='width:calc(var(--v,10) * 2.5%);background:#ef4444'></div></div><span class='d-note'>重复执行 ≈ 比例 × 2000 次——40% 就是 800 封重复邮件</span></div><div class='d-card'><b>有幂等键：重复无害</b><div class='d-bar'><div class='d-fill' style='width:calc(var(--v,10) * 0%);background:#10b981'></div></div><span class='d-tag green'>0 封重复——重试命中去重表，直接返回首次结果</span></div></div><div class='d-note' style='margin-top:8px'>幂等键不是让网络不超时，而是让超时后的重试变得无害——rodmap 把「幂等」列为本锚点关键问题的原因就在这里。</div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🎫",
+      "name": "幂等：重复请求不重复执行",
+      "text": "同一操作执行一次和多次结果相同：网络超时后重试，不会给客户发两封邮件、下两笔单。"
+    },
+    {
+      "icon": "🔑",
+      "name": "幂等实现三件套",
+      "text": "自然键（订单号+动作类型）生成幂等键 + 去重表查重 + 状态机管「处理中/已发送」——重试命中即返回首次结果。"
+    },
+    {
+      "icon": "🖊️",
+      "name": "人审闸门（approval gates）",
+      "text": "Agent 产出先挂起等人批准再执行，高危动作标配；2026 企业评估框架把它与 SOC 2/GDPR/HIPAA 对齐列为选型硬指标。"
+    },
+    {
+      "icon": "📼",
+      "name": "审计日志",
+      "text": "谁在何时让 Agent 做了什么、参数与结果如何，一条不落——追责、合规、复盘三件事的共同地基。"
+    },
+    {
+      "icon": "📮",
+      "name": "失败恢复三段式",
+      "text": "自动重试（带幂等键、设上限）→ 仍失败进死信队列 → 人工兜底接手：不丢任务，也不无限空转。"
+    },
+    {
+      "icon": "🧩",
+      "name": "企业集成选型叙事",
+      "text": "讲项目用「平台集成面+权限模型」组织：n8n/Dust 类编排平台提供 400+ 应用集成与内置权限模型，Agent 在权限范围内调用。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "Agent 调用邮件接口发送客户通知后网络超时，不知道对方是否已发出。按幂等设计，系统接下来该怎么做？",
+      "options": [
+        "换一个新的幂等键立即重发，确保一定发出",
+        "带着同一个幂等键重试；服务端查去重表命中「已发送」，返回首次结果，不重复投递",
+        "放弃本次任务，转人工重新发一封",
+        "等 24 小时后原样再发一次"
+      ],
+      "answer": 1,
+      "explain": "选 B。幂等的全部意义在『同一把钥匙』：重试必须带原幂等键，服务端凭去重表与状态机判断已办过，就直接返回首次结果。A 换新键等于告诉服务端「这是另一个任务」，恰好制造重复；C、D 则分别造成漏发或重发。"
+    },
+    {
+      "type": "choice",
+      "q": "以下哪一项设计【不能】防止「同一条消息被重复执行」？",
+      "options": [
+        "幂等键 + 去重表",
+        "状态机：只允许「未发送→发送中→已发送」单向流转",
+        "失败后不限次数地自动重试",
+        "以业务自然键（订单号+动作类型）生成唯一键"
+      ],
+      "answer": 2,
+      "explain": "选 C。无限重试不仅不防重复，反而在没有幂等保护时放大重复风险——重试必须与幂等键配套，且设次数上限，超出后进死信队列交人工兜底。A、B、D 正是幂等实现三件套：唯一键、去重查重、状态管控流转。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】（rodmap 关键问题改写·未经检索确证）你要为公司上线「自动对账邮件 Agent」：每天读取订单系统，给 500 个客户发送对账邮件。面试官问：如何保证一条邮件绝不被重复发送？失败了怎么办？哪些环节要留人审与审计？",
+      "reference": "第一层是幂等设计：以业务自然键（客户ID+账期+动作类型）生成幂等键，发送前先写去重表登记；邮件服务端用状态机管理「未发送→发送中→已发送」，重试请求带同一个幂等键，服务端查去重表命中即返回首次结果，绝不重复投递——网络超时只能让结果不确定，不能让动作重复。第二层是失败恢复：超时或报错先自动重试并设次数上限（如 3 次、间隔指数递增），仍失败的进死信队列，由人工兜底排查后手动放行——任务不丢，也不无限空转。第三层是人审闸门与审计：首次上线先监督运行，对账金额超过阈值或发给大客户的邮件挂起等人工批准；每一次发送记录触发人、时间、幂等键、参数与投递结果，写入审计日志，并与 SOC 2/GDPR 合规要求对齐。工程落地可以选 n8n/Dust 类编排平台——它们提供 400+ 应用集成与内置权限模型、审批能力，不必从零造轮子；自建时同样把幂等三件套（自然键、去重表、状态机）作为接口设计约定写进规范。",
+      "keyPoints": [
+        {
+          "point": "幂等键：自然键生成，发送前登记去重表",
+          "kw": ["幂等键", "自然键", "去重表"]
+        },
+        {
+          "point": "状态机管状态，重试带原键返回首次结果",
+          "kw": ["状态机", "首次结果"]
+        },
+        {
+          "point": "失败恢复：重试设上限+死信队列+人工兜底",
+          "kw": ["死信队列", "人工兜底", "上限"]
+        },
+        {
+          "point": "人审闸门：高危邮件挂起等批准",
+          "kw": ["挂起", "批准"]
+        },
+        {
+          "point": "审计日志记全要素，与合规对齐",
+          "kw": ["审计日志", "SOC 2"]
+        },
+        {
+          "point": "选型：n8n/Dust 类平台的集成面与权限模型",
+          "kw": ["n8n", "权限模型"]
+        }
+      ],
+      "explain": "点评：本题直接对应 rodmap 关键问题「权限、幂等、审计怎么做」。评分要点是『三层齐备：幂等防重、失败恢复兜底、人审+审计留痕』。能点破「超时只让结果不确定，不能让动作重复」这句话，说明真正理解了幂等要解决什么。"
+    }
+  ],
+  "feynman": {
+    "prompt": "用「外卖订单号」的类比，向非技术的运营同事解释：为什么自动发邮件的系统必须做幂等？三道保险分别是什么？",
+    "hint": "先讲手滑双击只送一份餐，再讲超时重发的危险，最后把幂等键、人审闸门、审计日志对应到『钥匙、签字、记录仪』。",
+    "modelAnswer": "自动发邮件的系统一定会遇到网络抖动：邮件发出去了，回执却丢了，系统一重试就可能给客户发两封——就像手滑双击下单，好在订单号让商家只认一次。幂等键就是这个订单号：每次发送先生成唯一钥匙登记在册，重试带同一把钥匙，服务端一查『办过了』就直接返回第一次结果，绝不重复投递。第二道保险是签字：金额超限或发给大客户的邮件，Agent 先挂起等人批准再发。第三道是记录仪：谁在何时发了什么、结果如何，全进审计日志，出了问题几分钟还原现场。真发不出去的进死信队列等人工处理——不丢、不重、可追责，这就是企业敢让 Agent 接手业务的底气。"
+  },
+  "links": [
+    {
+      "to": "2-7",
+      "text": "本页就是 2.7 四大架构中「工作流型」的企业级完整形态——路径固定的业务流程，配上幂等、审批与审计才敢真正上生产"
+    },
+    {
+      "to": "3-1",
+      "text": "幂等键与审计日志不是 Agent 内部的小技巧，而是 3.1 服务架构里接入层与观测层的接口设计约定——写进规范才约束得住每个动作"
+    },
+    {
+      "to": "3-10",
+      "text": "学完本考点后你会发现：3.10 把「人审闸门」展开成完整的人机协同体系——审批分级、反馈标注与持续学习都在那里深入"
+    },
+    {
+      "to": "4-9",
+      "text": "学完本考点后你会发现：4.9 接棒本页的失败恢复——「不报错但跑偏」的软故障四层防御与黄金信号告警，是幂等与审计之后的运维下半场"
+    }
+  ],
+  "interview": [
+    {
+      "q": "企业工作流 Agent 里，哪些动作必须人审？审计日志要记什么？",
+      "stars": 3,
+      "source": "Coworker.ai/Vellum 2026 企业评估框架归纳（措辞为推断，未见确证真题）",
+      "tip": "人审：资金、对外发送、删除等高危不可逆动作先挂起等批准；审计记触发人、时间、动作、参数、结果与审批人，并与 SOC 2/GDPR 合规对齐。"
+    },
+    {
+      "q": "你做的自动化 Agent 如何保证一条消息不被重复执行？",
+      "stars": 3,
+      "source": "rodmap 锚点关键问题改写（未经检索确证；概念为 rodmap 核心，幂等实现按内置知识讲授）",
+      "tip": "答幂等三件套：业务自然键生成幂等键、去重表查重、状态机管状态；重试带原键返回首次结果，失败设上限进死信队列人工兜底。"
+    }
+  ],
+  "summary": "Q：什么是幂等？（答：同一操作执行一次和多次结果相同——重试带同一个幂等键，服务端查去重表命中就返回首次结果，绝不重复发邮件/下单。）\nQ：人审闸门是什么？（答：Agent 把动作准备好后先挂起，等人批准再执行；高危动作标配，2026 企业评估框架的选型硬指标。）\nQ：失败恢复怎么做？（答：带幂等键自动重试并设上限→仍失败进死信队列→人工兜底；全程写审计日志。)"
+}

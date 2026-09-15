@@ -1,0 +1,25 @@
+{
+  "stage": "S2",
+  "project": "工具型研究助手",
+  "intro": "rodmap 阶段2 里程碑：一个 ReAct 式单 Agent——给定研究问题，自主决定调用搜索/网页阅读/笔记工具，多步执行后产出带引用的研究小结。核心考察点：循环控制、工具异常处理与轨迹记录。",
+  "steps": [
+    { "title": "实现两个原语工具", "detail": "search(query) 用搜索 API 返回前 5 条摘要；read(url) 抓正文并截断到 3000 字。工具函数返回统一的 {ok, data|error} 结构。" },
+    { "title": "写 ReAct 主循环", "detail": "系统提示词规定 Thought/Action/Observation 格式；程序解析 Action → 执行工具 → 把 Observation 拼回上下文；最多 8 步。" },
+    { "title": "加终止与防护", "detail": "连续 3 次同一工具调用（指纹去重）即熔断；每步记录步数与 token 消耗；强制输出阶段让 Agent 汇总并停止。" },
+    { "title": "轨迹日志", "detail": "把每步的 thought/action/observation 写入 JSONL 文件——这是你调试 Agent 行为的唯一依据，也是面试时展示工程思维的证据。" },
+    { "title": "端到端跑通 3 个研究问题", "detail": "选 3 个真实问题（如「2026 年端侧推理的主流芯片」）完整跑通，人工评估小结质量并记录失败案例。" }
+  ],
+  "checklist": [
+    "Agent 能多步执行（≥3 步工具调用）并自主决定调用顺序",
+    "工具异常（超时/解析失败）会作为 Observation 回传，Agent 能据此换路",
+    "有步数上限与重复调用熔断，不会无限循环",
+    "完整轨迹落盘为 JSONL，包含每步 token 消耗",
+    "3 个研究问题产出带引用的小结，失败案例已记录分析"
+  ],
+  "arch": "<div class='d-col' style='gap:6px;align-items:center'><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>❓ 研究问题</div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🧠 LLM（ReAct）<br><span class='d-note'>Thought→Action</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🔧 工具层<br><span class='d-note'>search / read<br>异常→Observation</span></div></div><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>🔁 主循环（≤8 步）<br><span class='d-note'>重复熔断 · 预算控制</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>📝 汇总输出<br><span class='d-note'>带引用小结</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>💾 轨迹 JSONL<br><span class='d-note'>调试与复盘依据</span></div></div></div>",
+  "tips": [
+    "Observation 内容过长时截断，否则两三轮就撑爆上下文",
+    "「让 Agent 停下来」比「让它动起来」难：输出阶段要给明确指令（如输出 FINAL: 开头）",
+    "工具报错信息要写得模型能读懂——「URL 无法访问（超时 10s）」优于「Error」"
+  ]
+}

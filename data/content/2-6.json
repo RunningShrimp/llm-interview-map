@@ -1,0 +1,163 @@
+{
+  "id": "2-6",
+  "title": "反思与自我修正：让 Agent 知错能改",
+  "definition": "Agent 执行完先回头检查：发现错了就反思——把『错在哪、下次怎么办』写成语言化经验存入记忆，下次带着经验再执行。它不是盲目重试，而是让每次失败都沉淀成一次改进。",
+  "analogies": [
+    {
+      "icon": "📓",
+      "name": "错题本：重做卷子 ≠ 翻错题本",
+      "text": "学生考砸了有两种反应：把整张卷子重做一遍（简单重试），或者把错题抄进错题本、写清错因，考前翻一遍（Reflexion）。前者下次遇到同类题大概率还错——他没记住为什么错；后者把教训变成了语言化经验，越考越稳。Reflexion 就是给 Agent 配错题本：执行后反思，把『失败原因+改进动作』存进记忆，下次执行前先翻一遍。"
+    },
+    {
+      "icon": "🧾",
+      "name": "交稿前的自查：发现存疑就去核实",
+      "text": "负责任的写手交稿前会通读一遍：读到『该行业年增长 30%』突然心里一咯噔——这个数我没查过。稳妥的做法不是硬着头皮交，而是停下来搜索核实，查完再交。这就是反思用于幻觉校正：Agent 自查时发现某条事实没把握（『我其实是凭印象写的』），就触发搜索工具去核实，而不是把可能的胡说直接递给用户。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：Reflexion 两轮对比实验",
+    "description": "一步步点『下一步』，看同一个任务怎么从第一轮失败走到第二轮成功；最后点开对照组，看不带经验时会发生什么。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='align-items:center;gap:8px'><b>🔁 同一个任务跑两轮：失败 → 反思 → 成功</b><span class='d-tag' style='margin-left:auto'>一步步点</span></div><div class='d-steps' id='d26-loop' style='margin-top:10px'><div class='d-step active'><div class='d-row' style='flex-wrap:wrap;gap:8px;align-items:center'><span class='d-tag'>任务：财报里净利润是多少？</span><span class='d-tag red'>第 1 轮答：120 亿 ✗</span></div><div class='d-note'>Agent 凭记忆直接作答，把去年的数字记串了——表格里写的其实是 102 亿。第一轮失败，注意它此时还没有任何经验。</div></div><div class='d-step'><div class='d-card' style='border-color:#f59e0b;background:#fffbeb'>🪞 反思：失败原因——没查数据源就凭印象作答；教训——涉及具体数字，先调 read_table 工具核实原文，再回答。</div><div class='d-note'>反思不是说『下次认真点』这种空话，而是写出可执行的教训：错在哪 + 下次的具体动作。</div></div><div class='d-step'><div class='d-row' style='flex-wrap:wrap;gap:8px;align-items:center'><span class='d-token hot d-pulse'>经验卡：先核实再作答</span><span class='d-arrow'>→</span><span class='d-tag green'>写入记忆 ✓</span></div><div class='d-note'>把反思结论写成一句语言化经验存入记忆——这一步是 Reflexion 与简单重试的本质区别：失败被沉淀了下来，而不是被丢掉。</div></div><div class='d-step'><div class='d-row' style='flex-wrap:wrap;gap:8px;align-items:center'><span class='d-tag amber'>带上经验卡执行</span><span class='d-arrow'>→</span><span class='d-token'>调用 read_table ✓</span><span class='d-arrow'>→</span><span class='d-tag green d-pulse'>第 2 轮答：102 亿 ✓</span></div><div class='d-note'>第二轮开始时上下文里带着经验卡，Agent 先核实再作答——一次通过。同样的模型、同样的工具，只多了一张经验卡。</div></div><div class='d-step'><div class='d-row' style='gap:10px;margin-bottom:6px'><span class='d-tag' style='width:120px;text-align:center;flex:none'>简单重试</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:90%;background:#ef4444'></div></div><b style='flex:none'>≈5 轮才蒙对</b></div><div class='d-row' style='gap:10px'><span class='d-tag' style='width:120px;text-align:center;flex:none'>Reflexion</span><div class='d-bar' style='flex:1'><div class='d-fill d-pulse' style='width:30%;background:#34d399'></div></div><b style='flex:none'>第 2 轮就对</b></div><div class='d-note'>而且经验卡会跨任务复用：下次任何『涉及数字』的任务，它都会带着这条经验上场——越用越稳。</div></div></div><div class='d-row' style='margin-top:10px;gap:10px;align-items:center'><button class='d-btn' data-act='d-prev' data-steps='#d26-loop' disabled>← 上一步</button><b data-steps-indicator='#d26-loop'>1 / 5</b><button class='d-btn' data-act='d-next' data-steps='#d26-loop'>下一步 →</button><button class='d-btn' data-act='d-replay' data-target='#d26-loop'>🔄 重播</button></div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='align-items:center;gap:10px;flex-wrap:wrap'><b>⚖️ 对照组：如果只重试、不反思？</b><button class='d-btn' data-act='d-toggle' data-target='#d26-contrast'>点开看对照</button></div><div id='d26-contrast' class='d-hidden' style='margin-top:10px'><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:8px'><span class='d-tag red'>重试 1：120 亿 ✗</span><span class='d-tag red'>重试 2：118 亿 ✗</span><span class='d-tag red'>重试 3：121 亿 ✗</span><span class='d-tag amber'>……全靠运气</span></div><div class='d-note'>不反思的重试 = 原样再掷一次骰子：上下文里没有任何新信息，模型大概率换个姿势犯同一个错。Reflexion 每一轮都比上一轮多一张经验卡，错误率才会真正往下走。</div></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🔁",
+      "name": "Reflexion 循环",
+      "text": "执行 → 反思 → 经验入记忆 → 带经验再执行；反思结论必须是可执行的具体教训，不是态度检讨。"
+    },
+    {
+      "icon": "🆚",
+      "name": "与简单重试的本质区别",
+      "text": "重试是原样再掷一次骰子；Reflexion 多了语言化经验沉淀——失败原因被写成教训喂给下一轮。"
+    },
+    {
+      "icon": "🧯",
+      "name": "反思用于幻觉校正",
+      "text": "自查发现事实存疑时不硬写，触发搜索/核实工具查证后再答——『验证反思』是对抗幻觉的第一道闸。"
+    },
+    {
+      "icon": "📚",
+      "name": "经验跨任务复用",
+      "text": "经验卡存在长期记忆里，同类任务下次直接带上——失败一次，全线受益。"
+    },
+    {
+      "icon": "🧪",
+      "name": "Self-RAG 式自我修正",
+      "text": "把 RAG 从『一次检索』升级为『检索→自评→修正』的循环：检索结果不好就打分、改写查询再检索。"
+    },
+    {
+      "icon": "🛑",
+      "name": "反思也要熔断",
+      "text": "给反思循环设最大轮数：无限自我怀疑和死循环一样烧钱——2 到 7 轮是论文里的常见配置。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】Reflexion 与『简单重试』的本质区别是什么？",
+      "options": [
+        "Reflexion 重试的次数更多",
+        "Reflexion 会把失败原因反思成语言化经验存入记忆，下一轮带着经验执行",
+        "Reflexion 用的是更大的模型",
+        "Reflexion 会自动修改训练参数"
+      ],
+      "answer": 1,
+      "explain": "选 B。重试只是原样再掷一次骰子；Reflexion 的关键是『语言化经验沉淀』——错在哪、下次怎么办被写成教训喂给下一轮，失败才算没白失败。"
+    },
+    {
+      "type": "choice",
+      "q": "【应用题】反思用于幻觉校正时，Agent 自查发现『这个数字我是凭印象写的』，最合理的下一步是？",
+      "options": [
+        "删掉这个数字，让答案显得更简洁",
+        "语气上加一句『大概、可能』再输出",
+        "触发搜索/核实工具查证原始数据，确认后再回答",
+        "重新生成一遍，赌这次能写对"
+      ],
+      "answer": 2,
+      "explain": "选 C。『验证反思』的要点是：存疑就触发核实工具，用事实替换印象——加模糊词只是把幻觉包装得更隐蔽。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官连发三问：什么是 Reflexion？它和 ReAct 的区别是什么？实际系统里你会怎么提升 Agent 的自我纠错能力？请组织一段完整回答。",
+      "reference": "Reflexion 是给 Agent 装错题本：执行一轮后回头反思，把『错在哪、下次怎么办』写成语言化经验存入记忆，下次执行时带着经验上路。它和 ReAct 的分工是：ReAct 管单步的边想边做，解决『每一步该干嘛』；Reflexion 管事后复盘，解决『这一趟哪里走错了』，两者常组合使用。它与简单重试的本质区别是：重试只是原样再掷一次骰子，反思却把教训沉淀下来喂给下一轮。提升自我纠错能力有三招：一，验证反思——发现事实存疑就触发搜索工具核实而不是盲目输出，这是幻觉校正的关键；二，Self-RAG 把检索升级为检索→自评→修正的循环，检索质量差就改写重查；三，给反思设最大轮数防止陷入无限自我怀疑的循环，并让经验卡跨任务复用，失败一次全线受益。",
+      "keyPoints": [
+        {
+          "point": "Reflexion 定义：执行后反思，经验存入记忆",
+          "kw": [
+            "执行",
+            "反思",
+            "经验",
+            "记忆"
+          ]
+        },
+        {
+          "point": "与 ReAct 分工：ReAct 管单步边想边做，Reflexion 管事后复盘",
+          "kw": [
+            "react",
+            "边想边做",
+            "复盘"
+          ]
+        },
+        {
+          "point": "与简单重试的区别：教训被语言化沉淀",
+          "kw": [
+            "简单重试",
+            "沉淀",
+            "教训"
+          ]
+        },
+        {
+          "point": "幻觉校正：存疑触发核实工具",
+          "kw": [
+            "幻觉",
+            "存疑",
+            "核实"
+          ]
+        },
+        {
+          "point": "Self-RAG 循环 + 最大轮数熔断",
+          "kw": [
+            "self-rag",
+            "轮数",
+            "循环"
+          ]
+        }
+      ],
+      "explain": "三连问按『定义 → 分工 → 落地三招』作答；能点出『验证反思』和 Self-RAG 属于加分项，说明读过一手材料。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向同学解释：Reflexion 是什么？为什么它比『失败了就再试一次』有效得多？",
+    "hint": "提示：错题本类比——重做卷子和翻错题本，哪个下次考得更好？",
+    "modelAnswer": "Reflexion 就是给 AI 配错题本：做完一轮先回头反思，把『错在哪、下次该怎么办』写成一句教训存进记忆，下次干活前先翻一遍再动手。失败了就原样再试一次没用，因为上下文里什么新东西都没有，AI 只会换个姿势犯同一个错；而反思过之后，每一轮都比上一轮多一条经验，错误才会真正变少——而且这经验跨任务通用，像错题本一样越攒越值钱。"
+  },
+  "links": [
+    {
+      "to": "2-5",
+      "text": "L3 你将看到：上一关的 ReAct 循环正是反思挂在上面的骨架——Reflection 通常监听循环的失败节点，发现走错就把教训喂回下一圈"
+    },
+    {
+      "to": "2-7",
+      "text": "学完本考点后你会发现：四大架构模式里自由度最高的自主型，常以 ReAct+Reflection 组合出战——反思负责质量兜底"
+    },
+    {
+      "to": "2-9",
+      "text": "学完本考点后你会发现：『怎么发现错了』要靠评估体系量化——轨迹评估与复合失败率给反思机制装上仪表盘"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是 Reflexion？和 ReAct 的区别是什么？怎么提升 Agent 自我纠错能力？",
+      "stars": 4,
+      "source": "面试鸭·Reflexion 原题题面（mianshiya.com，2025）",
+      "tip": "定义（执行→反思→经验入记忆→带经验再执行）+ 与 ReAct 分工（单步边想边做 vs 事后复盘）+ 提升三招（验证反思核实事实的幻觉校正、Self-RAG 检索自评修正、最大轮数熔断）。"
+    },
+    {
+      "q": "Agent 执行失败了，你的系统怎么发现错了、怎么修正？",
+      "stars": 3,
+      "source": "卡码笔记·ReAct/Reflection/规划执行三思路怎么选（notes.kamacoder.com，2025）",
+      "tip": "按三思路答题框架：ReAct 适合工具调用、Reflection 适合自我检查、规划执行适合复杂任务拆解；再补一句幻觉校正——发现存疑触发核实工具而非盲目输出。"
+    }
+  ],
+  "summary": "Q：Reflexion 的循环是什么？（答：执行→反思→语言化经验存入记忆→带经验再执行）\nQ：和简单重试差在哪？（答：重试原样再掷骰子，反思把教训沉淀下来喂给下一轮）\nQ：反思怎么治幻觉？（答：自查发现存疑就触发核实工具，用事实替换印象）"
+}

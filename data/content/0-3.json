@@ -1,0 +1,137 @@
+{
+  "id": "0-3",
+  "title": "模型是怎么学的（训练与过拟合直觉）",
+  "definition": "模型训练像教学生刷题：先乱猜答案，对错之间的差距（损失）反馈回去微调内部旋钮（参数），几百万轮后规律就刻进参数里。刷题过头把题目背死、遇到新题就崩，就是过拟合。",
+  "analogies": [
+    {
+      "icon": "🏋️",
+      "name": "健身房练肌肉",
+      "text": "模型的『参数』像全身肌肉，训练像做千万次举铁：每举一次（看一批数据），教练喊『姿势歪了』（损失信号），肌肉微调一点（参数更新）。练几百万次后，动作（规律）长进了肌肉里，不用想也能做对——这就是『学到了』。"
+    },
+    {
+      "icon": "📝",
+      "name": "背题库的学生",
+      "text": "两种学崩法：背题库型学生把练习题答案全背下来，模拟考（训练集）满分，真高考（新题）崩盘——这叫过拟合，死记硬背没学到规律；另一种是根本没学进去，看啥都不会——欠拟合。好的模型像掌握了解题方法的学生：旧题新题都会。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：调『训练强度』观察过拟合",
+    "description": "拖动滑杆增加训练轮数，看模型在『练习题』和『新题』上的得分如何分道扬镳。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"a2g\" data-tab=\"t1\">训练 20 轮（不足）</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a2g\" data-tab=\"t2\">训练 60 轮（刚好）</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a2g\" data-tab=\"t3\">训练 200 轮（过头）</button></div><div data-pane=\"t1\" data-group=\"a2g\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:140px;text-align:center\">练习题正确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:40%;background:#34d399\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:140px;text-align:center\">新题正确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:38%;background:#60a5fa\"></div></div></div></div><div class=\"d-note\" style=\"text-align:center\">欠拟合：两个分数都低——还没学进去。</div></div><div data-pane=\"t2\" data-group=\"a2g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:140px;text-align:center\">练习题正确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:88%;background:#34d399\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:140px;text-align:center\">新题正确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-pulse\" style=\"width:85%;background:#60a5fa\"></div></div></div></div><div class=\"d-note\" style=\"text-align:center\">刚刚好：两个分数都高——学到了规律 ✅</div></div><div data-pane=\"t3\" data-group=\"a2g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:460px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\" style=\"width:140px;text-align:center\">练习题正确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill\" style=\"width:99%;background:#34d399\"></div></div></div><div class=\"d-row\"><span class=\"d-tag\" style=\"width:140px;text-align:center\">新题正确率</span><div class=\"d-bar\" style=\"flex:1\"><div class=\"d-fill d-shake\" style=\"width:55%;background:#ef4444\"></div></div></div></div><div class=\"d-note\" style=\"text-align:center\">过拟合：练习题近满分，新题反而崩——把题目背死了 ❌</div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🎛️",
+      "name": "参数 = 旋钮",
+      "text": "模型内部有亿万个可调数值（参数），训练就是不断微调它们，直到输出普遍正确。"
+    },
+    {
+      "icon": "📉",
+      "name": "损失 = 错题扣分",
+      "text": "用『损失函数』给每次猜测打错题分，训练就是让总分不断下降的过程。"
+    },
+    {
+      "icon": "🧠",
+      "name": "学到的是规律",
+      "text": "好的训练让模型掌握普遍规律（会做新题），而不是背下训练数据。"
+    },
+    {
+      "icon": "💀",
+      "name": "过拟合",
+      "text": "训练数据上学得太死，新数据就崩——小数据集大模型时代仍偶发，理解它就懂了为什么要好数据。"
+    },
+    {
+      "icon": "🥗",
+      "name": "数据是食材",
+      "text": "模型能力上限很大程度由训练数据决定——这也是后面『数据质量>数量』结论的根源。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】一个模型在训练题上正确率 99%，遇到全新的题只有 60%，它最可能怎么了？",
+      "options": [
+        "学得很好",
+        "过拟合：把训练题背下来了，没学到规律",
+        "训练太少",
+        "数据太多"
+      ],
+      "answer": 1,
+      "explain": "选 B。训练/新题表现的大幅落差是过拟合的典型症状——模型记住了题目本身而非普遍规律。"
+    },
+    {
+      "type": "choice",
+      "q": "训练过程中『损失』下降意味着什么？",
+      "options": [
+        "模型体积变小",
+        "模型在数据上的预测越来越准",
+        "训练速度变快",
+        "模型参数变少"
+      ],
+      "answer": 1,
+      "explain": "选 B。损失是对预测错误的量化，训练的目标就是让它下降——即模型越猜越准。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】同事训练了一个『判断邮件是否垃圾』的小模型：训练集准确率 98%，上线一周后真实邮件判断一团糟。请用本关的直觉解释原因，并给出两条改进方向。",
+      "reference": "原因是典型的过拟合：模型把训练集里的题目（甚至包括其中的巧合特征）背下来了，而不是学到『垃圾邮件的普遍规律』，所以遇到新邮件就失效。改进方向：第一条是查数据——训练数据是否太少、太单一，或混入了『捷径特征』（比如垃圾邮件恰好都来自某个日期，模型学会了看日期而不是看内容）；要扩充数据的多样性并清理捷径。第二条是控制训练——减少训练轮数或加验证集监控：每次训练留一部分没见过的数据做『模拟考』，一旦模拟考成绩开始下滑就停止训练（早停），别让模型把题背死。本质一句话：让模型学规律，而不是背答案。",
+      "keyPoints": [
+        {
+          "point": "诊断：训练/真实表现的落差是过拟合",
+          "kw": [
+            "过拟合",
+            "背下来了",
+            "新邮件就失效"
+          ]
+        },
+        {
+          "point": "方向一：查数据（太少/单一/捷径特征）",
+          "kw": [
+            "数据",
+            "捷径特征",
+            "多样性",
+            "太单一"
+          ]
+        },
+        {
+          "point": "方向二：验证集/早停控制训练",
+          "kw": [
+            "验证集",
+            "早停",
+            "训练轮数",
+            "模拟考"
+          ]
+        }
+      ],
+      "explain": "L1 场景题只要求把『背题 vs 学规律』的直觉用对，不需要给出算法名词。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：AI 是怎么『学会』东西的？为什么会『学傻』？",
+    "hint": "提示：健身房举铁（练=调旋钮）+ 背题库学生（过拟合）两个类比。",
+    "modelAnswer": "AI 学习像健身：它体内有无数个小旋钮，每看一批例子就根据对错把旋钮微调一点点，练几百万次后规律就刻在旋钮里了。但如果拿太少太单一的题反复练，它就会像背题库的学生——练习题满分，遇到新题就懵，这叫过拟合。所以学好 AI 一半靠练，一半靠喂给它足够多样、干净的好题。"
+  },
+  "links": [
+    {
+      "to": "0-5",
+      "text": "AI 能自己调旋钮学习——它就是 L1 里那个『接龙机器』被训练后的样子"
+    },
+    {
+      "to": "0-5b",
+      "text": "懂得了『训练=调旋钮』，接下来看大模型的三段成长故事：预训练→SFT→对齐"
+    },
+    {
+      "to": "0-4",
+      "text": "被训练的那个『模型』内部长什么样？下一站：Transformer 直觉版"
+    }
+  ],
+  "interview": [
+    {
+      "q": "简单说说模型训练的原理？什么是过拟合？",
+      "stars": 4,
+      "source": "技术栈·大模型面试题17/美团二面原题（v2 检索核实）",
+      "tip": "用『调参数降损失』讲训练，用『背题 vs 学规律』讲过拟合，两句话档位足够 L1。"
+    }
+  ],
+  "summary": "Q：训练在调什么？（答：亿万个参数旋钮，靠损失信号不断微调）\nQ：过拟合的直觉解释？（答：把练习题背死了，新题就崩——没学到规律）\nQ：怎么避免？（答：多样干净的数据 + 验证集监控 + 适度训练）"
+}

@@ -1,0 +1,160 @@
+{
+  "id": "4-7b",
+  "title": "Agent 应用系统设计",
+  "definition": "Agent 系统设计题（如『设计智能客服 Agent』『数据分析 Agent』）考察：单体架构（四件套）、编排模式选择、工具与权限治理、可靠性与评测、生产治理（可观测/安全/成本）。答题主线：目标→架构→风险→闭环。",
+  "analogies": [
+    {
+      "icon": "🧩",
+      "name": "组装一台整车",
+      "text": "设计 Agent 系统像造一台自动驾驶汽车：决策大脑（LLM+规划）、传感器（工具与数据接入）、行车电脑记忆（记忆系统）、安全气囊与刹车（异常防护+人工接管）、测试场（评测体系）、车队管理后台（可观测与治理）。面试官最想听的恰恰是新手最容易跳过的部分：刹车、测试场和后台——因为跑起来不难，跑得稳才难。"
+    },
+    {
+      "icon": "🎬",
+      "name": "导演思维",
+      "text": "答这道题要像导演讲戏：不是罗列演员（组件），而是讲清楚『一场戏怎么拍』——开场（需求与边界）、分镜（任务编排）、走位（工具调用与状态流转）、NG 处理（失败与人工兜底）、成片审验（评测上线）。有流程感的答案天然像可用系统。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：智能客服 Agent 设计的六层拆解",
+    "description": "点击『下一步』，按设计评审顺序过一遍答题骨架。",
+    "html": "<div class=\"d-steps\" id=\"g2-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">层 1：目标与边界</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">解决什么（自助解决率）？</span><span class=\"d-tag\">边界：哪些必须转人工？</span><span class=\"d-tag\">SLO：响应/解决率目标</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">层 2：单体架构（四件套）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">大脑：意图理解+决策</span><span class=\"d-tag green\">规划：固定 SOP 编排 vs 动态规划</span><span class=\"d-tag green\">记忆：会话内+用户画像</span><span class=\"d-tag green\">工具：查订单/退款/工单（Function Calling）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">层 3：编排与多 Agent 决策</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">路由：售前/售后/投诉分线</span><span class=\"d-tag amber\">何时值得多 Agent（E7 判据）</span><span class=\"d-tag amber\">危险动作人工确认闸门</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">层 4：可靠性设计</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">工具失败重试+熔断</span><span class=\"d-tag\">步数/预算阈值</span><span class=\"d-tag\">降级路径（规则话术兜底）</span><span class=\"d-tag\">上下文管理防爆炸</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">层 5&6：评测与生产治理</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">评测：轨迹评估+解决率+golden set 回归</span><span class=\"d-tag green\">治理：Trace 可观测/安全审计/成本看板</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#g2-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#g2-steps\">1 / 5</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#g2-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#g2-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🎯",
+      "name": "先定目标与边界",
+      "text": "量化目标（自助解决率 60%→80%）、明确 Agent 不做什么（退款超阈值/法律咨询转人工）——边界即安全，也是后续评测的锚点。"
+    },
+    {
+      "icon": "🧠",
+      "name": "四件套选型",
+      "text": "大脑（底座模型档次）、规划（客服类用固定 SOP 编排，分析类用动态规划——E6 判据）、记忆（会话上下文+用户长期画像）、工具（Function Calling+Schema 校验）。"
+    },
+    {
+      "icon": "🔀",
+      "name": "编排决策",
+      "text": "单 Agent + 提示词分区优先；上下文干扰/职责差异/独立质控三条判据命中才上多 Agent（E7）——展示『反对过度设计』的成熟度。"
+    },
+    {
+      "icon": "🛡️",
+      "name": "可靠性四件套",
+      "text": "工具重试+指纹熔断（E4）、步数/预算阈值、降级路径（话术兜底/规则系统回退）、高危动作人类在环——面试必问『出错了怎么办』。"
+    },
+    {
+      "icon": "📊",
+      "name": "评测体系",
+      "text": "轨迹评估（步骤是否合理、工具选对没）+ 端到端指标（解决率/转人工率）+ golden set 回归（B8/D6 方法论）——Agent 评测比单轮对话难在多步。"
+    },
+    {
+      "icon": "🏭",
+      "name": "生产治理",
+      "text": "全链路 Trace（F7）、注入与内容安全（F6/F8）、成本看板与路由降本（F9）、灰度发布——把『演示级 Agent』变成『生产级系统』的最后一公里。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】客服 Agent 设计中，『退款』这类高风险动作的推荐处理方式是？",
+      "options": [
+        "让 Agent 根据用户描述直接调用退款接口",
+        "Agent 完成信息收集与资格校验后进入『待确认』状态，由用户或人工确认后才真正执行",
+        "禁止 Agent 提及退款",
+        "让模型自己判断金额是否合理"
+      ],
+      "answer": 1,
+      "explain": "选 B。人类在环两段式（先收集校验、确认后执行）兼顾效率与安全：模型可能被骗（注入）或误判（幻觉），不可逆资金操作的执行权必须留在确认环节。"
+    },
+    {
+      "type": "choice",
+      "q": "评估一个客服 Agent 的效果，最核心的端到端指标是？",
+      "options": [
+        "模型参数量",
+        "自助解决率与转人工率（配合满意度），而非单轮回答准确率",
+        "每秒请求数",
+        "提示词长度"
+      ],
+      "answer": 1,
+      "explain": "选 B。Agent 是多步系统，单轮准确（C 类指标）不能代表任务完成；业务闭环指标（解决率/转人工/满意度）才是北极星，配合轨迹评估定位问题环节。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『设计一个「智能数据分析 Agent」：业务人员上传 Excel 并用自然语言提问，Agent 返回数据结论与图表。请覆盖架构、可靠性、评测与安全。』请作答。",
+      "reference": "目标与边界：目标是让无 SQL 能力的业务同学自助完成 80% 日常取数分析；边界——不做数据修改只读分析、单次计算行数与超时设限、涉敏字段按权限脱敏。架构：单 Agent + 工具集（表格解析、SQL/查询引擎、Python 绘图、指标字典），规划用固定四步 SOP（理解→查询→校验→可视化）而非自由规划，因为分析流程确定性高；记忆分层——会话内保存中间表与口径确认，长期存业务术语表（『大区』口径）与用户偏好。可靠性：SQL 执行失败把错误信息回传让模型重试修正（最多 3 次），查询强制只读账号+行数上限+超时熔断，数字结论先经自动核对（合计与分项一致）再输出，异常走降级话术并留人工工单。评测：golden set 50 个历史分析问题（含期望数值与图表）做回归，指标=数值正确率、图表可用率、口径命中率；轨迹评估检查工具选择与查询语句合理性。安全：上传文件隔离沙箱执行（防代码注入），行级权限过滤，敏感列自动脱敏，全部查询审计留痕。治理：LangFuse Trace 全链路+成本看板，灰度两周对比人工取数时长验证价值。",
+      "keyPoints": [
+        {
+          "point": "目标边界先行：只读分析、行数/超时限、脱敏权限",
+          "kw": [
+            "边界",
+            "只读",
+            "超时",
+            "脱敏"
+          ]
+        },
+        {
+          "point": "架构：单 Agent+工具集+固定 SOP（论证为何不自由规划）",
+          "kw": [
+            "sop",
+            "工具",
+            "规划",
+            "单 agent"
+          ]
+        },
+        {
+          "point": "可靠性：错误回传修正+熔断+数字自动核对+降级",
+          "kw": [
+            "重试",
+            "熔断",
+            "核对",
+            "降级",
+            "错误"
+          ]
+        },
+        {
+          "point": "评测与安全：golden set 数值正确率+轨迹评估+沙箱+审计",
+          "kw": [
+            "golden",
+            "轨迹",
+            "沙箱",
+            "审计",
+            "数值"
+          ]
+        }
+      ],
+      "explain": "加分项：按流程确定性论证规划选型、数字自动核对防幻觉、沙箱执行；失分点：只画『LLM+SQL 工具』两张框图，无可靠性与评测。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：设计一个 AI Agent 产品，除了『接个大模型』还要设计哪些东西？为什么说刹车和测试场最重要？",
+    "hint": "提示：造车类比——大脑传感器之外，安全气囊、测试场、车队后台才区分玩具与产品。",
+    "modelAnswer": "接大模型只解决了『大脑』，要成为产品还得配齐：方向盘和传感器（工具接入与权限）、行车记忆（记忆系统）、最关键的是安全气囊和刹车——工具失败怎么办、死循环怎么熔断、危险操作让不让 AI 自己拍板（答案是要人工确认）；然后是测试场——用历史问题建回归测试集，每次改动都考一遍；最后是车队管理后台——全链路日志、成本看板、安全审计。跑起来一晚上就能做到，跑得稳、说得清效果、算得清成本，才叫产品。"
+  },
+  "links": [
+    {
+      "to": "2-1",
+      "text": "本大题的组件层就是 E1 四件套的系统化展开——单体做稳才有系统可谈"
+    },
+    {
+      "to": "3-4",
+      "text": "生产治理层的答案骨架直接来自 F7 的可观测性体系"
+    },
+    {
+      "to": "4-10c",
+      "text": "做完本题可以提炼通用答题模板——下一页的 G3 就是它的抽象版"
+    }
+  ],
+  "interview": [
+    {
+      "q": "设计一个智能客服/数据分析 Agent，你会怎么做？",
+      "stars": 4,
+      "source": "知乎·Agent 面试总结（工业界干货版）/ 牛客网·AI-Agent 面试题汇总",
+      "tip": "六层拆解：目标边界→四件套→编排→可靠性→评测→治理，每层给一个关键取舍。"
+    },
+    {
+      "q": "Agent 系统怎么评估？多步任务的质量怎么保障？",
+      "stars": 4,
+      "source": "知乎·Agent 面试总结（延伸追问）",
+      "tip": "轨迹评估+端到端业务指标+golden set 回归三层，强调多步系统的失败定位。"
+    }
+  ],
+  "summary": "Q：答题六层？（答：目标边界、四件套、编排决策、可靠性、评测、生产治理）\nQ：危险动作的标准姿势？（答：两段式人类在环——Agent 收集校验、确认后执行）\nQ：Agent 评测与对话评测的差异？（答：多步轨迹评估（工具选择/步骤合理）+ 端到端解决率）"
+}

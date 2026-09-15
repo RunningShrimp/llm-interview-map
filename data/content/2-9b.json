@@ -1,0 +1,146 @@
+{
+  "id": "2-9b",
+  "title": "Agent 评测与生产治理体系",
+  "definition": "Agent 评测比单轮对话难在多步：要评轨迹（工具选对没、步骤合理吗）+ 评闭环（业务指标解决率）+ 评回归（golden set）。治理体系把评测制度化：Trace 回放、灰度发布、成本护栏——从 demo 到产品的最后一公里。",
+  "analogies": [
+    {
+      "icon": "🏟️",
+      "name": "从友谊赛到联赛",
+      "text": "demo 阶段的 Agent 像友谊赛：跑通一次就庆祝；生产级要求像职业联赛：每场都有数据（轨迹记录）、有裁判标准（评估指标）、有升降级机制（回归测试拦截劣化）、有赛后复盘（Trace 回放）。评测体系就是把『跑通了一次』变成『每一步都可度量』。"
+    },
+    {
+      "icon": "🧭",
+      "name": "两个计分板",
+      "text": "Agent 评测要同时看两块计分板：过程板（轨迹质量——工具选对没、步骤冗余吗、有无危险操作）和结果板（业务闭环——问题解决率、转人工率、耗时成本）。只看结果可能『碰巧对了但路径危险』，只看过程可能『动作漂亮但没解决业务』。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一次 Agent 会话的评估拆解",
+    "description": "点击『下一步』，看轨迹评估与业务评估分别打什么分。",
+    "html": "<div class=\"d-steps\" id=\"e10-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">会话回放：用户要退款</div><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><span class=\"d-tag\">Step1 意图识别 ✓ → Step2 查订单工具 ✓ → Step3 校验资格 ✓ → Step4 生成退款方案 ✓ → Step5 请求人工确认 ✓ → 完成</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">轨迹板打分（过程）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">工具选择正确 ✓</span><span class=\"d-tag green\">步骤无冗余 ✓</span><span class=\"d-tag green\">危险操作走了确认闸 ✓</span><span class=\"d-tag amber\">耗时 28s（目标 &lt;30s）</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">业务板打分（结果）</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green d-pulse\">自助解决 ✓（计入解决率）</span><span class=\"d-tag\">满意度待用户反馈</span><span class=\"d-tag\">成本 0.4 元/会话</span></div><div class=\"d-note\">两板结合才能回答：『这个过程可复制吗？成本可接受吗？』</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#e10-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#e10-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#e10-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#e10-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🛤️",
+      "name": "轨迹评估",
+      "text": "逐步检查：意图理解、工具选择、参数质量、步骤效率、危险操作是否走闸——定位失败环节。"
+    },
+    {
+      "icon": "🎯",
+      "name": "业务闭环指标",
+      "text": "解决率、转人工率、满意度、单会话成本——Agent 的北极星是业务指标而非单轮准确率。"
+    },
+    {
+      "icon": "🔁",
+      "name": "golden set 回归",
+      "text": "沉淀高频任务+边界任务做标准测试集，每次变更（提示词/模型/工具）跑回归，劣化即阻断。"
+    },
+    {
+      "icon": "🛰️",
+      "name": "Trace 治理",
+      "text": "全链路落盘（每步Thought/工具/结果/耗时/费用），支持回放与聚合——LangFuse/LangSmith 类工具。"
+    },
+    {
+      "icon": "🚦",
+      "name": "灰度与护栏",
+      "text": "新版本 5~10% 流量灰度对比业务指标；成本与步数护栏防级联失控。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【架构题】为什么『单轮回答准确率』不能作为 Agent 的核心指标？",
+      "options": [
+        "准确率不重要",
+        "Agent 是多步系统：单轮准确不代表任务闭环，核心应是解决率等业务指标+轨迹质量",
+        "没法计算准确率",
+        "成本太高"
+      ],
+      "answer": 1,
+      "explain": "选 B。Agent 的价值在任务闭环：过程板（轨迹）与结果板（业务指标）结合，才能既对又稳。"
+    },
+    {
+      "type": "choice",
+      "q": "替换了 Agent 的底层模型后，发布前最关键的工序是？",
+      "options": [
+        "直接全量上线看反馈",
+        "golden set 轨迹+业务双指标回归 → 灰度 10% 对比 → 达标放量",
+        "把温度调低",
+        "更新文档"
+      ],
+      "answer": 1,
+      "explain": "选 B。模型变更影响全链路：回归拦截劣化，灰度验证真实业务指标——变更管理双闸。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你们的客服 Agent 上线三个月，老板问『效果怎么样、能不能再省点钱』。请设计评测与治理方案回答这两个问题。",
+      "reference": "先补基础设施再回答：第一步全链路 Trace——接入 LangFuse 类工具，每次会话记录完整轨迹（意图/工具调用/结果/耗时/token 成本），按会话聚合可回放；第二步指标体系——业务板（自助解决率、转人工率、满意度 CSAT、单会话成本）、轨迹板（工具调用成功率、平均步数、危险操作走闸率）、质量板（每周 100 条抽样 LLM 裁判评分+人工复核）；第三步回答『效果』——用数据汇报：解决率从基线 x% 到 y%、主要失败环节的归因（如 40% 转人工集中在某类意图，提示知识库缺口）；第四步回答『省钱』——成本解剖定位大头（通常是大模型调用与无效步数），施策：简单意图路由小模型、轨迹压缩减少 token、语义缓存高频问题；每项施策过 golden set 回归 + 灰度对比解决率，保证省钱不降质。治理制度化：以上形成周度复盘会+变更双闸（回归+灰度）的运营机制。",
+      "keyPoints": [
+        {
+          "point": "Trace 全链路+可回放",
+          "kw": [
+            "trace",
+            "轨迹",
+            "回放",
+            "langfuse",
+            "完整"
+          ]
+        },
+        {
+          "point": "三块指标板（业务/轨迹/质量）",
+          "kw": [
+            "解决率",
+            "转人工",
+            "步数",
+            "抽样",
+            "成本"
+          ]
+        },
+        {
+          "point": "效果归因到环节（转人工集中点）",
+          "kw": [
+            "归因",
+            "环节",
+            "知识库",
+            "缺口"
+          ]
+        },
+        {
+          "point": "省钱施策+回归灰度双闸",
+          "kw": [
+            "路由",
+            "压缩",
+            "缓存",
+            "回归",
+            "灰度"
+          ]
+        }
+      ],
+      "explain": "用数据回答老板问题+制度化运营机制——治理体系的满分答卷。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么说『跑通了』和『能上线』之间差一整套评测治理体系？",
+    "hint": "提示：友谊赛 vs 职业联赛；两块计分板。",
+    "modelAnswer": "跑通一次是友谊赛；生产要求像职业联赛——每场有数据记录（轨迹落盘可回放）、有裁判标准（轨迹板看过程对不对，业务板看解决率和成本）、有升降级（回归测试拦截每次改动的劣化）、有赛季制度（灰度发布+周度复盘）。Agent 的输出是多步不确定的，只有把『过程』和『结果』都变成可度量的指标并制度化运营，才能回答老板『效果如何、钱花得值不值』。"
+  },
+  "links": [
+    {
+      "to": "4-7b",
+      "text": "下一站终极架构题：评测与治理作为其中一层放进完整系统"
+    },
+    {
+      "to": "2-5b",
+      "text": "轨迹评估的对象正是上一站分析的失败模式——机制与治理对照"
+    }
+  ],
+  "interview": [
+    {
+      "q": "Agent 系统怎么评测？如何保障生产质量？",
+      "stars": 4,
+      "source": "阿里云·AI Agent 全栈开发面试宝典/LangSmith 官方（v2 检索证实）",
+      "tip": "轨迹板+业务板+回归灰度制度化，配客服案例数字。"
+    }
+  ],
+  "summary": "Q：两块计分板？（答：轨迹板（过程质量）+业务板（解决率/成本））\nQ：变更双闸？（答：golden set 回归 + 灰度对比）\nQ：Trace 的价值？（答：可回放定位失败环节，聚合出治理决策）"
+}

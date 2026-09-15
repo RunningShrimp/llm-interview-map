@@ -173,3 +173,71 @@ details.tree-module[open] > summary .arrow { transform: rotate(90deg); }
   font-size: 11px; font-weight: 700; vertical-align: middle;
 }
 .tree-node .f-badge { padding: 0 6px; font-size: 10.5px; }
+
+/* ============================================================
+ * v4 七关卡新增样式
+ * ============================================================ */
+
+/* 掌握程度徽章 */
+.mastery-badge {
+  background: #eef2ff; color: #4338ca; border: 1px solid #dfe3fb;
+  font-size: 11px; font-weight: 700; border-radius: 99px; padding: 1px 8px;
+  white-space: nowrap;
+}
+.k-meta .mastery-badge { font-size: 12px; padding: 2px 10px; }
+
+/* 选修标记 */
+.opt-badge {
+  display: inline-flex; align-items: center;
+  background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b;
+  font-size: 11px; font-weight: 700; border-radius: 99px; padding: 1px 8px;
+  white-space: nowrap;
+}
+
+/* 锚点关键问题（学习目标） */
+.key-question {
+  margin-top: 12px; background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #166534;
+}
+
+/* 技能树锚点分组内的关键问题行 */
+.anchor-goal {
+  font-size: 12.5px; color: var(--ink-3, #64748b);
+  background: #f8fafc; border-left: 3px solid var(--mod, #cbd5e1);
+  padding: 6px 10px; margin: 8px 0 2px; border-radius: 0 8px 8px 0;
+}
+
+/* 关卡末尾 Boss + 任务卡双入口 */
+.stage-extras { display: grid; grid-template-columns: 1.6fr 1fr; gap: 10px; margin-top: 12px; }
+.task-gate {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  background: #fffbeb; border: 1.5px dashed #f59e0b; color: #92400e;
+  border-radius: 12px; padding: 14px 16px; font-weight: 700; font-size: 13.5px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.task-gate:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(245, 158, 11, .18); }
+@media (max-width: 860px) { .stage-extras { grid-template-columns: 1fr; } }
+
+/* ---------- 实战任务卡页 ---------- */
+.task-step { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line, #e2e8f0); }
+.task-step:last-child { border-bottom: none; }
+.task-step .ts-num {
+  flex: 0 0 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
+}
+.task-step p { margin: 3px 0 0; color: var(--ink-2, #475569); font-size: 13.5px; }
+.task-checks { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
+.task-check {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: #f8fafc; border: 1px solid var(--line, #e2e8f0);
+  border-radius: 10px; padding: 9px 12px; font-size: 13.5px; cursor: pointer;
+}
+.task-check input { margin-top: 2px; }
+.task-check:has(input:checked) { background: #f0fdf4; border-color: #86efac; }
+.task-arch {
+  background: #fff; border: 1px solid var(--line, #e2e8f0); border-radius: 12px;
+  padding: 14px; overflow-x: auto;
+}
+.task-arch svg { max-width: 100%; height: auto; }
+.task-arch .d-card { margin: 4px; }

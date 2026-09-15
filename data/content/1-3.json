@@ -1,0 +1,144 @@
+{
+  "id": "1-3",
+  "title": "结构化输出与 JSON Mode 三道关",
+  "definition": "让模型稳定输出程序可解析的 JSON，靠三道关：提示词给 Schema 与示例 → API 的 JSON/严格模式 → 代码校验带错重试。这是把『聊天』变成『接口』的关键一步，也是 Function Calling 的地基。",
+  "analogies": [
+    {
+      "icon": "📮",
+      "name": "自由信件 vs 标准表格",
+      "text": "普通回答像自由书写的信：人读着舒服，程序没法处理。结构化输出像银行开户表：姓名、证件、金额各归各位——模型只负责往格子里填，程序按字段直接取用。JSON Schema 就是那张表格的样式。"
+    },
+    {
+      "icon": "🏭",
+      "name": "出货三道检",
+      "text": "第一道：订单写清规格（提示词给 Schema+示例+『只输出 JSON』约束）；第二道：生产线按标准模式生产（API JSON Mode，语法保证合法）；第三道：出货验收（代码 parse+Schema 校验），不合格打回重做（带错重试）。三道关缺一必翻车。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：三道关流程",
+    "description": "点击『下一步』走完一道信息抽取的完整流水线。",
+    "html": "<div class=\"d-steps\" id=\"c5-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 关：提示词写清规格</div><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><span class=\"d-card mono\" style=\"font-size:12px\">抽取字段：{\"姓名\": string, \"电话\": string, \"诉求\": string[]}</span><span class=\"d-tag amber\">约束：只输出 JSON，不解释、不要代码块</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 关：API JSON Mode</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">response_format=json_object</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">语法层保证合法 JSON</span></div><div class=\"d-note\">注意：语法定合法 ≠ 字段内容正确——字段级要靠第 3 关。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 关：校验与带错重试</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">parse+Schema 校验</span><span class=\"d-arrow\">→</span><span class=\"d-tag red d-shake\">失败：把错误喂回去</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">模型自修，重试 ≤3 次</span></div><div class=\"d-note\">带错误反馈的重试成功率远高于盲目重发；仍失败走人工兜底。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#c5-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#c5-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#c5-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#c5-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧾",
+      "name": "Schema 是合同",
+      "text": "字段、类型、必选、枚举写清楚——Schema 越明确（枚举代替自由文本）遵守率越高。"
+    },
+    {
+      "icon": "🔧",
+      "name": "JSON Mode 两层",
+      "text": "基础模式只保语法合法；严格模式（Structured Outputs）把 Schema 注入解码约束，字段级强保证。"
+    },
+    {
+      "icon": "✅",
+      "name": "校验重试",
+      "text": "pydantic/zod 校验类型与格式；失败把坏输出+报错一起发回让模型自修，上限 3 次。"
+    },
+    {
+      "icon": "🚫",
+      "name": "常见坑",
+      "text": "输出裹 markdown 代码块、枚举值拼错、嵌套太深遵守率降——Schema 设计要浅而稳。"
+    },
+    {
+      "icon": "🌉",
+      "name": "通往 Agent",
+      "text": "Function Calling 本质是平台化的结构化输出：Schema 变工具参数（E 关卡展开）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】开了 JSON Mode，程序还是解析后字段缺失，为什么？",
+      "options": [
+        "JSON Mode 有 bug",
+        "JSON Mode 只保语法合法，字段级正确要靠 Schema 严格模式或代码校验",
+        "温度太高导致",
+        "模型不支持中文"
+      ],
+      "answer": 1,
+      "explain": "选 B。语法合法 ≠ 内容合规：字段是否齐全、类型对不对，要 Schema 级约束（严格模式）或校验层兜底。"
+    },
+    {
+      "type": "choice",
+      "q": "Schema 校验失败后最有效的重试方式是？",
+      "options": [
+        "原样重发碰运气",
+        "把上次错误输出与校验报错一起发回，要求修正后重试",
+        "把 temperature 调到 2",
+        "直接把原始文本给用户"
+      ],
+      "answer": 1,
+      "explain": "选 B。带错误反馈的重试让模型知道错在哪（缺字段/类型错），自修成功率远高于盲目重发。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】从用户上传的合同抽取『甲乙方、金额、到期日』入库，要求准确率优先。请设计抽取链路（提示词层、模型层、校验层）。",
+      "reference": "提示词层：定义严格 Schema——甲方、乙方（string）、金额拆成数值与币种两个字段、到期日用 ISO8601 格式（YYYY-MM-DD）；每个字段附一句抽取定义和示例，明确『字段在文中找不到时填 null，禁止编造』。模型层：低温采样（0~0.2）+ API 严格结构化模式（Schema 直接绑定），复杂条款要求模型先引用原文位置再填字段（可核查）。校验层：pydantic 校验类型与格式（日期可解析、金额为数字），业务规则二次核验（各分期金额加总=总额），关键字段为 null 或置信低时进人工复核队列而不是入库。质量运营：抽样 50 份人工标注对比，统计字段级准确率持续改进提示词。准确率优先的核心理念：宁可 null 走人工，不可接受编造。",
+      "keyPoints": [
+        {
+          "point": "Schema：类型/格式约束+null 兜底禁编造",
+          "kw": [
+            "schema",
+            "null",
+            "禁止",
+            "编造",
+            "格式"
+          ]
+        },
+        {
+          "point": "低温+严格模式+引用原文位置",
+          "kw": [
+            "低温",
+            "严格",
+            "引用",
+            "位置"
+          ]
+        },
+        {
+          "point": "校验：类型+业务规则+低置信转人工",
+          "kw": [
+            "校验",
+            "规则",
+            "人工",
+            "置信"
+          ]
+        },
+        {
+          "point": "宁 null 不编造的原则",
+          "kw": [
+            "宁可",
+            "null",
+            "编造",
+            "准确率"
+          ]
+        }
+      ],
+      "explain": "三层齐备+『宁 null 不编造』，是抽取类功能的工程标准。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：怎么让 AI 的输出像接口一样可靠？",
+    "hint": "提示：表格 + 出货三道检。",
+    "modelAnswer": "让 AI 填标准表格而不是写自由作文，三道关：先在指令里把表格样式和示例给足（Schema）；再打开 JSON 模式保证吐出来的至少是合法表格；最后程序验收——字段类型不对、缺项就把错误指给 AI 让它重填，最多三次，还不行转人工。三道关都过，AI 输出才能被程序放心使用。"
+  },
+  "links": [
+    {
+      "to": "1-3c",
+      "text": "下一站 Function Calling：把 Schema 从提示词升级为平台级工具定义"
+    },
+    {
+      "to": "1-1b",
+      "text": "低温是结构化的隐形搭档——参数配置回看上一站"
+    }
+  ],
+  "interview": [
+    {
+      "q": "如何让大模型稳定输出可解析的 JSON？",
+      "stars": 3,
+      "source": "内置知识（应用岗常问）",
+      "tip": "三道关作答：Schema 示例 → JSON/严格模式 → 校验带错重试。"
+    }
+  ],
+  "summary": "Q：三道关？（答：Schema 示例 → JSON/严格模式 → 校验带错重试）\nQ：JSON Mode 边界？（答：只保语法，不保字段内容）\nQ：核心原则？（答：宁 null 走人工，不收编造）"
+}

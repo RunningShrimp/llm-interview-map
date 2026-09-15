@@ -1,0 +1,148 @@
+{
+  "id": "0-5c",
+  "title": "RLHF 与 DPO：模型怎么变听话",
+  "definition": "SFT 只教了「怎么答」，没教「哪种答更得体」。RLHF（基于人类反馈的强化学习）先用人类对多个回答的排序训出一个「打分器」（奖励模型），再让模型照着分数自我优化；DPO 是它的简化版：直接用偏好数据优化，省掉打分器和强化学习循环。",
+  "analogies": [
+    {
+      "icon": "🎓",
+      "name": "带教老师打分制",
+      "text": "SFT 之后的模型像实习生的第三周：活儿会干，但分寸全无——客户问「这方案能保证成功吗」，他敢拍胸脯说保证。RLHF 的做法是请老师傅坐镇：给实习生写的 4 份回复排序，「这份专业、那份过度承诺」，排得多了就训练出一个懂老师口味的自动打分器；之后实习生每天自己写方案、自己看分、按分调整，分数越写越高——这是 PPO 的在线闭环。DPO 更像直接把老师批注过的「好答案 vs 差答案」对照集发给实习生：「以后照好的那种说」，不用请打分老师，一轮对照学习直接改行为。"
+    },
+    {
+      "icon": "🎯",
+      "name": "射门教练的两种教法",
+      "text": "PPO 像请了专职教练站在门口：你每射一球他立刻喊「这脚 8 分那脚 5 分」，你边踢边调，进步快但教练工资贵、还可能被你「骗分」（找到教练喜欢但实际没进的姿势，即 reward hacking）。DPO 像发给你一本「世界波集锦 vs 打飞机集锦」对照册，你自己揣摩差别直接改动作——便宜稳定，但上限取决于对照册的质量。"
+    }
+  ],
+  "demo": {
+    "title": "PPO vs DPO：两条对齐路线怎么走",
+    "description": "点击页签切换两种方法，看它们各自需要哪些组件、训练时在做什么；再用滑杆调节「偏好数据质量」，观察两种方法的效果变化与翻车风险。",
+    "html": "<div class='d-row' style='gap:6px;margin-bottom:8px'><button class='d-btn active' data-act='d-tab' data-group='align' data-tab='ppo'>PPO（在线闭环）</button><button class='d-btn' data-act='d-tab' data-group='align' data-tab='dpo'>DPO（离线直优）</button></div><div data-pane='ppo' data-group='align'><div class='d-row' style='gap:6px;flex-wrap:wrap;justify-content:center'><div class='d-card'>🧠 策略模型<br><span class='d-note'>生成回答</span></div><div class='d-arrow'>→</div><div class='d-card'>⚖️ 奖励模型<br><span class='d-note'>人类排序训出的打分器</span></div><div class='d-arrow'>→</div><div class='d-card'>🔁 PPO 更新<br><span class='d-note'>KL 惩罚防跑偏</span></div></div><p class='d-note'>4 个模型协同在线训练：能力强、工程贵、可能 reward hacking</p></div><div data-pane='dpo' data-group='align' class='d-hidden'><div class='d-row' style='gap:6px;flex-wrap:wrap;justify-content:center'><div class='d-card'>📊 偏好对<br><span class='d-note'>chosen ＞ rejected</span></div><div class='d-arrow'>→</div><div class='d-card'>🧠 策略模型直接优化<br><span class='d-note'>无需奖励模型</span></div></div><p class='d-note'>2 个模型离线训练：简单稳定、成本低，上限依赖数据质量</p></div><div style='margin-top:10px'><span class='d-note'>偏好数据质量：<b id='d05c-q'>70</b> 分</span><input type='range' min='10' max='100' value='70' data-output='#d05c-q' data-suffix=' 分' style='width:100%'><div class='d-vs'><div class='d-card'><b>对齐效果</b><div class='d-bar'><div class='d-fill' style='width:var(--v,70)%;background:#10b981'></div></div><span class='d-note'>数据越好，两法都越有效</span></div><div class='d-card'><b>DPO 翻车风险</b><div class='d-bar'><div class='d-fill' style='width:calc(100 - var(--v,70)*1%)'></div></div><span class='d-note'>DPO 上限更依赖数据质量</span></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🗳️",
+      "name": "奖励模型=人类口味的打分器",
+      "text": "让人类对同一问题的多个回答排序，训练出能给回答打分的模型——它是 RLHF 的核心资产。"
+    },
+    {
+      "icon": "🔁",
+      "name": "PPO：在线强化学习",
+      "text": "模型生成→奖励模型打分→按分更新，循环往复；配 KL 惩罚防止模型为刷分偏离原语言能力。"
+    },
+    {
+      "icon": "⚡",
+      "name": "DPO：省掉打分器",
+      "text": "把偏好对（好答案>坏答案）直接作为优化信号，数学上等价于绕过奖励建模，训练更简单稳定。"
+    },
+    {
+      "icon": "🧨",
+      "name": "reward hacking 是经典追问",
+      "text": "模型可能学会「讨好打分器」而非真的变好（如冗长、谄媚）；KL 约束与人工抽检是防线。"
+    },
+    {
+      "icon": "📈",
+      "name": "GRPO 是 2026 新主流",
+      "text": "DeepSeek-R1 用组相对策略优化：同一题采样一组答案、以组内相对优劣当奖励，砍掉价值网络省显存——见 H2。"
+    },
+    {
+      "icon": "🎒",
+      "name": "和 LoRA 的关系",
+      "text": "对齐训练同样可以用 LoRA 做轻量适配：底座冻结，只训小附件，消费级卡也能跑偏好优化。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "RLHF 三阶段的标准顺序是？",
+      "options": [
+        "奖励建模 → SFT → 强化学习",
+        "SFT 打底 → 用人类排序训练奖励模型 → 用 PPO 按奖励优化策略",
+        "强化学习 → 奖励建模 → SFT",
+        "直接用人类反馈微调，没有阶段之分"
+      ],
+      "answer": 1,
+      "explain": "经典 RLHF 三阶段：先 SFT 让模型会按指令说话（否则连像样的回答都生成不出）；再收集人类对回答的排序训练奖励模型（RM）；最后 PPO 以 RM 分数为信号优化策略，并用 KL 惩罚约束不偏离 SFT 太远。"
+    },
+    {
+      "type": "choice",
+      "q": "团队用 DPO 对齐后，模型回答变得异常冗长、爱堆漂亮废话，最可能的原因是？",
+      "options": [
+        "学习率太小导致欠拟合",
+        "偏好数据里「被选中」的回答普遍偏长，模型学到了「长=好」的捷径（偏好偏差）",
+        "DPO 必须配合奖励模型才能避免",
+        "模型参数量太小"
+      ],
+      "answer": 1,
+      "explain": "人类标注天然存在冗长偏差：标注者往往偏爱更详尽的回答。若偏好数据的 chosen 答案系统性偏长，DPO 会把「长」当成高分特征。对策：标注规范里控制长度混淆变量、偏好对内长度均衡、上线前人工抽检冗长度。"
+    },
+    {
+      "type": "scenario",
+      "q": "面试官问：「我们做一个医疗咨询助手，SFT 之后回答挺专业但经常把『可能』说成『肯定』，该用 RLHF 还是 DPO？为什么？」请给出选型与理由，并说明无论选哪个都要做的一件事。",
+      "reference": "选型建议：优先 DPO。理由一，医疗场景的偏好信号容易构造——「肯定式表述」标为 rejected、「恰当限定」标为 chosen，偏好对清晰；理由二，DPO 无需训练和托管奖励模型，工程链路简单、训练稳定，适合团队没有强化学习工程经验的情况；理由三，该问题是表述分寸问题而非开放创造问题，属于 DPO 擅长的离线偏好修正。如果团队已有 RLHF 管线且需要在线持续优化，也可用 PPO 系方法，但要加 KL 惩罚防止模型为讨好打分器而牺牲专业性。无论选哪个都必须做的一件事：构建高质量偏好数据并对结果做人工评估校准——医疗场景尤其要让医生参与标注与验收，防止偏好模型把「听起来稳妥」学成新的话术套路。",
+      "keyPoints": [
+        {
+          "point": "选 DPO：偏好信号易构造、工程简单稳定",
+          "kw": [
+            "DPO",
+            "偏好",
+            "稳定"
+          ]
+        },
+        {
+          "point": "无需奖励模型是关键优势",
+          "kw": [
+            "奖励模型",
+            "工程"
+          ]
+        },
+        {
+          "point": "PPO 可行但需 KL 惩罚防刷分",
+          "kw": [
+            "KL",
+            "讨好打分器"
+          ]
+        },
+        {
+          "point": "高质量偏好数据与人工校准是共同前提",
+          "kw": [
+            "偏好数据",
+            "人工",
+            "校准"
+          ]
+        }
+      ],
+      "explain": "点评：面试官想听的是「选型有依据」而不是站队。DPO 的三个理由（信号易构造/工程简单/问题类型匹配）+ PPO 的适用条件 + 共同前提（数据与人工校准），构成完整答案；主动提医疗场景需要专业标注者，是加分项。"
+    }
+  ],
+  "feynman": {
+    "prompt": "不看资料，向面试官解释：为什么有了 SFT 还需要 RLHF/DPO？两者（PPO vs DPO）的核心取舍是什么？",
+    "hint": "抓住「SFT 教模仿、对齐教分寸」这条主线；取舍从「要不要训练奖励模型」展开。",
+    "modelAnswer": "SFT 的学习信号是「标准答案长什么样」，模型只能模仿；但同一问题有很多可接受的答法，且「得体、安全、有分寸」很难写成唯一标准答案。RLHF 的思路是把人类的判断变成可优化的信号：先训奖励模型学会人类口味，再用强化学习（PPO）让模型朝高分方向迭代。DPO 发现可以省掉奖励模型这一层：直接拿「好答案>坏答案」的偏好对优化模型。核心取舍：PPO 在线闭环上限高、能持续探索，但四个模型协同训练贵且容易 reward hacking；DPO 离线、两个模型、简单稳定，但效果上限依赖偏好数据的质量与覆盖。2026 年的 GRPO 用「组内相对比较」进一步简化了奖励信号，是推理模型的主流对齐方案。"
+  },
+  "links": [
+    {
+      "to": "0-5b",
+      "text": "本页接在 0.5b 的三段成长之后：SFT（岗前培训）教了「按指令办事」，本页的对齐才是教「办事的分寸」"
+    },
+    {
+      "to": "h2-rlvr-grpo",
+      "text": "学完本考点后你会发现：2026 前沿的 RLVR/GRPO 正是 PPO-DPO 这条主线的演进——用「可验证的对错」替代人类口味当奖励"
+    }
+  ],
+  "interview": [
+    {
+      "q": "DPO 和 PPO 的区别是什么？RLHF、DPO、GRPO 之间是什么关系？",
+      "stars": 4,
+      "source": "小林coding·大模型工程面试题/牛客·2025-2026高频",
+      "tip": "先画 RLHF 三阶段，再说 PPO=在线闭环（4 模型）vs DPO=离线直优（2 模型），最后 GRPO=组相对奖励+砍价值网络；关系统一在「用偏好/奖励信号优化策略」"
+    },
+    {
+      "q": "为什么 SFT 之后还需要 RLHF/对齐？",
+      "stars": 4,
+      "source": "dev.to·RLHF Demystified/卡码笔记",
+      "tip": "SFT 只会模仿单一标准答案；对齐把「多种可接受答法中的相对更好」变成训练信号，解决分寸、安全与有用性"
+    }
+  ],
+  "summary": "Q：奖励模型是怎么来的？（答：同一问题生成多个回答，让人类排序，用排序数据训练一个能输出分数的模型。）\nQ：DPO 为什么不需要奖励模型？（答：数学推导表明可以直接在偏好对上优化策略，等价于隐式跳过奖励建模，训练链路更短更稳定。）\nQ：reward hacking 是什么？（答：模型找到讨好奖励模型的捷径如堆长度、堆礼貌话术，实际质量未提升；靠 KL 约束、数据均衡与人工抽检防范。）"
+}

@@ -1,0 +1,135 @@
+{
+  "id": "2-8b",
+  "title": "多 Agent 何时真的优于单 Agent",
+  "definition": "默认先用单 Agent；只有当任务可并行拆分、属于读多写少的探索型工作、或子任务需要专业分工与上下文隔离时，多 Agent 才划算——代价是约 15× token、错误放大与协调复杂度。",
+  "analogies": [
+    {
+      "icon": "🧹",
+      "name": "大扫除要不要叫帮手",
+      "text": "一个人打扫两居室：边扫边归位，脑子里的『计划』不用跟人对齐。但三间屋子要深度清洁且互不干扰时，请三人各扫一间更快——活能拆、互不打架才叫人。叫人还有隐性成本：交代任务、验收成果都要时间，活太小就亏了，这就是 15× token 里『协调开销』的影子。"
+    },
+    {
+      "icon": "📚",
+      "name": "开卷查资料 vs 闭卷写作文",
+      "text": "探索型任务像开卷考试：翻的书多、落笔少，几个人分头翻不同书架完全没问题（读多写少→可并行）。写作型任务像闭卷作文：每一笔都在改同一张卷子，多个人同时写只会互相覆盖（写入冲突→回到单 Agent）。判据一句话：读多写少敢并行，重写入要收口。"
+    },
+    {
+      "icon": "💰",
+      "name": "全能助理 vs 专家团队",
+      "text": "小案子请一个全能助理足够；大案子才值得各领域专家分头查证、主编汇总。但专家贵（多 Agent 约 15× token），而且一位专家查错了，主编可能照单全收——一个环节的错被当成事实往下传，这就是『错误放大』。折中方案是平时用助理、大活临时外包专家，这就是混合架构。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：上不上多 Agent 决策台（双滑杆）",
+    "description": "拖上面滑杆调『任务可并行度』，看两种架构的匹配条此消彼长；再拖『写入风险』滑杆，风险过高会亮出红灯提示；最后对照结论表，点开决策口诀，合成『单 Agent / 多 Agent / 混合』的选择。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px'><b>🔀 任务可并行度</b><input type='range' min='0' max='100' value='45' style='flex:1;min-width:180px' data-output='#d28b-par' data-suffix='%'><b id='d28b-par' style='min-width:60px;text-align:right'>45%</b></div><div class='d-row' style='margin-bottom:6px'><span class='d-tag green' style='width:132px;text-align:center;flex:none'>多 Agent 匹配</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc(var(--v,45) * 1%);background:#34d399'></div></div></div><div class='d-row'><span class='d-tag' style='width:132px;text-align:center;flex:none'>单 Agent 匹配</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc((100 - var(--v,45)) * 1%);background:#60a5fa'></div></div></div><div class='d-note'>拖动看看：并行度越高，越值得让多个子 Agent 分头开工；但光看这条还不够——接着看下面的写入风险。</div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px'><b>✍️ 写入风险（要同时改同一份东西吗）</b><input type='range' min='0' max='100' value='30' style='flex:1;min-width:180px' data-output='#d28b-wri' data-suffix='%'><b id='d28b-wri' style='min-width:60px;text-align:right'>30%</b></div><div class='d-row' style='margin-bottom:8px'><span class='d-tag red' style='width:132px;text-align:center;flex:none'>上下文打架</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc(var(--v,30) * 1%);background:#ef4444'></div></div></div><div class='d-note' style='transition:opacity .15s;opacity:calc((var(--v,30) - 55) * 0.08)'><span class='d-tag red'>⚠️ 亮红灯</span> 写入风险高：即使任务可并行，也优先单 Agent，或用混合思路——让子 Agent 只读不写，写作收口给一个主脑。</div><div class='d-note'>把滑杆拉过 60 试试：红灯提示会浮现——写入风险能一票否决『上多 Agent』的冲动。</div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='align-items:center;gap:8px;margin-bottom:8px'><b>🧭 合成结论表</b><button class='d-btn' style='margin-left:auto' data-act='d-toggle' data-target='#d28b-rule'>看决策口诀</button></div><table class='d-table'><tr><th>两根滑杆读出的情形</th><th>建议</th></tr><tr><td>并行度低、写入风险也低</td><td><span class='d-tag'>单 Agent</span> 最划算，别为架构而架构</td></tr><tr><td>并行高 ＋ 读多写少 ＋ 需要分工/上下文隔离</td><td><span class='d-tag green'>多 Agent</span>，但先准备约 15× token 的预算</td></tr><tr><td>中间地带 / 预算紧</td><td><span class='d-tag amber'>混合</span> 单双按任务切换，可省约 88% 成本</td></tr><tr><td>写入风险高</td><td>回到<span class='d-tag'>单 Agent</span> 或混合（子 Agent 只读）</td></tr></table><div id='d28b-rule' class='d-note d-hidden' style='margin-top:10px'>口诀：默认单 Agent；Anthropic 三条件——任务可并行、探索型读多写少、需要专业分工/上下文隔离——越齐越上多 Agent；LangChain 的 when NOT to use：路径能画成流程图、上下文装得下，就别请团队。</div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "✅",
+      "name": "Anthropic 三条件",
+      "text": "任务可并行、探索型读多写少、子任务需要专业分工/上下文隔离——满足得越齐，多 Agent 越值得。"
+    },
+    {
+      "icon": "💸",
+      "name": "代价账本",
+      "text": "Anthropic 实测多 Agent 约 15× token；单个子 Agent 出错可能被主管当真（错误放大），协调复杂度随人数增长。"
+    },
+    {
+      "icon": "🚫",
+      "name": "LangChain when NOT",
+      "text": "分支少、路径可预测、信息能装进一个上下文时别上多 Agent：工作流或单 Agent 更便宜、更可控、更好调。"
+    },
+    {
+      "icon": "📏",
+      "name": "read-vs-write 判据",
+      "text": "Phil Schmid 准则：读多写少的探索型任务可多 Agent 并行；重写入、共享状态的任务慎上，写入冲突是大坑。"
+    },
+    {
+      "icon": "🌗",
+      "name": "默认单 Agent 原则",
+      "text": "先做单 Agent 跑通全流程，遇到真瓶颈（上下文装不下、串行太慢）再升级——架构升级是手段不是勋章。"
+    },
+    {
+      "icon": "🔀",
+      "name": "混合架构",
+      "text": "按任务动态切换单/多：arXiv 2505.18286 报告混合可提精度 1.1-12%、同时省约 88% 成本。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【理解题】『为行业报告收集素材：查 20 个来源、读大量网页、最后由一人执笔』，按三条件该怎么选架构？",
+      "options": [
+        "全流程纯多 Agent，连写作也让多个 Agent 同时改一份稿",
+        "典型的读多写少探索型：检索阶段多 Agent 并行、写作阶段收口给单 Agent",
+        "必须全流程纯单 Agent，并行任何环节都是浪费",
+        "上辩论模式，让 Agent 们先吵出大纲"
+      ],
+      "answer": 1,
+      "explain": "选 B。检索是典型的读多写少（各查各的、互不覆盖），满足可并行条件；写作是重写入（都改同一份稿），按 read-vs-write 判据收口给单 Agent——这正是『检索多 Agent＋写作单 Agent』的混合思路。"
+    },
+    {
+      "type": "choice",
+      "q": "【辨析题】关于多 Agent 的代价，下面哪种说法是对的？",
+      "options": [
+        "只是首版开发慢一点，运行成本和单 Agent 差不多",
+        "token 约为单 Agent 的 15 倍，单个子 Agent 的错可能被放大成结论，协调代码也更复杂",
+        "多 Agent 一定比单 Agent 准确，所以贵的有道理",
+        "token 消耗只取决于模型大小，和架构无关"
+      ],
+      "answer": 1,
+      "explain": "选 B。Anthropic 对多 Agent 研究系统的实测口径是约 15× token；错误放大指子 Agent 的错误结论被主管汇总采信；协调复杂度指拆单、通信、验收的工程成本。A/C/D 都混淆了架构与效果的关系。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】团队想把现有客服 Agent 升级成『5 个专家 Agent 互相对话解决问题』，但预算只有原来的 1.5 倍。请用本关判据评估这个升级，并给出建议。",
+      "reference": "按三条件过一遍：客服问题大多一问一答、串行处理，任务可并行度低；对话要在同一份工单上下文上持续读写，写入风险高；也不是读多写少的探索型任务——三条件基本都不满足。再看代价端：多 Agent 约 15× token，1.5 倍预算根本兜不住，还会引入错误放大（一个专家答错、其他专家跟着续歪）与协调复杂度。建议：遵循默认单 Agent 原则，留在单 Agent；若真有瓶颈（如资料检索慢），用混合思路——主 Agent 自己维持对话，只把『查资料』这类读多写少的子任务外包给并行子 Agent；上线后用 token 账单和错误率数据验证升级是否真有必要。",
+      "keyPoints": [
+        {
+          "point": "三条件判负：不可并行、写多、非探索型",
+          "kw": ["三条件", "可并行度", "读多写少"]
+        },
+        {
+          "point": "代价兜不住：15× token＋错误放大＋协调复杂度",
+          "kw": ["15", "错误放大", "协调复杂度"]
+        },
+        {
+          "point": "建议：默认单 Agent，局部混合外包读任务",
+          "kw": ["默认单 Agent", "混合", "外包"]
+        }
+      ],
+      "explain": "本题考判据套用三步：先过三条件、再算 15× 的账、最后给『默认单 Agent＋局部混合』的台阶方案——三步齐全即为优秀。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用『大扫除要不要叫帮手』向朋友讲清楚：什么时候该上多 Agent，什么时候一个人（单 Agent）就够？",
+    "hint": "三个问题连着问：活能拆吗？拆开后互相打架吗？叫人的成本（交代＋验收＋开销）算得过来吗？",
+    "modelAnswer": "大扫除先问三句：屋子能分成互不干扰的几间吗（可并行）？是『翻箱倒柜找东西』还是『都要归到同一个柜子』（读多写少还是都写一处）？请人帮忙的交代和验收成本划得来吗？三问都过才叫帮手（多 Agent）；否则自己一个人边扫边归位更省心（默认单 Agent）。折中办法是平时自己干、重活临时请钟点工（混合架构），又省钱又不出乱子。"
+  },
+  "links": [
+    {
+      "to": "2-8",
+      "text": "前置回看：2-8 教你把团队搭起来（主管-工人/流水线/辩论），本课回答更重要的问题——什么时候才真的需要叫这支团队上场"
+    },
+    {
+      "to": "4-6",
+      "text": "学完本考点后你会发现：Anthropic 的多 Agent 研究系统就是三条件的标准示范——读多写少的深度研究，用 15× token 买来并行与上下文隔离；实战篇带你在研究/写作团队里跑通全流程"
+    }
+  ],
+  "interview": [
+    {
+      "q": "多 Agent 什么时候真的优于单 Agent？协调开销和错误放大怎么权衡？",
+      "stars": 4,
+      "source": "LangChain《How and when to build multi-agent systems》（langchain.com/blog，2025，含 when NOT to use）＋Phil Schmid《Single vs Multi-Agent System?》（philschmid.de，2025）",
+      "tip": "先给三条件（可并行、读多写少探索型、需分工/上下文隔离），再给代价（约 15× token、错误放大、协调复杂度），落到默认单 Agent、遇真瓶颈再升级；写入重的任务补 read-vs-write 判据。"
+    },
+    {
+      "q": "多 Agent 系统比单 Agent 贵多少？什么条件下才值得上？",
+      "stars": 3,
+      "source": "Anthropic《How we built our multi-agent research system》（15× token）/Claude 官方博客三条件（2025-2026，问法为报告归纳）",
+      "tip": "15× token 是 Anthropic 的实测口径；值不值看任务形状：三条件越齐越值得，拿不准上混合架构——按任务切换单/多，arXiv 2505.18286 报告可提精度 1.1-12% 并省约 88% 成本。"
+    }
+  ],
+  "summary": "Q：判断要不要上多 Agent 的三条件是什么？（答：任务可并行、探索型读多写少、子任务需要专业分工/上下文隔离，满足越齐越值得）\nQ：多 Agent 的主要代价是什么？（答：约 15× token、子 Agent 错误会被放大、协调复杂度随人数上升）\nQ：拿不准时怎么选？（答：默认单 Agent 跑通再说；折中用混合架构按任务切换，可提精度并省约 88% 成本）"
+}

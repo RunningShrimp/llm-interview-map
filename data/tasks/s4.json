@@ -1,0 +1,25 @@
+{
+  "stage": "S4",
+  "project": "带监控与评估的 Agent API",
+  "intro": "rodmap 阶段4 里程碑：把 S2 的研究助手包成 HTTP 服务并「生产化」——请求日志与 trace、评估回归门禁、成本预算告警、灰度与回滚。这是从 Demo 工程师到 AI 工程化工程师的分水岭项目。",
+  "steps": [
+    { "title": "包成 API 服务", "detail": "用 FastAPI 包一层 POST /research 接口：入参问题、出参小结+引用；异步处理长任务，加请求超时。" },
+    { "title": "接入可观测", "detail": "为每次请求生成 trace_id，记录每步工具调用、token 消耗与耗时（结构化日志即可，Langfuse 更佳）；错误率/延迟/成本三个指标可从日志聚合。" },
+    { "title": "建评估回归集", "detail": "沉淀 20 个历史问题为评估集，写自动评估脚本（LLM-as-judge 打分+人工抽检 5 条校准）；任何改动跑一遍，分数倒退即阻断。" },
+    { "title": "成本护栏", "detail": "单请求 token 上限 + 每日预算阈值，超限告警并降级（换小模型/拒绝请求）；日志里能按请求归因成本。" },
+    { "title": "灰度与回滚", "detail": "新版本提示词/模型先放 10% 流量，对比新旧版本评估分与坏例率；准备一键切回上一版配置的路由开关。" }
+  ],
+  "checklist": [
+    "每个请求有 trace_id，能从日志还原一次请求的完整轨迹",
+    "评估集可一键重跑，有分数记录；至少执行过一次「分数倒退→阻断→修复」演练",
+    "单请求与每日成本护栏生效，超限行为有日志可查",
+    "灰度开关可用，演示过「10% 放量 → 对比 → 回滚」全流程",
+    "README 含架构图、SLO 定义（如 p95<30s）与压测数据"
+  ],
+  "arch": "<div class='d-col' style='gap:6px'><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>🚪 API 网关<br><span class='d-note'>鉴权 · 限流 · trace_id</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🚦 版本路由<br><span class='d-note'>灰度 10% · 一键回滚</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🤖 Agent 服务<br><span class='d-note'>ReAct 循环 + 工具</span></div></div><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>🔭 可观测<br><span class='d-note'>trace · 延迟 · 成本三指标</span></div><div class='d-card' style='text-align:center'>📏 评估回归门禁<br><span class='d-note'>20 题评估集 · judge</span></div><div class='d-card' style='text-align:center'>💰 成本护栏<br><span class='d-note'>单请求上限 · 日预算告警</span></div></div></div>",
+  "tips": [
+    "trace 记录的最小集：请求参数、每步工具调用+耗时、token 数、最终答案——面试讲这个就是「可观测性」的现成答案",
+    "评估门禁不必复杂：一个脚本+一张历史分数表，就能拦住大部分回退",
+    "成本护栏要在代码层做（计数器+阈值），不要指望事后看账单"
+  ]
+}

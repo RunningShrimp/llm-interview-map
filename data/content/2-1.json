@@ -1,0 +1,144 @@
+{
+  "id": "2-1",
+  "title": "Agent 是什么：给 AI 装上手手脚",
+  "definition": "AI Agent = 以 LLM 为大脑的智能体：外加任务清单（规划）、笔记本（记忆）、门禁卡（工具）三件套，能自己拆解目标、调工具干活。Chatbot 只动嘴，Agent 能动手——这是 AI 应用的下一个台阶。",
+  "analogies": [
+    {
+      "icon": "🧑‍💻",
+      "name": "全能实习生",
+      "text": "把 Agent 想成刚入职的超级实习生：脑子聪明（LLM 会推理），但干活还需要三样——任务清单本（把『组织年会』拆成订场地/排节目/发通知）、工作笔记本（记住老板偏好和上午聊了什么）、门禁卡和电脑权限（能真去订会议室、发邮件）。只有脑子没有手脚，什么都干不了——这就是 Chatbot 与 Agent 的分水岭。"
+    },
+    {
+      "icon": "🤖",
+      "name": "机器人三件套",
+      "text": "对比一下你用过的 AI：客服机器人只会一问一答（动嘴）；Agent 接到『帮我把这周数据整理成周报发老板』，会自己拆步骤、查数据、做表、发送，全程只汇报结果（动手）。谱系上：单轮问答（Chatbot）→ 按流程走的自动化（Workflow）→ 自主拆解应变（Agent），自主性逐级上升。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：Chatbot vs Agent 干同一件事",
+    "description": "切换两种形态，看『订下周三的会议室』如何被完成。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"e1g\" data-tab=\"m1\">💬 Chatbot</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"e1g\" data-tab=\"m2\">🤖 Agent</button></div><div data-pane=\"m1\" data-group=\"e1g\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag amber\">你：帮我订下周三下午的会议室</span><span class=\"d-card d-shake\" style=\"border-color:#ef4444\">AI：好的，预订会议室需要登录 OA 系统后……（只能告诉你怎么做）</span></div></div><div data-pane=\"m2\" data-group=\"e1g\" class=\"d-hidden\"><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-tag amber\">同样的请求</span><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap;margin-top:6px\"><span class=\"d-token hot d-pulse\">① 查空会议室</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.25s\">② 选 12 人带屏</span><span class=\"d-token hot d-pulse\" style=\"animation-delay:.5s\">③ 调预订接口 ✅</span></div><span class=\"d-card d-anim-late\" style=\"border-color:#10b981;background:#f0fdf4\">已完成：泰山厅（12 人），周三 14:00-15:00。</span></div></div><div class=\"d-note\">💡 区别不在聪明程度，在有没有手脚：规划、记忆、工具三件套。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧠",
+      "name": "LLM 是大脑",
+      "text": "负责理解意图、推理决策、决定下一步——Agent 的上限由模型能力决定。"
+    },
+    {
+      "icon": "🗺️",
+      "name": "规划：拆任务",
+      "text": "把大目标拆成小步骤并排序，执行中还会根据反馈调整。"
+    },
+    {
+      "icon": "💾",
+      "name": "记忆：保状态",
+      "text": "记住对话历史、中间结果与用户偏好，跨步骤不失忆。"
+    },
+    {
+      "icon": "🔧",
+      "name": "工具：干实事",
+      "text": "调搜索、查数据库、发邮件——让模型作用于真实世界。"
+    },
+    {
+      "icon": "🔁",
+      "name": "循环运转",
+      "text": "感知→思考→行动→观察，循环到目标完成——节拍器叫 ReAct（L2 学）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】Agent 与普通聊天机器人的本质区别是？",
+      "options": [
+        "Agent 用的模型更大",
+        "Agent 有规划、记忆、工具三件套，能自主拆解目标并执行",
+        "Agent 一定联网",
+        "聊天机器人不能理解中文"
+      ],
+      "answer": 1,
+      "explain": "选 B。分水岭是自主性+行动力：从『说』到『做』。模型大小（A）不是标准。"
+    },
+    {
+      "type": "choice",
+      "q": "『每天早上 8 点自动把日报发到群里』更适合用哪种形态实现？",
+      "options": [
+        "Agent 自主决策",
+        "固定流程的自动化（Workflow）：路径确定，不需要 AI 自由发挥",
+        "更大的模型",
+        "更长的提示词"
+      ],
+      "answer": 1,
+      "explain": "选 B。路径固定的任务用 Workflow 更稳更便宜；Agent 的价值在路径不确定、需要应变的任务——按需选形态是工程判断。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】老板要求：『给我们的售后系统加个 AI，能自动处理退货申请。』请判断哪些环节适合 AI 自主完成、哪些必须留给规则或人工，并说明理由。",
+      "reference": "适合交给 AI 的：理解客户诉求（自由文本转结构化信息）、查询订单与政策并给出初步方案、生成安抚性回复——这些是语言理解与组织，是模型的强项。必须留给规则或人工的：最终退款执行（资金不可逆，必须人工或强规则确认）、是否符合理赔政策的最终判定（涉及资损与合规，需要确定性）、客户情绪激烈或投诉升级的场景（需要人类担责）。理由一句话：语言环节交给模型发挥，资金与合规环节交给确定性与人类——『AI 提方案，人类拍板』是 Agent 落地最稳的起步形态。",
+      "keyPoints": [
+        {
+          "point": "语言理解/方案生成适合 AI",
+          "kw": [
+            "理解",
+            "诉求",
+            "方案",
+            "语言"
+          ]
+        },
+        {
+          "point": "资金/合规动作留给规则或人工",
+          "kw": [
+            "退款",
+            "人工",
+            "规则",
+            "不可逆",
+            "合规"
+          ]
+        },
+        {
+          "point": "给出判断标准：语言 vs 确定性",
+          "kw": [
+            "确定性",
+            "：语言 ",
+            "语言 ",
+            " 确定"
+          ]
+        },
+        {
+          "point": "AI 提案+人类拍板的起步形态",
+          "kw": [
+            "的起步形态",
+            "拍板",
+            "确认",
+            "起步"
+          ]
+        }
+      ],
+      "explain": "L1 场景题重在建立『AI 擅长区 vs 危险区』的判断框架。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：AI Agent 和聊天机器人有什么不一样？",
+    "hint": "提示：全能实习生——脑子之外还要清单本、笔记本、门禁卡。",
+    "modelAnswer": "聊天机器人只有嘴，一问一答；Agent 是给聪明的脑子配齐了装备：任务清单本负责把大目标拆成小步骤，工作笔记本记住偏好和进展，门禁卡让它能真的去操作——查数据、订会议室、发邮件。你说一句目标，它自己拆解执行只汇报结果。从『会说』到『会干』，靠的就是这三件套。"
+  },
+  "links": [
+    {
+      "to": "1-3b",
+      "text": "三件套里最关键的『工具』是怎么接上的？下一站：点餐小票的直觉"
+    },
+    {
+      "to": "2-5",
+      "text": "L2 你将学会 Agent 的运转节拍：ReAct 循环——本关直觉的落地版"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么是 AI Agent？和 Chatbot 的区别？",
+      "stars": 4,
+      "source": "牛客·大模型 Agent 面试全攻略/JavaGuide",
+      "tip": "L1 档：三件套+能动嘴与动手的对比，30 秒讲清。"
+    }
+  ],
+  "summary": "Q：Agent 三件套？（答：规划拆任务、记忆保状态、工具干实事）\nQ：与 Chatbot 的分水岭？（答：自主拆解+执行 vs 一问一答）\nQ：什么任务不该交给 Agent？（答：路径固定的用 Workflow，资金合规的留给人工）"
+}

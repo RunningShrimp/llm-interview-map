@@ -1,0 +1,147 @@
+{
+  "id": "1-3b",
+  "title": "工具调用的直觉：点餐小票",
+  "definition": "工具调用（Function Calling）让 AI 能『下单办事』：它按应用给的格式填一张参数小票，程序验单后交给真正的系统执行，结果端回来继续对话。AI 只填单不办事——权限牢牢握在应用手里。",
+  "analogies": [
+    {
+      "icon": "📋",
+      "name": "点餐小票",
+      "text": "AI 接工具像顾客点餐：菜单上写着每道菜的说明和必填选项（工具定义），顾客不能冲进厨房炒菜，只能按格式填一张小票（调用参数：菜名=宫保鸡丁，辣度=微辣）。服务员（应用）先验单——格式对不对、合不合理——才送厨房（真正的系统）执行，做好端回来（结果回传），顾客再就着菜继续聊。"
+    },
+    {
+      "icon": "🎫",
+      "name": "填表办事",
+      "text": "让 AI 助手查天气，不是让它『嘴上算』，而是给它一张天气查询表单（城市、日期两个格子）。AI 负责把你的话翻译成表单内容：『北京明天天气』→ {城市: 北京, 日期: 明天}。表格系统收到后直接返回数据。AI 全程没碰过天气系统——它只是个高效的前台。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一张小票的完整旅程",
+    "description": "点击『下一步』，看从你的话到真正执行之间发生了什么。",
+    "html": "<div class=\"d-steps\" id=\"e2-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">第 1 步：应用给出『菜单』</div><div class=\"d-col\" style=\"max-width:480px;margin:0 auto\"><span class=\"d-card mono\" style=\"font-size:12px\">工具：查天气<br>格子：城市（必填）、日期</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 2 步：AI 填小票</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag amber\">你说：北京明天下雨吗？</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">{ 城市: 北京, 日期: 明天 }</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 3 步：服务员验单 + 厨房执行</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag green\">✓ 城市有、日期合法</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">天气系统返回：小雨 22°C</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">第 4 步：端回来，AI 组织语言</div><div class=\"d-row\" style=\"justify-content:center\"><span class=\"d-tag green d-pulse\">『北京明天小雨，22°C，记得带伞 ☔』</span></div><div class=\"d-note\">AI 全程只填了单——真正办事的是系统，权限在应用手里。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#e2-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#e2-steps\">1 / 4</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#e2-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#e2-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📋",
+      "name": "菜单：工具定义",
+      "text": "应用先告诉 AI 有哪些工具、每个工具填什么参数——描述越清楚，AI 填得越准。"
+    },
+    {
+      "icon": "🧾",
+      "name": "小票：结构化参数",
+      "text": "AI 把你的自然语言翻译成格式化参数（通常是 JSON），这是它唯一的输出。"
+    },
+    {
+      "icon": "✅",
+      "name": "验单：程序校验",
+      "text": "参数格式对不对、业务上合不合理，由程序检查——不合格退回去让 AI 重填。"
+    },
+    {
+      "icon": "🍳",
+      "name": "厨房：系统执行",
+      "text": "真正的执行者是接好权限的系统（天气服务/数据库），AI 从未直接接触。"
+    },
+    {
+      "icon": "🔐",
+      "name": "安全的根基",
+      "text": "『AI 填单、程序办事』意味着危险操作的权限可以锁在应用侧——这是 Agent 安全的地基。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】AI 助手帮你『查到了明天的天气』，真正去查天气系统的是谁？",
+      "options": [
+        "AI 自己联网查的",
+        "应用程序：AI 只生成了查询参数，由程序校验后执行",
+        "天气服务的 AI",
+        "用户手机"
+      ],
+      "answer": 1,
+      "explain": "选 B。AI 的产出是一张参数小票；验单与执行都在应用侧——这就是为什么权限可以牢牢受控。"
+    },
+    {
+      "type": "choice",
+      "q": "AI 填的小票把日期写成了『下礼拜三』，程序该怎么办？",
+      "options": [
+        "猜一个日期执行",
+        "验单失败，把错误信息退回给 AI，让它换成标准格式重填",
+        "报错崩溃",
+        "不处理"
+      ],
+      "answer": 1,
+      "explain": "选 B。把格式要求或错误原因退回去，AI 会改填标准格式（如 2026-09-09）——一次友好的人机协作纠错。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】给 AI 接一个『发邮件』工具后，有用户诱导它给全公司群发了奇怪内容。请用『点餐小票』的直觉分析问题出在哪、怎么防。",
+      "reference": "问题出在『验单』和『权限』两个环节被跳过了：AI 的小票被直接送进了厨房——发信工具拿到合法格式的参数就执行了，没有任何检查。防法照着餐厅改：第一，加验单——程序在执行前检查收件人数量、内容长度与违禁词，超过阈值（如群发超 10 人）直接拒绝；第二，降权限——发邮件这类外部影响的操作不设『直发』权限，改成『AI 起草、人工确认后发送』，小票变草稿；第三，留小票存根——每次调用记录谁、何时、发了什么，出事可追溯。核心直觉：AI 只会填单，厨房门禁必须由应用把守——门禁松了，多聪明的前台都会被坏人利用。",
+      "keyPoints": [
+        {
+          "point": "定位：小票没验单就进了厨房",
+          "kw": [
+            "验单",
+            "进了厨房",
+            "执行",
+            "小票"
+          ]
+        },
+        {
+          "point": "加程序级检查（收件人/内容阈值）",
+          "kw": [
+            "阈值",
+            "检查",
+            "拒绝",
+            "群发"
+          ]
+        },
+        {
+          "point": "高危操作改人工确认（草稿制）",
+          "kw": [
+            "人工",
+            "确认",
+            "草稿",
+            "起草"
+          ]
+        },
+        {
+          "point": "调用留痕可追溯",
+          "kw": [
+            "记录",
+            "可追溯",
+            "追溯",
+            "存根"
+          ]
+        }
+      ],
+      "explain": "能用『填单 vs 办事』的分工定位安全边界，是本关的核心收获。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：AI 是怎么『帮你办事』的？为什么说它只填单不办事？",
+    "hint": "提示：点餐小票——菜单、填单、验单、厨房、端回来。",
+    "modelAnswer": "应用先给 AI 一份菜单：有哪些工具、每个要填什么参数。AI 把你的话翻译成一张格式化小票，自己并不动手；服务员（程序）先验单，格式不对退回去重填，合格才送厨房（真正的系统）执行，结果端回来 AI 再组织成人话告诉你。它只填单不办事——所以危险操作的权限永远可以锁在程序手里。"
+  },
+  "links": [
+    {
+      "to": "1-3c",
+      "text": "L2 你将亲手定义一个带参数校验的工具：把小票流程写成代码"
+    },
+    {
+      "to": "2-1",
+      "text": "工具是 Agent 三件套的『手脚』——回到 Agent 全景看它怎么运转"
+    },
+    {
+      "to": "1-3",
+      "text": "点餐小票是 1.3 结构化输出的具象版——JSON Schema 就是小票的格式联"
+    }
+  ],
+  "interview": [
+    {
+      "q": "Function Calling 是怎么回事？",
+      "stars": 5,
+      "source": "小林面试笔记·Function Calling（必考）",
+      "tip": "L1 档：填单-验单-执行-回传四步讲清，强调权限在应用侧。"
+    }
+  ],
+  "summary": "Q：工具调用四步？（答：给菜单→AI 填单→程序验单执行→结果回传）\nQ：为什么说权限在应用手里？（答：AI 只产出参数，执行者是接权限的系统）\nQ：参数填错了怎么办？（答：退回错误信息让 AI 重填）"
+}

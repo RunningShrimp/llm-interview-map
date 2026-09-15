@@ -1,0 +1,144 @@
+{
+  "id": "1-1",
+  "title": "主流模型家族速览与选型",
+  "definition": "Transformer 三种拼法：Encoder-only（BERT，会读，做理解检索）、Decoder-only（GPT，会写，做生成对话）、Enc-Dec（T5，先懂后写）。当今主流大模型几乎全是 Decoder-only。",
+  "analogies": [
+    {
+      "icon": "👥",
+      "name": "三种考生",
+      "text": "Encoder-only（BERT）像做阅读理解的考生：反复通读全文、划重点，只输出判断不写作文——擅长分类、找相似；Decoder-only（GPT）像作文考生：一个字一个字往下写，写每个字只能看前面——擅长聊天与创作；Encoder-Decoder（T5）像翻译官：先吃透原文再逐字说译文——适合翻译摘要这类输入输出强对应的活。"
+    },
+    {
+      "icon": "🧩",
+      "name": "今天的分工",
+      "text": "现实中的分工已经变了：生成与对话全被 GPT 式承包；BERT 没消失，转行做了『给句子算相似度』的专业户——你用的 RAG 检索、语义搜索，背后多数是 Encoder 系的 Embedding 模型。选型口诀：做生成找 Decoder，做语义匹配找 Encoder。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：三种架构面对同一任务",
+    "description": "切换任务类型，看哪种架构最对口。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"a6g\" data-tab=\"t1\">任务：写封邮件</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a6g\" data-tab=\"t2\">任务：判断评论好评/差评</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"a6g\" data-tab=\"t3\">任务：中译英</button></div><div data-pane=\"t1\" data-group=\"a6g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">Decoder-only（GPT 系）✅</span><span class=\"d-tag\">逐词生成是它的看家本领</span></div></div><div data-pane=\"t2\" data-group=\"a6g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">Encoder-only（BERT 系）✅</span><span class=\"d-tag\">双向通读做分类又快又准；GPT 也能做但大材小用</span></div></div><div data-pane=\"t3\" data-group=\"a6g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">Encoder-Decoder（T5 系）✅</span><span class=\"d-tag\">先懂后写天生对口；现代常用 GPT + 提示词替代</span></div></div><div class=\"d-note\">💡 实战直觉：拿不准就先试 GPT 系 + 好提示词，成本敏感的理解类任务再换小 BERT。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📖",
+      "name": "Encoder-only 会读",
+      "text": "双向看全文，输出理解表示——分类、相似度、聚类；今天主要以 Embedding 模型的身份活跃。"
+    },
+    {
+      "icon": "✍️",
+      "name": "Decoder-only 会写",
+      "text": "因果掩码逐词生成——对话、创作、代码；GPT/LLaMA/Qwen 全是它。"
+    },
+    {
+      "icon": "🔁",
+      "name": "Enc-Dec 先懂后写",
+      "text": "翻译/摘要的经典架构；现代常被 Decoder+提示词替代。"
+    },
+    {
+      "icon": "🤔",
+      "name": "为什么 Decoder 赢了",
+      "text": "训练目标简单可无限扩展、信号密度高、推理高效——L4 详细论证。"
+    },
+    {
+      "icon": "🧭",
+      "name": "选型口诀",
+      "text": "生成对话→Decoder 系大模型；语义匹配/分类→Encoder 系小模型（便宜十倍）。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【应用题】公司要做『工单自动分类』（几十个类别），预算敏感。最合理的选型是？",
+      "options": [
+        "直接用最大的 GPT 模型",
+        "Encoder 系小模型（BERT 级）微调——分类任务小模型又快又便宜",
+        "自研一个大模型",
+        "用规则硬写"
+      ],
+      "answer": 1,
+      "explain": "选 B。分类是理解任务，Encoder 系小模型效果足够且推理成本比大 GPT 低一个量级——按任务选家族是省钱的第一步。"
+    },
+    {
+      "type": "choice",
+      "q": "你的 RAG 系统需要给文档段落算语义向量，应该选哪个家族？",
+      "options": [
+        "Decoder-only 大模型",
+        "Encoder-only 的 Embedding 模型",
+        "图像模型",
+        "随便哪个"
+      ],
+      "answer": 1,
+      "explain": "选 B。算句向量是 Encoder 的主场——双向通读输出理解表示，专为此设计且便宜。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】公司同时有三个需求：①客服对话机器人；②10 万条商品评论打情感标签；③把商品描述翻译成英文。请给每个需求选架构家族并说明理由与成本考量。",
+      "reference": "需求①是对话生成，选 Decoder-only 的大模型（GPT/Qwen 级），逐词生成与指令跟随是它的本行，成本按对话量计；需求②是文本分类，选 Encoder-only 小模型（BERT 级）微调：10 万条标注数据充足，小模型精度可靠、单条推理成本只有大模型的几十分之一，用大模型是浪费；需求③是输入输出强对应的翻译：传统上是 Encoder-Decoder（T5 系）的主场，但现代工程更常用的方案是 Decoder 大模型加翻译提示词——效果够好且少维护一套模型，若翻译量极大且格式固定，可评估专用翻译模型控制成本。总结规律：生成与对话走 Decoder 大模型；批量理解类任务优先 Encoder 小模型；结构化转换任务先试大模型+提示词，量大再评估专用模型；此外，回答中还应明确提到「选型」。",
+      "keyPoints": [
+        {
+          "point": "①对话生成选 Decoder 大模型",
+          "kw": [
+            "decoder",
+            "对话",
+            "生成",
+            "gpt"
+          ]
+        },
+        {
+          "point": "②批量分类选 Encoder 小模型微调（成本考量）",
+          "kw": [
+            "encoder",
+            "bert",
+            "分类",
+            "微调",
+            "Encode"
+          ]
+        },
+        {
+          "point": "③翻译先大模型+提示词，量大评估专用",
+          "kw": [
+            "翻译",
+            "提示词",
+            "专用",
+            "量"
+          ]
+        },
+        {
+          "point": "总结按任务形态与成本选家族",
+          "kw": [
+            "任务",
+            "成本",
+            "总结",
+            "选型"
+          ]
+        }
+      ],
+      "explain": "三个需求覆盖三种家族——能按任务形态与成本对号入座，就是本关的目标。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：BERT 和 GPT 有什么不一样？为什么满世界都是 GPT 这种？",
+    "hint": "提示：阅读理解考生 vs 作文考生。",
+    "modelAnswer": "BERT 像只做阅读理解的考生：把文章读透做判断，不会写长文；GPT 像写作文考生，一个字一个字往下写。『接着往下写』这本事太通用了——聊天、写代码、做题都是接龙，加上训练方式简单能无限喂数据，所以满世界都是 GPT 这种 Decoder 架构；BERT 则转行做了给句子算相似度的基础工作，你的搜索和 RAG 背后都是它。"
+  },
+  "links": [
+    {
+      "to": "0-5",
+      "text": "选型的前提是理解能力边界——0.5 讲的「能力/幻觉/上下文从哪来」决定了什么任务配什么模型"
+    },
+    {
+      "to": "1-4c",
+      "text": "Encoder 系 Embedding 模型的实战舞台：RAG 的向量检索实操"
+    }
+  ],
+  "interview": [
+    {
+      "q": "BERT 和 GPT 的核心区别？各自适合什么任务？",
+      "stars": 5,
+      "source": "牛客·大模型常考100道（第2题）",
+      "tip": "注意力方向→训练目标→适用任务三步对比，收尾补 Encoder 转行做 Embedding。"
+    }
+  ],
+  "summary": "Q：三大家族？（答：Encoder 会读、Decoder 会写、Enc-Dec 先懂后写）\nQ：当今格局？（答：生成全归 Decoder，Encoder 转 Embedding 专业户）\nQ：省钱选型？（答：批量理解任务用 Encoder 小模型）"
+}

@@ -1,0 +1,25 @@
+{
+  "stage": "S0",
+  "project": "调用 LLM API 的问答 CLI",
+  "intro": "rodmap 阶段0 里程碑：写一个命令行问答工具——输入问题，调用 LLM API 返回回答。它检验你对 token、参数、错误处理的最低限理解，是你 AI 工程师生涯的第一个可运行产物。",
+  "steps": [
+    { "title": "申请 API Key 并配置环境", "detail": "任选一家大模型平台（OpenAI/DeepSeek/智谱等）申请 Key，用环境变量保存（不要写死在代码里），建好 venv 虚拟环境并安装官方 SDK。" },
+    { "title": "实现最小问答循环", "detail": "input() 读问题 → 调 chat.completions 接口（system 提示词设定角色）→ print 回答，循环直到用户输入 exit。" },
+    { "title": "加上 temperature 与 max_tokens", "detail": "把 temperature 做成命令行参数（0~2），观察同一问题在不同温度下的回答差异；设置 max_tokens 防止超长。" },
+    { "title": "处理三类异常", "detail": "网络超时、429 限流（指数退避重试）、余额不足——分别给出友好提示，而不是让程序崩溃。" },
+    { "title": "记录 token 消耗", "detail": "从响应 usage 字段读取 prompt/completion tokens，每次问答后打印本次花费估算，写进 README。" }
+  ],
+  "checklist": [
+    "Key 通过环境变量读取，代码与 README 中没有明文密钥",
+    "支持多轮循环问答，输入 exit 可正常退出",
+    "temperature 可通过参数调整并亲自对比过 0 与 1.5 的输出差异",
+    "至少处理了超时与限流两类异常，程序不会裸崩",
+    "每次回答后打印 token 用量；README 写清运行步骤"
+  ],
+  "arch": "<div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>⌨️ 用户输入<br><span class='d-note'>input() 问题</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🖥️ CLI 主循环<br><span class='d-note'>拼 system 提示词 + 参数</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>☁️ LLM API<br><span class='d-note'>chat.completions</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>📊 usage 统计<br><span class='d-note'>tokens × 单价</span></div></div>",
+  "tips": [
+    "system 提示词固定角色（如「你是简洁的中文技术助手」），能显著稳定输出风格",
+    "temperature=0 适合事实问答，调试时先固定为 0 再逐步放开",
+    "API Key 泄露是最常见事故：.env 文件必须进 .gitignore"
+  ]
+}

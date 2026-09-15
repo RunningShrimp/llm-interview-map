@@ -1,0 +1,139 @@
+{
+  "id": "4-6",
+  "title": "多 Agent 协作系统实战：研究/写作团队",
+  "definition": "把 2.8 的团队论搬上真实项目：主管拆单发『任务书』，子 Agent 带独立上下文并行检索，汇总成稿后评审修订再交付；配套 token 预算封顶与失败兜底，管住约 15× token 的账单。",
+  "analogies": [
+    {
+      "icon": "🗞️",
+      "name": "编辑部做封面报道",
+      "text": "主编把选题拆成几条采访线，记者各自出门查证——每人带自己的笔记本，就是『独立上下文』；交稿后编辑核事实、改稿子，主编终审定刊。翻车教训同款：采访提纲（任务书）写不清，记者就跑偏；没有核稿环节，错料直接见报。"
+    },
+    {
+      "icon": "🧾",
+      "name": "工单制的外包团队",
+      "text": "主管给每个子 Agent 发工单：查什么、回答哪几个问题、交付什么格式、预算多少 token。干完按工单逐项验收，不合格退回。工单越具体，回收的活越整齐——这是结构化通信在实战里的样子。"
+    },
+    {
+      "icon": "🚨",
+      "name": "保险丝与备胎（失败兜底）",
+      "text": "外包出去的活可能没人交：给每个子任务设截止时间，到点没回就用部分结果＋标注缺口先交付（降级）；预算烧到上限就自动收工（熔断）；某个工人挂了，主管重派一个或自己顶上（兜底重试），绝不无限等待。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：一次完整的多 Agent 研究流程（步进）",
+    "description": "点『下一步』走完 Anthropic 式研究团队的全流程：主管拆单→子 Agent 并行检索→汇总成稿→评审→修订交付。每步的进度条表示 token 预算的累计消耗，留意每步的工程要点。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='align-items:center;gap:8px'><b>🗞️ 课题：调研 A 市场格局</b><span class='d-tag' style='margin-left:auto'>一步步点右边按钮</span></div><div class='d-steps' id='d46-flow' style='margin-top:10px'><div class='d-step active'><div class='d-row' style='margin-bottom:4px'><span class='d-tag' style='width:118px;text-align:center;flex:none'>📋 ① 主管拆单</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:8%;background:#60a5fa'></div></div></div><div class='d-note'>拆成 3 份任务书：市场规模／主要玩家／定价策略，每份写明目标、问题清单、交付格式与 token 预算（如 12000）。任务书是结构化通信的落地：四件套写全，子 Agent 才不跑偏，预算也在此封顶。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag' style='width:118px;text-align:center;flex:none'>🏃 ② 并行检索</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:45%;background:#60a5fa'></div></div></div><div class='d-note'>3 个子 Agent 同时开工，各自独立上下文（一人一块白板，互不污染）；只读外部资料、不碰同一份稿件，所以敢并行。敢并行的依据正是 2-8b 三条件：读多写少。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:118px;text-align:center;flex:none'>🧾 ③ 汇总成稿</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:80%;background:#f59e0b'></div></div></div><div class='d-note'>主管按格式收 3 份结构化摘要，拼成初稿——token 已烧掉大头。15× token 主要烧在这程：Anthropic 实测多 Agent 研究系统约为单 Agent 的 15 倍 token，所以每份任务书都要设上限、超限熔断。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:118px;text-align:center;flex:none'>🔍 ④ 评审</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:92%;background:#f59e0b'></div></div></div><div class='d-note'>评审 Agent 对照任务书逐条核：结论有没有来源？数字对不对？覆盖全不全？查出 2 处问题（如『玩家 B 份额无来源』）。汇总即验收：没来源的结论进不了终稿，不带病拼稿。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag green' style='width:118px;text-align:center;flex:none'>✍️ ⑤ 修订交付</span><div class='d-bar' style='flex:1'><div class='d-fill d-pulse' style='width:100%;background:#34d399'></div></div></div><div class='d-note'>评审意见回流对应子 Agent 补查修正，主管出终稿。失败兜底三招：某子任务超时就降级为部分结果＋标注缺口；可重派补查；预算烧完自动收工，绝不无限等待。</div></div></div><div class='d-row' style='margin-top:10px;gap:10px;align-items:center'><button class='d-btn' data-act='d-prev' data-steps='#d46-flow' disabled>← 退一步</button><b data-steps-indicator='#d46-flow'>1 / 5</b><button class='d-btn' data-act='d-next' data-steps='#d46-flow'>下一步 →</button></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📋",
+      "name": "拆单＝写任务书",
+      "text": "目标、问题清单、交付格式、token 预算四件套写全再派活，任务书写得越具体，子 Agent 越不跑偏。"
+    },
+    {
+      "icon": "🏃",
+      "name": "并行的前提是读多写少",
+      "text": "子 Agent 各带独立上下文、只读外部资料、不写同一份稿件，才敢并行；写入要收口给主管。"
+    },
+    {
+      "icon": "🧾",
+      "name": "汇总即验收",
+      "text": "主管按任务书格式收件并核对覆盖度，不合格当场退回，不带病拼稿。"
+    },
+    {
+      "icon": "💸",
+      "name": "token 预算封顶",
+      "text": "多 Agent 约 15× token：每个子任务在任务书里设预算上限，接近即收敛输出，超限熔断。"
+    },
+    {
+      "icon": "🚨",
+      "name": "失败兜底",
+      "text": "超时/失败降级为部分结果＋标注缺口，可重派补查；重试要有上限，绝不无限等待。"
+    },
+    {
+      "icon": "🔁",
+      "name": "评审-修订闭环",
+      "text": "评审对照任务书核事实与来源，意见回流对应子 Agent 修订后再交付——闭环没断，质量才有着落。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【理解题】深度研究任务里，为什么子 Agent 可以放心并行检索？",
+      "options": [
+        "因为模型足够聪明，并行也不会出错",
+        "因为各子 Agent 带独立上下文、只读外部资料不写同一份稿件，没有写入冲突",
+        "因为它们先互相自由对话协调好了分工",
+        "因为并行不增加任何成本"
+      ],
+      "answer": 1,
+      "explain": "选 B。敢并行的两个前提：独立上下文（互不污染）＋读多写少（不抢着改同一份稿，写入冲突小）。并行照样烧 token（约 15×），也不是靠自由对话协调——那是上下文爆炸的来源。"
+    },
+    {
+      "type": "choice",
+      "q": "【场景题】某个子 Agent 检索超时没能交件，系统最稳妥的做法是？",
+      "options": [
+        "无限重试，直到它交件为止",
+        "整个任务作废，全部从头再来",
+        "降级为部分结果＋标注缺口交付，必要时重派子 Agent 补查，并受 token 预算约束",
+        "让主管自己编一段补上"
+      ],
+      "answer": 2,
+      "explain": "选 C。失败兜底三板斧：降级（部分结果＋标注缺口，透明交付）、重派（补查而非死等）、预算约束（熔断防止无限重试烧钱）。无限重试会拖死任务，编造数据则是更严重的事故。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你按 Anthropic 骨架搭了个研究团队 demo：主管拆了 4 个子任务并行检索，结果初稿里有两条结论没给来源，账单还超出预期约 20 倍。请诊断问题并给出至少三条改进。",
+      "reference": "诊断一：缺评审闭环——没来源的结论能进初稿，说明汇总后没有对照任务书做事实核查，评审环节断了；诊断二：token 失控——拆单时没给每个子任务设预算封顶，多 Agent 天然约 15× token，没有熔断就会一路烧穿。改进一：加评审步骤或评审 Agent，逐条核对来源与覆盖度，不合格退回修订，不带病交付；改进二：任务书里写明每个子任务的 token 预算上限，接近上限即收敛输出，超限熔断；改进三：收紧任务书与通信——明确交付格式与来源要求，子 Agent 只回结构化摘要而非全文粘贴，既省 token 也便于验收。",
+      "keyPoints": [
+        {
+          "point": "诊断：缺评审与事实核查闭环",
+          "kw": ["评审", "事实核查", "初稿"]
+        },
+        {
+          "point": "诊断：无预算封顶与熔断",
+          "kw": ["预算", "封顶", "熔断"]
+        },
+        {
+          "point": "改进：交付格式与来源写进任务书",
+          "kw": ["任务书", "交付格式", "来源"]
+        }
+      ],
+      "explain": "本题考实战骨架的迁移：在拆单-并行-汇总-评审-修订五环里，能否指出断掉的『评审』与『预算』两环，并落到任务书的具体写法。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请向朋友讲清楚：一支 AI 研究团队从接到课题到交出报告，一共分几步？每一步最怕出什么岔子？",
+    "hint": "用编辑部类比：主编拆选题→记者分头采访→编辑拼稿核事实→改稿见报；岔子对应跑偏、烧钱、错料、没人交稿。",
+    "modelAnswer": "五步：主编（主管）把课题拆成几张任务书，写清查什么、交付什么格式、花多少钱；几位记者（子 Agent）各带各的笔记本分头查证，互不干扰；编辑把交回的摘要按格式拼成初稿——这一步最烧钱，约 15 倍 token，所以每张任务书都设了预算上限；评审逐条核事实、找来源，没来源的退回；最后修订交付。若有记者超时没回，就用已有材料标注缺口先交，绝不无限等。"
+  },
+  "links": [
+    {
+      "to": "2-8b",
+      "text": "前置回看：实战里『敢不敢并行』正是 2-8b 三条件的直接应用——研究任务读多写少才敢让子 Agent 各查各的；判据忘了就回上一课复习"
+    },
+    {
+      "to": "4-7",
+      "text": "学完本考点后你会发现：这套研究团队的拆单、通信、预算、兜底，正是下一课多 Agent 平台要抽成公共能力的编排、通信与治理三层"
+    },
+    {
+      "to": "h5-a2a-protocol",
+      "text": "学完本考点后你会发现：本课的『任务书』只在自家系统里通用；要让不同厂商的 Agent 互派任务，就需要 A2A 这样的开放协议来标准化任务卡与状态回传"
+    }
+  ],
+  "interview": [
+    {
+      "q": "主 Agent 和子 Agent 的通信链路是怎样的？为什么用多 Agent 而不是把能力做成 Tool？",
+      "stars": 4,
+      "source": "知乎《多 Agent 架构面试全解析》（zhuanlan.zhihu.com/p/2040834441451459515，2026）",
+      "tip": "按 Anthropic 骨架答：主管下发结构化任务书（目标/问题清单/交付格式/预算）→子 Agent 独立上下文执行→按格式回传、主管汇总评审；Tool 是单次无状态调用，子 Agent 是带循环与记忆的自治单元，能自己多轮检索并隔离上下文——这是『做成 Tool』给不了的。"
+    },
+    {
+      "q": "多 Agent 系统比单 Agent 贵多少？你上线时怎么控成本？",
+      "stars": 3,
+      "source": "Anthropic《How we built our multi-agent research system》（anthropic.com/engineering/multi-agent-research-system，2025，15× token）/CallSphere《7 Agentic AI & Multi-Agent System Interview Questions for 2026》",
+      "tip": "先报 15× token 的实测口径，再给三板斧：任务书内设子任务预算封顶与超限熔断、回传用结构化摘要代替全文粘贴、失败降级避免无限重试；可补混合架构省约 88% 成本（arXiv 2505.18286）。"
+    }
+  ],
+  "summary": "Q：多 Agent 研究系统的五步骨架是什么？（答：主管拆单→子 Agent 并行检索（独立上下文）→汇总成稿→评审→修订交付）\nQ：15× token 怎么管？（答：任务书里给每个子任务设预算上限，接近即收敛、超限熔断，回传用结构化摘要而非全文）\nQ：子 Agent 超时或失败怎么办？（答：失败兜底——降级为部分结果＋标注缺口交付，可重派补查，重试有上限，绝不无限等待）"
+}

@@ -1,0 +1,143 @@
+{
+  "id": "0-1",
+  "title": "AI 需要的数学：向量、概率与损失",
+  "definition": "AI 眼里没有文字，只有数字：词要变成向量（一排有含义的坐标数），回答附带概率（把握有多大），答错要按损失（给『错得离谱程度』打的分）扣分改进。这三个词就是 AI 的数学地基。",
+  "analogies": [
+    {
+      "icon": "📍",
+      "name": "向量 = 给词发坐标",
+      "text": "给朋友发奶茶店位置，你发的是一串数：经度、纬度——一个地点变成了两个数字。AI 读文字同理：把每个词变成一串有含义的数（向量）。妙处在距离：『开心』和『高兴』坐标挨得近，是邻居；『开心』和『卡车』隔得远。意思的远近变成了坐标的远近，AI 就这样『看懂』了语义。"
+    },
+    {
+      "icon": "🌦️",
+      "name": "概率 = 天气预报的把握度",
+      "text": "预报说『降雨概率 80%』，不是保证下雨，而是『我有八成把握』。AI 回答也一样：每个候选答案都带一个把握分，0.9 就是很有把握，0.4 就是心里没底。聊天机器人平时挑把握最高的答案，想让它写得多样时还会故意偶尔选低把握的词——这也是它有时惊艳有时胡说的原因之一。"
+    },
+    {
+      "icon": "🎯",
+      "name": "损失 = 射箭计分裁判",
+      "text": "射箭时箭离靶心越远，扣分越多。损失函数就是那个裁判：拿 AI 的答案和标准答案一比，按差多远打个扣分。训练时 AI 千万次微调内部参数（可调数值），目标只有一个：让裁判的扣分越来越少。0-3 关会讲到，这个『降扣分』的过程其实就是训练本身。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：损失裁判打分台 + 蒙眼下山",
+    "description": "上面拖滑杆调『偏差大小』，观察两种损失函数各罚多少分；下面一步步点『下一步』，看 AI 如何顺着坡度把损失一步步降到谷底。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px'><b>🎯 偏差大小（离靶心多远）</b><input type='range' min='0' max='100' value='40' style='flex:1;min-width:180px' data-output='#m01e-err' data-suffix=' 分'><b id='m01e-err' style='min-width:64px;text-align:right'>40 分</b></div><div class='d-row' style='margin-bottom:6px'><span class='d-tag' style='width:110px;text-align:center;flex:none'>绝对损失</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc(var(--v,40) * 1%);background:#60a5fa'></div></div></div><div class='d-row' style='margin-bottom:6px'><span class='d-tag' style='width:110px;text-align:center;flex:none'>平方损失</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc(var(--v,40) * var(--v,40) * 0.01%);background:#ef4444'></div></div></div><div class='d-note'>拖动看看：偏差从 40 拉到 80，绝对损失只翻一倍，平方损失却涨到 4 倍——错得越离谱罚得越狠，AI 因此会优先去修大错误。</div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='align-items:center;gap:8px'><b>⛰️ 梯度下降：蒙眼下山</b><span class='d-tag' style='margin-left:auto'>一步步点右边按钮</span></div><div class='d-steps' id='m01e-hill' style='margin-top:10px'><div class='d-step active'><div class='d-row' style='margin-bottom:4px'><span class='d-tag red' style='width:96px;text-align:center;flex:none'>扣分 80</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:80%;background:#ef4444'></div></div></div><div class='d-note'>第 0 步：随机落在半山腰，扣分高达 80。蒙眼的登山者用脚底试出『哪边下坡更陡』——这个方向就叫梯度。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:96px;text-align:center;flex:none'>扣分 55</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:55%;background:#f59e0b'></div></div></div><div class='d-note'>第 1 步：朝最陡的下坡方向挪一小步。步子不敢迈太大——迈过头会直接跨过谷底（步长太大，训练会来回震荡）。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:96px;text-align:center;flex:none'>扣分 35</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:35%;background:#f59e0b'></div></div></div><div class='d-note'>第 2 步：再感受坡度，再挪一步。扣分一路下滑：80 → 55 → 35——这条下降曲线，就是训练日志里你将看到的 loss。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag' style='width:96px;text-align:center;flex:none'>扣分 22</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:22%;background:#60a5fa'></div></div></div><div class='d-note'>第 3 步：越靠近谷底，坡越缓，步子自动变小，下降变慢——扣分 22。不是不学了，是快到地方了。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag green' style='width:96px;text-align:center;flex:none'>扣分 18</span><div class='d-bar' style='flex:1'><div class='d-fill d-pulse' style='width:18%;background:#34d399'></div></div></div><div class='d-note'>第 4 步：谷底附近几乎走平，扣分卡在 18 附近不再明显下降——这叫『收敛』，模型学得差不多了，可以收工。</div></div></div><div class='d-row' style='margin-top:10px;gap:10px;align-items:center'><button class='d-btn' data-act='d-prev' data-steps='#m01e-hill' disabled>← 退一步</button><b data-steps-indicator='#m01e-hill'>1 / 5</b><button class='d-btn' data-act='d-next' data-steps='#m01e-hill'>下一步 →</button></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "📍",
+      "name": "向量 = 文字的坐标",
+      "text": "把词变成一串有含义的数字后，『意思相近』就成了『坐标相近』，AI 靠比距离理解语义。"
+    },
+    {
+      "icon": "🌦️",
+      "name": "概率 = 把握度",
+      "text": "AI 的每个输出都带 0 到 1 的把握分，它不是确定地『知道』，而是在挑最有把握的答案。"
+    },
+    {
+      "icon": "🎯",
+      "name": "损失 = 错题扣分",
+      "text": "损失函数量化『答得离谱的程度』，训练的一切目标都是让这个扣分不断下降。"
+    },
+    {
+      "icon": "⛰️",
+      "name": "梯度下降 = 蒙眼下山",
+      "text": "AI 沿『扣分下降最快的方向』小步挪动，几百万步后落进山谷——损失很低，就是学会了。"
+    },
+    {
+      "icon": "🔗",
+      "name": "数学是地基不是门槛",
+      "text": "L1 只需直觉不用推导：后面学 Embedding 时你会发现，它就是把文字变坐标的直接应用。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】AI 把『开心』『高兴』『卡车』三个词变成向量后，下面哪种情况最符合它的『理解』？",
+      "options": [
+        "三个词的坐标完全重合",
+        "『开心』和『高兴』坐标接近，和『卡车』隔得远",
+        "『卡车』和『开心』坐标最近，因为都是常用词",
+        "向量没有距离的含义，纯粹是随便编的数"
+      ],
+      "answer": 1,
+      "explain": "选 B。向量的核心价值就是把『意思相近』变成『坐标相近』——同义词是近邻，无关词隔得远，这是语义理解的起点。"
+    },
+    {
+      "type": "choice",
+      "q": "【直觉题】天气预报说『降雨概率 80%』，这和 AI 给某个答案打 0.8 的概率，共同点是什么？",
+      "options": [
+        "都表示这件事已经发生了八成",
+        "都表示把握程度：十次里大约八次",
+        "都表示这件事一定会发生",
+        "都只是一个好看的数字，没有含义"
+      ],
+      "answer": 1,
+      "explain": "选 B。概率表达的是把握/置信程度：0.8 ≈ 十次里约八次，代表倾向性而非必然——所以 AI 才会说错话。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你给团队做了个『帮我找文档』的功能：同事搜「项目延期怎么汇报」，系统却没找到那篇标题完全不同的《进度风险沟通指南》。请用本关的直觉解释为什么漏掉了，并给出一条补救思路。",
+      "reference": "漏掉的根源：系统在按字面匹配关键词，搜索词和文档标题没有一个字相同，自然搜不到。向量思维的做法是把搜索词和文档都变成坐标（向量）：『项目延期』和『进度风险』意思接近，在坐标上就该挨得近；『怎么汇报』和『沟通』也是近邻。只要比较坐标距离，就能发现语义相近——哪怕一个字都不一样。补救思路：把文档和搜索词都转成向量，按『坐标距离近』排序返回结果，这就是语义搜索的雏形；距离远近本质上是模型对『这两段话像不像』的打分，和损失给『错得离谱程度』打分是同一套数字思维。",
+      "keyPoints": [
+        {
+          "point": "诊断：按字面匹配，一个字不同就漏掉",
+          "kw": [
+            "字面匹配",
+            "一个字相同",
+            "漏掉"
+          ]
+        },
+        {
+          "point": "直觉：文本变向量，意思近坐标近",
+          "kw": [
+            "向量",
+            "坐标",
+            "意思接近",
+            "挨得近"
+          ]
+        },
+        {
+          "point": "补救：按坐标距离排序 = 语义搜索雏形",
+          "kw": [
+            "语义搜索",
+            "排序",
+            "距离"
+          ]
+        }
+      ],
+      "explain": "L1 场景题只要求会用『坐标与距离』的直觉解释检索失败，能想到『转成向量按距离排序』即为优秀。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向完全不懂 AI 的朋友解释：AI 是怎么『看懂』一句话、又怎么知道自己答错了？",
+    "hint": "三个类比连着用：奶茶店坐标（向量）→ 天气预报把握度（概率）→ 射箭裁判扣分（损失）。",
+    "modelAnswer": "AI 不认识字，它给每个词发一串坐标数字，意思近的词坐标也近，就像两家挨着的奶茶店；回答问题时它给每个候选答案打把握分，像天气预报的降雨概率；答完后由『射箭裁判』（损失函数）按离标准答案多远扣分，AI 照着扣分不断微调自己，下次扣得更少——这就是它学习的全部秘密。"
+  },
+  "links": [
+    {
+      "to": "0-2",
+      "text": "学完本考点后你会发现：Python 工程底座里每次调模型拿到的返回值就是概率分数和向量数组——本关的数学直觉，每天都要在代码里摸到"
+    },
+    {
+      "to": "0-7",
+      "text": "学完本考点后你会发现：embedding 本质上是向量数学的应用——把文字变成坐标、按距离比相似，正是本关『向量=坐标』直觉的落地"
+    }
+  ],
+  "interview": [
+    {
+      "q": "为什么 NLP 模型要先把文字转成向量？向量的距离代表什么？",
+      "stars": 4,
+      "source": "CSDN·机器学习面试题/内置知识（基础层）",
+      "tip": "答『文字→坐标、意思近→距离近』即可，再补一句『这是 Embedding 和语义检索的地基』就能加分。"
+    },
+    {
+      "q": "简单说说损失函数是什么？训练为什么要让损失变小？",
+      "stars": 3,
+      "source": "CSDN·机器学习面试题/内置知识（基础层）",
+      "tip": "用『射箭裁判按偏差扣分、训练就是让扣分持续下降』的直觉回答，不必报公式；能提一句平方损失罚大错更狠更好。"
+    }
+  ],
+  "summary": "Q：向量是什么？（答：给文字发的一串坐标数，意思越近坐标越近）\nQ：概率在 AI 里表示什么？（答：对每个候选答案的把握度，像降雨概率）\nQ：损失函数干嘛的？（答：给『错得离谱程度』打分的裁判，训练就是让它一路下降）"
+}

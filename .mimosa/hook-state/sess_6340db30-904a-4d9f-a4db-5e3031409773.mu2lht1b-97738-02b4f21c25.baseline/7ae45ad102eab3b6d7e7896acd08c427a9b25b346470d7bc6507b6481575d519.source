@@ -1,0 +1,10 @@
+{
+  "name": "llm-interview-map",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LLM 应用开发面试学习地图 — 纯静态学习站点（GitHub Pages）",
+  "type": "commonjs",
+  "scripts": {
+    "validate": "node tools/validate.js"
+  }
+}

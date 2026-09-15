@@ -1,0 +1,158 @@
+{
+  "id": "1-1c",
+  "title": "LLM API 实务（参数/流式/限流重试/成本）",
+  "definition": "调 LLM API 的工程四件套：采样参数（temperature 控随机性、top_p 控候选范围）、流式输出（SSE 逐字返回降延迟）、限流与重试（429 退避重试、超时与降级）、成本核算（按 token 计费、上下文缓存省钱）。",
+  "analogies": [
+    {
+      "icon": "🎚️",
+      "name": "水龙头与水管",
+      "text": "temperature 是水龙头开度：关小（低温）水流稳定精准但单调，开大（高温）水花四溅有创意但容易失控；top_p 是滤网：只从累计概率前 p 的词里挑，0.9 就是『只在最像样的 90% 候选里选』。流式输出像接水管逐杯接水（逐 token 推送），用户第一口马上喝到，而不用等整桶接满；限流重试像高峰期取号排队——被拒绝（429）就退避几秒再来，而不是疯狂敲门。"
+    },
+    {
+      "icon": "🧾",
+      "name": "出租车计价器",
+      "text": "LLM 按token（约等于词块）双程计费：输入（提示词）一份价、输出（生成）一份价，输出通常是输入的 3~5 倍贵。上下文越长计价器跑得越快——所以『历史对话全塞进去』是最常见的账单爆炸原因，工程上要做历史压缩与缓存。"
+    }
+  ],
+  "demo": {
+    "title": "交互演示：temperature 如何改变输出风格",
+    "description": "拖动滑杆调整温度，观察『今天天气真好，』的续写候选变化。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:8px\"><input type=\"range\" min=\"0\" max=\"100\" value=\"20\" data-output=\"#c4-t\" data-suffix=\"\"><span>temperature = <b id=\"c4-t\">0.20</b>（滑杆值 ÷100）</span></div><div class=\"demo-box\" style=\"padding:12px\"><div class=\"d-col\" style=\"max-width:500px;margin:0 auto\"><div class=\"d-row\"><span class=\"d-tag\">低温（接近 0）</span><span class=\"d-token hot\">今</span><span class=\"d-token\">天</span><span class=\"d-token\">天气</span><span class=\"d-token\">晴朗</span><span class=\"d-arrow\">→ 稳定、确定、可复现</span></div><div class=\"d-row\"><span class=\"d-tag amber\">中温 0.7</span><span class=\"d-token\">今天</span><span class=\"d-token\">心情</span><span class=\"d-token\">不错</span><span class=\"d-token\">，适合</span><span class=\"d-token\">出门</span><span class=\"d-arrow\">→ 自然多样</span></div><div class=\"d-row\"><span class=\"d-tag red\">高温 1.5</span><span class=\"d-token d-shake\">今天</span><span class=\"d-token\">橙子</span><span class=\"d-token\">在</span><span class=\"d-token\">歌唱</span><span class=\"d-arrow\">→ 创意/失控</span></div></div></div><div class=\"d-note\">💡 经验值：事实问答/抽取 0~0.3，对话 0.5~0.8，创意写作 0.9+；top_p 与 temperature 二选一调，不要同时大改。</div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🎚️",
+      "name": "采样参数",
+      "text": "temperature 缩放概率分布（0→近似贪心）；top_p 截断候选池（核采样）；top_k 保留前 k 个候选；max_tokens 控长度、stop 序列控截断点。"
+    },
+    {
+      "icon": "🚰",
+      "name": "流式输出 SSE",
+      "text": "服务端逐 token 推送，首字延迟（TTFT）从秒级降到几百毫秒，用户体验质变；工程要点：客户端拼接 delta、断线重连、最后 usage 汇总计费。"
+    },
+    {
+      "icon": "🔁",
+      "name": "限流与重试",
+      "text": "429/超时按指数退避 + 抖动重试，设最大重试次数；多 key 池分摊限流；重要链路备降级模型（如 GPT-4o 挂了降 4o-mini 或备厂商）。"
+    },
+    {
+      "icon": "🧾",
+      "name": "成本三招",
+      "text": "① 输入侧：历史压缩、prompt 前缀缓存（相同前缀计费打折）；② 模型侧：简单任务路由到小模型（见 F9）；③ 输出侧：max_tokens 设上限、避免重复生成。"
+    },
+    {
+      "icon": "🌊",
+      "name": "批处理接口",
+      "text": "非实时任务（离线摘要、数据清洗）走 Batch API 半价，24 小时内返回——成本敏感型批任务的标配。"
+    },
+    {
+      "icon": "🛡️",
+      "name": "工程细节",
+      "text": "敏感信息脱敏后再出网、日志留存合规、幂等键防重复扣费、监控 token 用量与失败率——生产 API 的隐形必修课。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【真题风格】从 API 返回『LLM 是复读机』式的机械重复回答，最先应该调什么参数？",
+      "options": [
+        "把 temperature 调高（如 0.7~1.0），增加采样多样性",
+        "把 max_tokens 调大",
+        "把 stop 序列删掉",
+        "换更长的系统提示"
+      ],
+      "answer": 0,
+      "explain": "选 A。低温（尤其接近 0）时模型几乎贪心地选最高概率词，容易陷入重复循环；调高温度恢复多样性。牛客 AI-Agent 题库将『复读机』直接归因于温度/top-p 设置。"
+    },
+    {
+      "type": "choice",
+      "q": "关于成本优化，以下做法错误的是？",
+      "options": [
+        "把每轮对话的完整历史无限追加进上下文",
+        "对相同前缀利用 prompt 缓存降低输入费用",
+        "离线批量任务改用 Batch API 享受半价",
+        "简单任务路由到便宜的小模型"
+      ],
+      "answer": 0,
+      "explain": "选 A。历史无限增长既烧钱（输入 token 线性上涨）又稀释注意力（C6 的 lost in the middle）；正确做法是历史压缩/滑动窗口。B、C、D 都是标准省钱手段。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】面试官问：『你负责的 LLM 功能上线后出现三类问题：高峰期大量 429、用户抱怨等待久、月底账单超预算 3 倍。请给出系统性的解决方案。』请作答。",
+      "reference": "三类问题分别治理：限流问题——接入层做客户端限流与请求合并，429 响应按指数退避加随机抖动重试并设最大次数，申请提升配额或多 key/多厂商池分摊，关键链路配置降级模型兜底；延迟问题——改用流式 SSE 输出让首字延迟降到几百毫秒，缩短系统提示与历史（只保留最近 N 轮加摘要），非必要环节换小模型，并行化检索等前置步骤；成本问题——先加监控定位 token 去向（输入还是输出贵），再对症下药：历史压缩与滑动窗口控制输入长度，max_tokens 设合理上限，系统提示固定前缀开启 prompt 缓存，简单意图路由到便宜模型，离线类任务迁到 Batch API 半价，最后设定预算告警与单用户配额防止滥用。三件事的公共基础是可观测性：给每次调用打标记录延迟、token、失败率等指标，用数据验证每项措施的效果。",
+      "keyPoints": [
+        {
+          "point": "429：指数退避重试 + 多 key/多厂商池 + 降级兜底",
+          "kw": [
+            "退避",
+            "重试",
+            "429",
+            "降级"
+          ]
+        },
+        {
+          "point": "延迟：流式输出 + 上下文压缩 + 模型路由",
+          "kw": [
+            "流式",
+            "sse",
+            "延迟",
+            "小模型"
+          ]
+        },
+        {
+          "point": "成本：缓存/批处理/长度上限/预算告警",
+          "kw": [
+            "缓存",
+            "batch",
+            "预算",
+            "上限"
+          ]
+        },
+        {
+          "point": "先可观测再优化：记录延迟/token/失败率",
+          "kw": [
+            "监控",
+            "观测",
+            "记录",
+            "指标"
+          ]
+        }
+      ],
+      "explain": "加分项：先定位再治理的顺序、每项措施给验证指标；失分点：只答『重试一下』『换个模型』的单点招数。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：temperature 是什么？为什么公司用 API 要关心『token』？",
+    "hint": "提示：水龙头开度类比温度；出租车计价器类比 token 计费——输入输出双程收费。",
+    "modelAnswer": "temperature 就是水龙头开度：拧到最小，AI 每次都给最标准那个答案，稳但死板；拧大一点，它会在合理的候选里随机挑，回答自然多样；拧太大就开始胡言乱语。token 是 AI 眼里的词块，也是计费单位——像出租车计价器，你发给它的话按 token 收一次钱，它生成的回答再收一次（还更贵），所以把聊天记录无限塞给它、让它滔滔不绝，月底账单就会爆炸。"
+  },
+  "links": [
+    {
+      "to": "0-6b",
+      "text": "提示词决定模型『做什么』，API 参数决定它『怎么做』——两者配合才稳定"
+    },
+    {
+      "to": "1-3",
+      "text": "低温 + 格式约束 + JSON Mode 是结构化输出的三连招"
+    },
+    {
+      "to": "3-7c",
+      "text": "本页的省钱三招是单次调用级，F9 讲系统级成本优化（缓存/路由/蒸馏全景）"
+    }
+  ],
+  "interview": [
+    {
+      "q": "temperature 和 top_p 分别控制什么？实践中怎么调？",
+      "stars": 4,
+      "source": "小林 coding·采样参数 / CSDN·温度值/Top-P/Top-K 面试问答",
+      "tip": "先讲各自机制（缩放分布 vs 截断候选池），再给场景经验值，强调两者别同时大调。"
+    },
+    {
+      "q": "LLM API 生产调用要注意哪些工程问题？",
+      "stars": 4,
+      "source": "前端&AI 工程化面试指南（面试官提问形式）",
+      "tip": "流式、限流退避、超时降级、成本监控四块各给一条硬措施。"
+    }
+  ],
+  "summary": "Q：temperature 与 top_p 的机制区别？（答：前者缩放整个概率分布，后者按累计概率截断候选池）\nQ：429 的标准处理姿势？（答：指数退避 + 抖动 + 最大重试次数 + 多 key/降级兜底）\nQ：账单超预算先做什么？（答：上监控定位 token 去向，再对症——压缩历史/设上限/用缓存/路由小模型）"
+}

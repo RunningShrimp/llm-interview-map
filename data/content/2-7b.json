@@ -1,0 +1,156 @@
+{
+  "id": "2-7b",
+  "title": "何时用工作流，何时用自主 Agent",
+  "definition": "一句话判据：任务路径能画成流程图（分支可穷举）就用工作流；路径没法预先写出、要模型现场决定下一步才上自主 Agent。Agent 更贵也更难调试，所以默认先工作流，压不住了再升级。",
+  "analogies": [
+    {
+      "icon": "🚇",
+      "name": "通勤坐地铁，盲区才打车",
+      "text": "每天上班路线固定——坐地铁：准点、便宜、延误可查，没人天天打车通勤，因为可预测的路径不值得为灵活性付费。而去一个陌生的、说不清地址的地方——打车：边走边问、随时改道，但更贵、结果看司机发挥。工作流就是地铁（路径写死），自主 Agent 就是打车（现场决定路线）。选型的第一问永远是：这条路线，画得出来吗？"
+    },
+    {
+      "icon": "📋",
+      "name": "连锁店的 SOP 与店长",
+      "text": "连锁快餐给新员工发操作手册（SOP＝工作流）：每一步写死，照做就对，谁来都一样。顾客突然发火要投诉——手册没写，才轮到店长现场判断（＝自主 Agent）。好老板的做法是：把每次突发复盘成新的一页 SOP，让现场发挥越来越少——这恰好是工程上的『默认先工作流，压不住再升级』。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：可预测度滑杆选型器",
+    "description": "拖动滑杆调『任务路径可预测度』，观察两根适配度条的消长——哪根长选哪种；再点开 LangChain 官方的劝退清单。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px'><b>🎚️ 任务路径可预测度</b><input type='range' min='0' max='100' value='30' style='flex:1;min-width:180px' data-output='#d27b-v' data-suffix='%'><b id='d27b-v' style='min-width:56px;text-align:right'>30%</b></div><div class='d-note' style='margin-bottom:10px'>往左拉＝路径画不出流程图（分支取决于执行中途的结果）；往右拉＝路径能画成流程图。读法：哪根条更长就选哪种方案。</div><div class='d-row' style='margin-bottom:6px'><span class='d-tag' style='width:140px;text-align:center;flex:none'>🏭 工作流适配度</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc(var(--v,30) * 1%);background:#60a5fa'></div></div></div><div class='d-row' style='margin-bottom:6px'><span class='d-tag' style='width:140px;text-align:center;flex:none'>🤖 自主 Agent 适配度</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc((100 - var(--v,30)) * 1%);background:#f59e0b'></div></div></div><div class='d-row' style='justify-content:space-between;margin-bottom:6px'><span class='d-tag amber'>← 不可预测区：现场决定下一步</span><span class='d-tag green'>可预测区：流程图写得出来 →</span></div><div class='d-note'>默认原则：两根差不多长时也选工作流——灵活性要付费（每步都是一次模型决策），别为用不上的灵活性买单。</div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='align-items:center;gap:10px;flex-wrap:wrap'><b>🚫 LangChain 官方：什么情况别用 Agent</b><button class='d-btn' data-act='d-toggle' data-target='#d27b-no'>点开劝退清单</button></div><div id='d27b-no' class='d-hidden' style='margin-top:10px'><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:8px'><span class='d-tag red'>① 路径可穷举 → 工作流/代码</span><span class='d-tag red'>② 一次调用能解决 → 直接 API</span><span class='d-tag red'>③ 要确定性输出 → 模板+校验</span><span class='d-tag red'>④ 高频成本敏感 → 规则自动化</span></div><div class='d-note'>劝退不等于 Agent 没用：官方给的折中路线是把固定部分拆给工作流，只把真正不可预测的长尾留给 Agent——这也是工程上的默认起点。</div></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧭",
+      "name": "核心判据：分支与不可预测性",
+      "text": "任务路径能画成流程图→工作流；画不出、分支取决于执行中途结果→才轮到自主 Agent。"
+    },
+    {
+      "icon": "💰",
+      "name": "成本与可控性代价",
+      "text": "Agent 每步都是一次模型决策，token 与延迟成倍涨；路径现场生成，调试与回归像大雾里找路。"
+    },
+    {
+      "icon": "🚫",
+      "name": "when NOT to use agents",
+      "text": "LangChain 官方劝退清单：路径可穷举、单次调用可解、要确定性输出、高频成本敏感——都别上 Agent。"
+    },
+    {
+      "icon": "🔁",
+      "name": "默认先工作流",
+      "text": "从工作流起步，需求变化压不住时再升级自主；升级方向永远比降级好做——先简后繁，别先繁后简。"
+    },
+    {
+      "icon": "🧩",
+      "name": "中间态真实存在",
+      "text": "工作流骨架+关键节点留 LLM 自由度+人工闸门兜底——多数生产系统是混合体，不是二选一。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【选型题】下面哪个信号最能说明『该上自主 Agent 了』？",
+      "options": [
+        "任务步骤很多，看起来很复杂",
+        "领导觉得 Agent 这个词更时髦",
+        "任务的分支无法预先穷举，下一步做什么取决于执行中途的观察结果",
+        "团队想省服务器成本"
+      ],
+      "answer": 2,
+      "explain": "选 C。步骤多但路径固定，画成流程图照样是工作流；只有『路径写不出来、要现场决定』这一条，才是自主 Agent 的真正入场券。"
+    },
+    {
+      "type": "choice",
+      "q": "【选型题】『每天固定拉 3 张表、按同样 5 步生成日报』的任务，按本关原则该怎么落地？",
+      "options": [
+        "自主 Agent，让它自己决定怎么拉数",
+        "工作流：路径能画成流程图，可控、可审计、便宜",
+        "多 Agent 协作，一人拉一张表",
+        "不做了，这种任务太简单"
+      ],
+      "answer": 1,
+      "explain": "选 B。路径完全可预测是工作流的标准形状；为它上自主 Agent 等于为用不上的灵活性支付更高的成本与调试难度。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】老板拍板：『给客服做一个最聪明的自主 Agent』。你分析后发现 80% 的请求是查订单状态这类固定问题。请组织一段话说服他改为默认先工作流，并说明后续什么条件才升级。",
+      "reference": "先给任务画像：把一周请求拉出来分桶——查订单、退换货进度这类固定问题的路径完全能画成流程图，分支可穷举，属于工作流地盘；只有长尾的复杂咨询才真的不可预测。然后算账：自主 Agent 每个请求都要多轮 LLM 决策，token 成本和延迟成倍涨，而 80% 的高频流量用工作流几乎零边际成本；出了错，工作流看日志定位到具体节点就能修，自主 Agent 的路径现场生成，调试像在大雾里找路。所以结论是默认先工作流：固定问题走流程图，长尾问题设人工闸门转人工；等长尾占比大到规则写不动、路径真的画不成流程图时，再把那一块升级成自主 Agent——只升级长尾这一段，成本可控。",
+      "keyPoints": [
+        {
+          "point": "判据：流程图与可穷举",
+          "kw": [
+            "流程图",
+            "可穷举",
+            "不可预测"
+          ]
+        },
+        {
+          "point": "成本账：token、延迟、高频流量",
+          "kw": [
+            "成本",
+            "token",
+            "延迟",
+            "高频"
+          ]
+        },
+        {
+          "point": "可控账：日志定位节点、调试难",
+          "kw": [
+            "日志",
+            "节点",
+            "调试"
+          ]
+        },
+        {
+          "point": "默认先工作流 + 人工闸门",
+          "kw": [
+            "默认先工作流",
+            "人工闸门"
+          ]
+        },
+        {
+          "point": "升级条件：长尾压不住再升级",
+          "kw": [
+            "升级",
+            "长尾"
+          ]
+        }
+      ],
+      "explain": "说服老板的话术顺序＝画像→算账→结论→升级条件；『人工闸门』这一句是加分项，说明你考虑了兜底而不是非此即彼。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向产品经理解释：什么时候该用简单工作流，什么时候才值得上自主 Agent？为什么默认先工作流？",
+    "hint": "提示：地铁与打车；SOP 与店长；灵活性是要付费的。",
+    "modelAnswer": "先问一句：这个任务的路线图能不能画出来？能画成流程图——每步做什么、几种分支都数得清——就用工作流，像地铁一样准点便宜出事好查。画不出来、下一步做什么要看执行中途的结果，才上自主 Agent，像打车随叫随停但更贵、路线看司机发挥。默认先工作流的原因很简单：Agent 每一步都在调用大模型做决策，token 和延迟成倍涨，出了错还没法定位；而灵活性这东西，只有真正用得上才值得付费。固定部分交给工作流，把真正不可预测的长尾留给 Agent，再挂个人工闸门兜底——这是最稳的组合。"
+  },
+  "links": [
+    {
+      "to": "2-7",
+      "text": "L3 你将看到：上一关四模式对比表里『适用场景』那一列，正是用本关判据逐行打分的结果"
+    },
+    {
+      "to": "2-8",
+      "text": "学完本考点后你会发现：单 Agent 也扛不住时还有更贵的一档——多 Agent 协作，那把尺子（协调开销 vs 并行收益）比本关更苛刻"
+    },
+    {
+      "to": "3-1",
+      "text": "学完本考点后你会发现：选型定了还要落地——服务架构与接口设计是工作流方案和自主方案共同的工程底座"
+    }
+  ],
+  "interview": [
+    {
+      "q": "什么时候该用简单工作流，什么时候该用自主 Agent？",
+      "stars": 4,
+      "source": "rodmap 2.7 锚点关键问题（判据综述，LangChain 官方·when to build agents，2025）",
+      "tip": "核心答分支与不可预测性：路径能画成流程图→工作流；再补成本与可控性（Agent 更贵更难调试）和默认先工作流原则，最后给中间态（工作流骨架+节点自由度）。"
+    },
+    {
+      "q": "什么情况下不建议使用 Agent？",
+      "stars": 3,
+      "source": "LangChain 官方博客·when NOT to use agents（langchain.com/blog，2025）",
+      "tip": "背官方四条劝退：路径可穷举用工作流/代码、单次调用可解直接 API、要确定性输出用模板+校验、高频成本敏感用规则自动化；收尾强调把不可预测的长尾才留给 Agent。"
+    }
+  ],
+  "summary": "Q：工作流还是自主 Agent，一句话判据？（答：路径能画成流程图→工作流；画不出、要现场决定→自主）\nQ：为什么默认先工作流？（答：Agent 每步都是模型决策，更贵且路径现场生成难调试）\nQ：LangChain 劝退清单哪四条？（答：路径可穷举/单次调用可解/要确定性/高频成本敏感）"
+}

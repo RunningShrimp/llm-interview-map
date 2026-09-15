@@ -123,11 +123,11 @@
   },
   "links": [
     {
-      "to": "d10-graphrag-advanced",
-      "text": "GraphRAG 与高级 RAG 是本关的成熟地基——Self-RAG/CRAG 思想在此"
+      "to": "1-4c",
+      "text": "Agentic RAG 的地基是 1.4c 的检索质量优化——切分、混合检索与重排做得好，自主检索才有意义"
     },
     {
-      "to": "e3-react-practice",
+      "to": "2-5",
       "text": "自主检索的运行节拍就是 ReAct——L2 的循环在这里指挥检索"
     }
   ],

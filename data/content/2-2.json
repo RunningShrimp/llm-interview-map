@@ -1,0 +1,157 @@
+{
+  "id": "2-2",
+  "title": "任务分解与规划：把模糊目标拆成步骤",
+  "definition": "规划（Planning）是 Agent 把「调研 X 并写报告」这类模糊目标，拆成带依赖的可执行子任务的能力。主流做法：Plan-and-Execute 先生成计划再执行、ReWOO 一次规划批量并行省 token，失败后回炉重规划。",
+  "analogies": [
+    {
+      "icon": "🗺️",
+      "name": "自驾游的两种玩法",
+      "text": "ReAct 像边开边定：开一段看一段路牌，灵活但容易在城市里绕晕，油都花在临时决策上。Plan-and-Execute 像出发前先做路书：先在地图上把「加油站→景点→酒店」全排好、标清先后依赖（先加油才能上山），然后照单执行——长途不跑偏，但路上封路就要重规划。ReWOO 更省的版本：出发前把整趟行程一次性排完，连「到每个景点拍什么照」都写好，沿途不用每站打电话回来问家里（减少 LLM 调用），还允许两位乘客分头逛两个景点（并行）。"
+    },
+    {
+      "icon": "🧾",
+      "name": "装修工头的任务拆单",
+      "text": "「把房子装好」这种目标没法直接开工。工头先拆：水电→瓦工→木工→油漆，写清楚依赖（必须先水电后瓦工）——这一步就是任务分解；每项再标验收标准（水路打压测试通过）——这就是给 Executor 的完成判据。如果瓦工贴完砖发现防水没做，正确的做法不是骂瓦工重贴，而是回炉计划本身：谁在拆单时漏了防水工序？——这就是「错误答案通常意味着错误计划」：重规划要回到 Planner 层，而不是在 Executor 层傻重试。"
+    }
+  ],
+  "demo": {
+    "title": "ReAct vs Plan-and-Execute vs ReWOO 三台对比",
+    "description": "用「调研竞品并写报告」这个任务，页签切换三种规划范式的执行过程；滑杆调节任务步数，观察 ReWOO 省下的 LLM 调用次数如何放大。",
+    "html": "<div class='d-row' style='gap:6px;margin-bottom:8px;flex-wrap:wrap'><button class='d-btn active' data-act='d-tab' data-group='pl' data-tab='re'>ReAct 边想边做</button><button class='d-btn' data-act='d-tab' data-group='pl' data-tab='pe'>Plan-and-Execute</button><button class='d-btn' data-act='d-tab' data-group='pl' data-tab='rw'>ReWOO</button></div><div data-pane='re' data-group='pl'><div class='d-steps' id='d22-re'><div class='d-step active'>💭 「先搜竞品 A 的定价」→ 🔍 搜索…</div><div class='d-step'>👀 看结果 → 💭 「接着查竞品 B」→ 🔍 搜索…</div><div class='d-step'>💭 「资料够了，写报告」→ ✍️ 输出<span class='d-note'>每步都要 LLM 决策：灵活但调用多、易绕晕</span></div></div><div class='d-row' style='gap:8px;margin-top:6px'><button class='d-btn' data-act='d-prev' data-steps='#d22-re'>←</button><button class='d-btn' data-act='d-next' data-steps='#d22-re'>下一步 →</button><span class='d-note' data-steps-indicator='#d22-re'>1 / 3</span></div></div><div data-pane='pe' data-group='pl' class='d-hidden'><div class='d-row' style='gap:6px;flex-wrap:wrap;justify-content:center'><div class='d-card'>🧑‍💼 Planner<br><span class='d-note'>一次拆解+依赖排序</span></div><div class='d-arrow'>→</div><div class='d-card'>🔧 Executor<br><span class='d-note'>逐步照单执行</span></div><div class='d-arrow'>→</div><div class='d-card'>✅ Verifier<br><span class='d-note'>校验失败→回炉 Planner</span></div></div><p class='d-note'>长任务不跑偏；计划错了就「重规划」，而不是重复执行</p></div><div data-pane='rw' data-group='pl' class='d-hidden'><div class='d-row' style='gap:6px;flex-wrap:wrap;justify-content:center'><div class='d-card'>🧑‍💼 Planner<br><span class='d-note'>不看工具结果，一次排完所有调用</span></div><div class='d-arrow'>→</div><div class='d-card'>🦾 Worker 并行执行<br><span class='d-note'>搜索A ∥ 搜索B ∥ 搜索C</span></div><div class='d-arrow'>→</div><div class='d-card'>🧮 Solver 汇总</div></div><p class='d-note'>省 LLM 调用与 token、可并行；代价：中途无法根据结果调整计划</p></div><div style='margin-top:10px'><span class='d-note'>任务工具调用数：<b id='d22-n'>6</b> 次</span><input type='range' min='2' max='20' value='6' data-output='#d22-n' data-suffix=' 次' style='width:100%'><div class='d-vs'><div class='d-card'><b>ReAct 的 LLM 决策轮</b><div class='d-bar'><div class='d-fill' style='width:calc(var(--v,6)*5%)'></div></div><span class='d-note'>≈每步一次（n 轮）</span></div><div class='d-card'><b>ReWOO 的 LLM 决策轮</b><div class='d-bar'><div class='d-fill' style='width:calc(12 + var(--v,6)*2.2%)'></div></div><span class='d-note'>≈规划 1 轮 + 汇总 1 轮（n 越大省越多）</span></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧩",
+      "name": "任务分解三要素",
+      "text": "子任务、依赖关系（谁先谁后）、完成判据（怎么算做完）——缺判据的计划没法校验失败。"
+    },
+    {
+      "icon": "📋",
+      "name": "Plan-and-Execute 两段式",
+      "text": "Planner 一次生成完整计划，Executor 逐步执行；解决长任务「跑偏」与上下文膨胀，是 ReAct 之后的默认升级。"
+    },
+    {
+      "icon": "🚀",
+      "name": "ReWOO：一次规划省 token",
+      "text": "规划阶段不看工具观察结果（Reasoning WithOut Observation），批量并行执行后由 Solver 汇总；LLM 调用从 n 次降到约 2 次。"
+    },
+    {
+      "icon": "🔁",
+      "name": "重规划≠重试",
+      "text": "执行失败时先问「计划本身对吗」：Verifier 校验失败应回环到 Planner 修计划，在 Executor 层重复重试只会原地翻车。"
+    },
+    {
+      "icon": "🧭",
+      "name": "三范式选型口诀",
+      "text": "ReAct 管单步灵活性，Plan-and-Execute 管长任务不跑偏，Reflection 管输出质量——按任务形状选，不追新。"
+    },
+    {
+      "icon": "⚠️",
+      "name": "规划的边界",
+      "text": "强依赖中间结果动态调整的任务不适合 ReWOO；目标本身模糊时要先澄清再规划——规划不解决需求问题。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "Plan-and-Execute 模式下，Executor 执行第 3 步连续失败 5 次，最合理的处理是？",
+      "options": [
+        "继续重试到第 20 次，总有一次会成",
+        "触发重规划：把失败信息交回 Planner，检查是不是计划本身有问题（如前置步骤遗漏），修正后再执行",
+        "直接跳过第 3 步继续往下执行",
+        "让 Executor 自己改写计划"
+      ],
+      "answer": 1,
+      "explain": "连续失败通常说明「错误答案源于错误计划」：可能第 3 步的前置依赖没满足、或计划与实际环境不符。重试是 Executor 层的赌博，跳过会污染后续步骤；正确路径是回炉 Planner 重规划。让执行层私自改计划则破坏了权责分离，失控风险高。"
+    },
+    {
+      "type": "choice",
+      "q": "什么任务最适合用 ReWOO 而不是 ReAct？",
+      "options": [
+        "每一步都强依赖上一步搜索结果的开放探索任务",
+        "子任务可以提前列全、彼此基本独立的大批量调研任务（如同时查 10 个竞品的公开信息）",
+        "只有一步的简单问答",
+        "需要和用户反复确认需求的任务"
+      ],
+      "answer": 1,
+      "explain": "ReWOO 的优势来自「一次规划+并行执行+汇总」：子任务能提前列全且相互独立时，既省 LLM 调用又能并行。A 正是 ReWOO 的禁区——中途结果会改变后续计划；C 用不上规划；D 的瓶颈在澄清而非执行。"
+    },
+    {
+      "type": "scenario",
+      "q": "面试官：「让你做一个『每天自动调研行业新闻并写成日报』的 Agent，你会怎么设计规划模块？计划失败怎么恢复？」请给出：任务分解方案（含依赖与判据）、规划范式选择与理由、失败恢复机制。",
+      "reference": "任务分解：把日报拆成四个子任务并标依赖——新闻抓取（判据：条数≥20 且含来源链接）→ 相关性筛选与摘要（依赖抓取完成，判据：筛出≥5 条行业相关）→ 主题聚合（依赖筛选，判据：每条主题有≥2 条新闻支撑）→ 成稿排版（依赖聚合，判据：含标题、摘要、原文链接三要素）。规划范式选 Plan-and-Execute：任务是每日重复的长链路，路径基本固定，先一次性生成计划可保证稳定不跑偏；抓取环节内部的多个源相互独立，可用 ReWOO 思想并行调度省调用。失败恢复分两层：单步失败先在 Executor 层做有限重试（如抓取超时重试 2 次并换备用源）；重试耗尽或校验不过则升级为重规划——把失败信息交回 Planner，例如筛选环节发现今日新闻不足，重规划为「扩大抓取时间窗到 48 小时」，而不是让后续环节在残缺数据上硬跑。全流程记录计划与每步判据结果，日报末尾附执行状态，失败可追溯。",
+      "keyPoints": [
+        {
+          "point": "子任务带依赖关系与可判定的完成判据",
+          "kw": [
+            "依赖",
+            "判据"
+          ]
+        },
+        {
+          "point": "选 Plan-and-Execute 并说明任务形状匹配理由",
+          "kw": [
+            "Plan-and-Execute",
+            "长链路",
+            "稳定"
+          ]
+        },
+        {
+          "point": "独立子任务并行调度省调用",
+          "kw": [
+            "并行"
+          ]
+        },
+        {
+          "point": "失败恢复分两层：有限重试后重规划",
+          "kw": [
+            "重试",
+            "重规划"
+          ]
+        },
+        {
+          "point": "计划与执行状态可追溯",
+          "kw": [
+            "状态",
+            "追溯"
+          ]
+        }
+      ],
+      "explain": "点评：评分要点是「分解带判据、范式选择有理由、恢复机制分层次」。能把重规划和重试区分开、并给出具体重规划例子（扩时间窗）的候选人，在面试里非常显眼。"
+    }
+  ],
+  "feynman": {
+    "prompt": "不看资料，向面试官讲清：ReAct、Plan-and-Execute、ReWOO 三种范式的核心区别与各自适用场景。",
+    "hint": "一个管灵活、一个管不跑偏、一个管省钱；用自驾游或装修工头的类比串起来。",
+    "modelAnswer": "三者差别在「什么时候做决策」。ReAct 每一步都由 LLM 看着最新结果临时决策，最灵活，适合路径不可预知的小任务，代价是调用多、长任务容易绕晕。Plan-and-Execute 把决策集中到开头：Planner 一次性拆出带依赖的完整计划，Executor 照单执行，Verifier 校验失败就回炉重规划——适合步骤多、路径相对可预见的长任务，核心价值是不跑偏。ReWOO 更进一步：规划时连工具结果都不看，把所有调用一次排完、能并行的并行，最后 Solver 统一汇总——把 LLM 决策从 n 次压到约 2 次，适合子任务能提前列全且相互独立的大批量任务。选型口诀：单步灵活用 ReAct，长任务防跑偏用 Plan-and-Execute，批量省钱用 ReWOO。"
+  },
+  "links": [
+    {
+      "to": "2-1",
+      "text": "2.1 说 Agent 的公式里有「循环」——本页的规划就是让循环「先想清楚再动」的那部分智能"
+    },
+    {
+      "to": "2-5",
+      "text": "学完本考点后你会发现：2.5 的 ReAct 执行循环正是本页三种范式的「底盘」——规划决定走法，执行循环决定每一步怎么迈"
+    },
+    {
+      "to": "2-6",
+      "text": "学完本考点后你会发现：反思（Reflexion）是本页「重规划」的思想来源——从失败中沉淀语言化经验，喂给下一轮计划"
+    }
+  ],
+  "interview": [
+    {
+      "q": "ReAct 与 Plan-and-Execute 范式的核心区别是什么？什么场景该用 ReWOO 省 token？",
+      "stars": 4,
+      "source": "JavaBetter·Agent 13题/小林笔记·三种范式/掘金·ReWOO 解析",
+      "tip": "决策时机（每步 vs 开头一次）+ 长任务跑偏问题；ReWOO 适合子任务可预列、相互独立的批量任务（调用从 n→约2）"
+    },
+    {
+      "q": "Agent 执行卡住或失败，你的系统怎么恢复？重试和重规划的区别是什么？",
+      "stars": 4,
+      "source": "Hugging Face Agents 课程实践/LangGraph Plan-and-Execute 教程",
+      "tip": "先有限重试（换参/换工具），耗尽后回炉 Planner 修计划——「错误答案通常意味着错误计划」；全程可追溯"
+    }
+  ],
+  "summary": "Q：任务分解要拆出哪三样东西？（答：子任务、依赖关系、完成判据——没有判据的计划无法校验成败。）\nQ：ReWOO 为什么省 token？（答：规划时不变看工具结果，所有调用一次排完并并行执行，LLM 决策从每步一次降到约两次。）\nQ：执行失败该重试还是重规划？（答：先有限重试；连续失败说明计划本身可能错了，应回炉 Planner——重试是执行层赌博，重规划是修正决策。})"
+}

@@ -44,6 +44,11 @@
       "icon": "🔮",
       "name": "状态：趋势观察",
       "text": "官方产品已发布但生产案例少；面试多为开放讨论题——诚实评估当前可靠性边界。"
+    },
+    {
+      "icon": "🔁",
+      "name": "产品格局剧变（2025-2026）",
+      "text": "OpenAI Operator 已于 2025-08 关停、能力并入 ChatGPT Agent；OpenAI 另宣布弃用 Agent Builder、Assistants API 于 2026-08 关停——引用产品案例时以最新格局为准。"
     }
   ],
   "exercises": [
@@ -125,12 +130,16 @@
   },
   "links": [
     {
-      "to": "e3-react-practice",
+      "to": "2-5",
       "text": "感知-行动循环的节拍依然是 ReAct——只是工具变成了屏幕"
     },
     {
-      "to": "e4-function-calling-practice",
+      "to": "1-3c",
       "text": "有 API 的场景，工具调用仍是正解——GUI 是无 API 时的兜底"
+    },
+    {
+      "to": "4-4",
+      "text": "实战入门篇在 4.4（选修）——前沿（本页）+ 入门（4.4）连读构成全景"
     }
   ],
   "interview": [

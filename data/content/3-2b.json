@@ -1,0 +1,145 @@
+{
+  "id": "3-2b",
+  "title": "合成数据与模型自进化前沿",
+  "definition": "合成数据是用模型生成训练数据再喂给模型的数据工程前沿：self-instruct 自举、强模型蒸馏、自博弈（self-play）与 R1 式可验证数据爆炸——数据瓶颈时代的『用 AI 造 AI 粮食』。",
+  "analogies": [
+    {
+      "icon": "🏭",
+      "name": "从挖矿到合成粮食",
+      "text": "传统训练数据像挖矿：互联网矿藏有限且快被挖空（数据墙）；合成数据像工业化合成粮食——用强模型当『种子工厂』，按需生成指令-回答对（self-instruct）、把强模型的推理过程蒸馏给小模型（R1 蒸馏）、甚至让模型自博弈互相出题批改（AlphaZero 式）。粮食不再靠天，靠生产线。"
+    },
+    {
+      "icon": "🪞",
+      "name": "照镜子的风险",
+      "text": "合成数据有面镜子陷阱：用模型生成数据再训模型，反复几代可能『近亲繁殖』——多样性坍塌、错误被放大（模型崩塌，model collapse）。所以工业级配方是『合成+真数据混炼』，并且用可验证奖励（代码能跑、数学对答案）当质检员。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：合成数据的三条生产线",
+    "description": "点击『下一步』，看三种主流合成方式与各自的质检要点。",
+    "html": "<div class=\"d-steps\" id=\"b10s-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">生产线 1：Self-Instruct 自举</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">175 条种子指令</span><span class=\"d-arrow\">→</span><span class=\"d-token hot d-pulse\">强模型自扩 5 万条</span><span class=\"d-arrow\">→</span><span class=\"d-tag\">去重过滤后训练</span></div><div class=\"d-note\">Alpaca 的起家技术——多样性靠种子覆盖与去重保住。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">生产线 2：强模型蒸馏</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">推理模型生成 80 万条长思维链</span><span class=\"d-arrow\">→</span><span class=\"d-tag green d-pulse\">小模型学过程而非只学答案</span></div><div class=\"d-note\">R1 蒸馏：把『怎么想』教给小模型——推理能力的性价比迁移。</div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">生产线 3：可验证自进化</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">模型自出题 → 程序判卷</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">只保留验证通过的 → 无限刷题飞轮</span></div><div class=\"d-note\">质检员是程序（代码跑测试/数学对答案）——合成数据质量的关键保险。</div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#b10s-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#b10s-steps\">1 / 3</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#b10s-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#b10s-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🏭",
+      "name": "三条生产线",
+      "text": "Self-Instruct 自举、强模型蒸馏（含思维链蒸馏）、可验证自进化（自出题程序判卷）。"
+    },
+    {
+      "icon": "🪞",
+      "name": "模型崩塌风险",
+      "text": "合成数据反复自训导致多样性坍塌与错误放大——必须混真数据、控代数。"
+    },
+    {
+      "icon": "✅",
+      "name": "可验证质检",
+      "text": "代码/数学类合成数据能用程序验证对错——质量有保底，是 RLVR 数据爆炸的基础。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "法律与污染",
+      "text": "蒸馏他人模型可能有服务条款风险；合成数据混入测试集会造成评测污染——治理要跟上。"
+    },
+    {
+      "icon": "🔮",
+      "name": "状态",
+      "text": "方向级面试出现中（27 届备战资料已收录），子方向（自博弈/端到端合成）仍属趋势观察。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【前沿题】『模型崩塌（model collapse）』指什么？",
+      "options": [
+        "模型文件损坏",
+        "用合成数据反复自训导致多样性坍塌、错误被逐代放大",
+        "显存不足",
+        "训练速度崩溃"
+      ],
+      "answer": 1,
+      "explain": "选 B。合成数据近亲繁殖是核心风险——工业配方是合成+真数据混炼并用可验证奖励质检。"
+    },
+    {
+      "type": "choice",
+      "q": "为什么『可验证领域的合成数据』质量最有保底？",
+      "options": [
+        "生成得更多",
+        "对错可以程序判定（代码跑测试、数学对答案）——不合格样本直接过滤，数据自带质检",
+        "成本为零",
+        "不需要人工"
+      ],
+      "answer": 1,
+      "explain": "选 B。数学/代码的合成数据有客观判卷器，噪声可控——这正是 RLVR 数据能爆炸的前提。"
+    },
+    {
+      "type": "scenario",
+      "q": "【架构题】团队计划『用 GPT-4 生成 50 万条客服对话，微调自己的 8B 模型』。请评估该方案的收益、风险与改进建议。",
+      "reference": "收益面：合成数据把标注成本从人月级降到 API 费用级，且强模型生成的回答质量基线高——方向可行。风险三条：一是分布单一——GPT 的口吻与知识边界会成为你模型的天花板，且大量样本彼此相似（多样性坍塌前兆），需要按真实业务问题分布反向驱动生成、并做去重与多样性度量；二是服务条款与法律——多数厂商条款禁止用输出训练竞品模型，商用前必须过法务；三是质量参差——生成的『客服回答』可能一本正经地违反业务规则，必须有质检层（业务规则校验+人工抽检），最好掺入 20~30% 真实人工标注数据做『锚』。改进后的方案：以真实日志的问题分布为骨架、GPT 只负责生成候选回答、人工或规则引擎做验收、混真实标注数据训练——合成数据当加速器，不当替代品。另外明确：这是『蒸馏式训练』，若模型将对外商用需确认数据授权链。",
+      "keyPoints": [
+        {
+          "point": "收益：成本骤降+质量基线高",
+          "kw": [
+            "成本",
+            "合成",
+            "质量",
+            "可行"
+          ]
+        },
+        {
+          "point": "风险：分布单一/天花板/多样性坍塌",
+          "kw": [
+            "分布",
+            "多样性",
+            "天花板",
+            "坍塌",
+            "去重"
+          ]
+        },
+        {
+          "point": "法律：服务条款禁训练竞品",
+          "kw": [
+            "条款",
+            "法律",
+            "蒸馏",
+            "授权"
+          ]
+        },
+        {
+          "point": "改进：真实分布骨架+质检+真数据掺锚",
+          "kw": [
+            "质检",
+            "掺",
+            "真实",
+            "规则",
+            "验收"
+          ]
+        }
+      ],
+      "explain": "收益风险对半开+落地改进——合成数据题的平衡答法。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：合成数据是什么？为什么说它像『照镜子』有风险？",
+    "hint": "提示：合成粮食 + 镜子陷阱 + 程序质检。",
+    "modelAnswer": "互联网数据快被挖完了，现在的做法是用 AI 造 AI 的粮食：让强模型自己出题写答案（self-instruct）、把它的思考过程抄给小模型（蒸馏）、甚至让它自己出题自己刷（能自动判对的领域）。风险是照镜子：用模型造数据再训模型，一代代传下去多样性越来越少、错误越放越大。所以成熟做法是合成和真数据混着用，而且尽量选能程序判对的领域——质检员是代码不是人。"
+  },
+  "links": [
+    {
+      "to": "h2-rlvr-grpo",
+      "text": "可验证奖励与合成数据是同一枚硬币：程序判卷既当奖励又当数据质检"
+    },
+    {
+      "to": "0-5b",
+      "text": "合成只是来源之一——回到 L2 复习完整的数据工程五步"
+    }
+  ],
+  "interview": [
+    {
+      "q": "怎么看合成数据训练？有哪些风险？",
+      "stars": 3,
+      "source": "CSDN·27届备战系列/AgentGuide 手册（方向级面试出现中）",
+      "tip": "三生产线+崩塌风险+混炼配方，附 GPT 生成数据的法务提醒。"
+    }
+  ],
+  "summary": "Q：三条生产线？（答：Self-Instruct、强模型蒸馏、可验证自进化）\nQ：最大风险？（答：模型崩塌——多样性坍塌与错误放大）\nQ：质量保底靠什么？（答：可验证领域的程序判卷+真数据混炼）"
+}

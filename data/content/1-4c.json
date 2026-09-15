@@ -1,0 +1,155 @@
+{
+  "id": "1-4c",
+  "title": "检索质量优化：切分、混合检索与重排",
+  "definition": "RAG 答不准，八成先怪检索。三大抓手：切分（把文档切成大小合适、带元数据的块）、混合检索（向量召回+BM25 关键词召回互补）、重排（Rerank，用更精的模型对召回结果二次排序），共同决定该找的资料有没有进提示词。",
+  "analogies": [
+    {
+      "icon": "📚",
+      "name": "图书馆找资料的完整功夫",
+      "text": "切分像把一整本教材撕成带书签的卡片：按章节撕（结构感知），每张卡片别太大也别太碎，还必须在卡片上写「出自第几章第几节」（来源元数据）——撕得太碎一句话看不懂，撕得太大一张卡片写满无关内容。混合检索像两个图书员搭档：一个靠「意思相近」找书（向量检索：问「怎么让员工有干劲」能找到讲「激励理论」的章节），一个靠「关键词一字不差」找书（BM25：搜专有名词「OKR」时不会错）；两人的结果用 RRF 融合排序。重排像主管复核：候选的 20 本书先粗翻一遍（Cross-Encoder 把问题和候选放在一起细读），挑出真正相关的 5 本——粗翻快、精读准，两段式才又快又好。"
+    }
+  ],
+  "demo": {
+    "title": "块大小 × 检索方式实验台",
+    "description": "拖动滑杆观察「块大小」如何同时影响检索精度与信息完整度；用页签对比纯向量 vs 混合检索在三类查询上的表现；点「重排开关」看最终进入提示词的 Top-3 变化。",
+    "html": "<div style='margin-bottom:10px'><span class='d-note'>块大小：<b id='d14c-ck'>400</b> 字</span><input type='range' min='100' max='1000' step='50' value='400' data-output='#d14c-ck' data-suffix=' 字' style='width:100%'><div class='d-vs'><div class='d-card'><b>语义完整度</b><div class='d-bar'><div class='d-fill' style='width:calc(20 + var(--v,400)*0.08%)'></div></div><span class='d-note'>块太小→一句话被截断看不懂</span></div><div class='d-card'><b>检索精度</b><div class='d-bar'><div class='d-fill' style='width:calc(110 - var(--v,400)*0.09%)'></div></div><span class='d-note'>块太大→一堆无关内容稀释相似度</span></div></div><span class='d-note'>🟢 经验区间 300-500 字 + 15% 重叠：两边都还行</span></div><div class='d-row' style='gap:6px;margin-bottom:8px'><button class='d-btn active' data-act='d-tab' data-group='rt' data-tab='vec'>纯向量检索</button><button class='d-btn' data-act='d-tab' data-group='rt' data-tab='hyb'>混合检索</button></div><div data-pane='vec' data-group='rt'><div class='d-table'><div class='d-row' style='border-bottom:1px solid #e2e8f0;padding:4px'><span style='flex:1'>查询类型</span><span style='width:70px;text-align:center'>表现</span></div><div class='d-row' style='padding:4px'><span style='flex:1'>「怎么提升团队凝聚力」（语义改写）</span><span class='d-tag green' style='width:70px;text-align:center'>✓ 很强</span></div><div class='d-row' style='padding:4px'><span style='flex:1'>「OKR-PR-2026」（专有名词）</span><span class='d-tag red' style='width:70px;text-align:center'>✗ 会翻</span></div></div></div><div data-pane='hyb' data-group='rt' class='d-hidden'><div class='d-table'><div class='d-row' style='border-bottom:1px solid #e2e8f0;padding:4px'><span style='flex:1'>查询类型</span><span style='width:70px;text-align:center'>表现</span></div><div class='d-row' style='padding:4px'><span style='flex:1'>「怎么提升团队凝聚力」</span><span class='d-tag green' style='width:70px;text-align:center'>✓ 很强</span></div><div class='d-row' style='padding:4px'><span style='flex:1'>「OKR-PR-2026」</span><span class='d-tag green' style='width:70px;text-align:center'>✓ BM25 补上</span></div></div><p class='d-note'>RRF（倒数排名融合）把两路结果合成一个榜单</p></div><div style='margin-top:10px'><button class='d-btn' data-act='d-toggle' data-target='#d14c-rr'>🔧 切换 Rerank 开关</button><div id='d14c-rr' class='d-hidden' style='margin-top:8px'><div class='d-row' style='gap:6px;flex-wrap:wrap'><div class='d-card'>召回 Top-20<br><span class='d-note'>向量+BM25 各贡献</span></div><div class='d-arrow'>→</div><div class='d-card'>⚖️ Cross-Encoder 精排<br><span class='d-note'>问题+候选一起细读</span></div><div class='d-arrow'>→</div><div class='d-card green'>Top-3 入提示词<br><span class='d-note'>相关性显著提升</span></div></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "✂️",
+      "name": "结构感知切分",
+      "text": "按标题/段落/表格边界切，块 300-500 字、块间重叠约 15%，避免把一句话或一张表拦腰切断。"
+    },
+    {
+      "icon": "🏷️",
+      "name": "元数据是切分的灵魂",
+      "text": "每块带来源、章节、日期、权限标签——既支撑引用溯源，也是后文权限过滤与增量更新的前提。"
+    },
+    {
+      "icon": "🔀",
+      "name": "混合检索互补",
+      "text": "向量召回懂语义改写但怕专有名词/编号，BM25 关键词召回正相反；两路召回用 RRF 融合是 2026 年标配。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "Rerank 两段式",
+      "text": "Bi-Encoder 各编各的快但粗，Cross-Encoder 把问题与候选拼一起细读所以更准；先粗召回 Top-20~50 再精排取 Top-3~5。"
+    },
+    {
+      "icon": "📐",
+      "name": "先量检索再谈生成",
+      "text": "标 20 个问题的应命中块算 Recall@M/MRR；检索不达标时优先调切分与检索，而不是改生成提示词。"
+    },
+    {
+      "icon": "🧩",
+      "name": "父子块技巧",
+      "text": "用小块做检索匹配、命中后回取其父块（大上下文）喂给模型，兼顾精度与完整度。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "用户反馈：知识库里明明有《API-2026-限流规范.pdf》，搜「API-2026-限流规范」却检索不到。最可能的原因与首选解法是？",
+      "options": [
+        "块太大导致语义稀释，把块改成 100 字",
+        "向量检索对文件名式专有编号不敏感，应加 BM25 关键词召回组成混合检索",
+        "换更大的生成模型",
+        "把 temperature 调低"
+      ],
+      "answer": 1,
+      "explain": "「API-2026-限流规范」是编号型字符串，Embedding 模型很难把它的语义坐标和正文对上，这是纯向量检索的典型盲区；BM25 按字面匹配恰好补位。调小块会伤语义完整度，换大模型和调 temperature 都发生在生成层，与「检索不到」无关。"
+    },
+    {
+      "type": "choice",
+      "q": "Rerank 为什么设计成「先粗召回再精排」两段式，而不是直接用 Cross-Encoder 扫全库？",
+      "options": [
+        "Cross-Encoder 精度不够，需要粗排先帮忙",
+        "Cross-Encoder 要把问题与每个候选拼一起前向计算，代价随候选数线性膨胀，全库扫延迟与成本不可接受",
+        "粗召回是历史遗留习惯，没有技术原因",
+        "因为向量库不支持 Cross-Encoder"
+      ],
+      "answer": 1,
+      "explain": "Cross-Encoder 的精度来自「问题-候选联合编码」的词级交互，但这也意味着每个候选都要一次完整前向计算：百万块全扫等于百万次前向。工程解法是廉价快速的 Bi-Encoder/ANN 先把候选缩到几十条，再让昂贵的精排只做几十次——延迟、成本、精度三者的经典折中。"
+    },
+    {
+      "type": "scenario",
+      "q": "你的企业知识库 RAG 上线后，业务方抱怨「明明有资料却答不对」。你标了 30 个问题的应命中块，测出 Recall@5 只有 55%。请给出排查与优化路线（至少四步），并说明每步的判断依据。",
+      "reference": "第一步先做切分体检：抽样查看被切块的内容，确认是否把段落、表格拦腰切断、块是否过大或过小，必要时改为结构感知切分、块 300-500 字加 15% 重叠，并确认每块带有来源与章节元数据。第二步查查询与文本的形态错配：统计未命中的查询里专有名词、编号、人名缩写的占比，占比高说明向量检索盲区大，应引入 BM25 关键词召回并用 RRF 融合做混合检索。第三步加重排：召回扩大到 Top-20 后接 Cross-Encoder 精排取 Top-3，观察 Recall@3 与命中率变化。第四步做查询改写：把口语化或多跳问题改写成更适合检索的形态，对多轮对话补上指代消解。每一步只改一个变量并复测 Recall@5 与 Recall@3，用数据确认哪一步真正贡献了提升；若四步后仍不达标，再考虑 Embedding 模型换型并用同一评估集对比。全程先修检索再动生成提示词，避免两个变量混在一起无法归因。",
+      "keyPoints": [
+        {
+          "point": "先体检切分：结构感知、块大小与重叠、元数据",
+          "kw": [
+            "切分",
+            "重叠",
+            "元数据"
+          ]
+        },
+        {
+          "point": "专有名词占比高则上混合检索 BM25+RRF",
+          "kw": [
+            "BM25",
+            "混合检索",
+            "RRF"
+          ]
+        },
+        {
+          "point": "扩召回接 Cross-Encoder 重排",
+          "kw": [
+            "重排",
+            "Cross-Encoder",
+            "Top"
+          ]
+        },
+        {
+          "point": "查询改写与指代消解",
+          "kw": [
+            "查询改写",
+            "改写"
+          ]
+        },
+        {
+          "point": "单变量迭代并先检索后生成",
+          "kw": [
+            "复测",
+            "生成提示词"
+          ]
+        }
+      ],
+      "explain": "点评：这道题考察「检索调优的系统化路线」。评分要点是顺序意识（切分→混合→重排→改写）与归因纪律（单变量、复测、先检索后生成）。能报出「300-500 字/15% 重叠/Top-20→Top-3」等经验值会明显加分。"
+    }
+  ],
+  "feynman": {
+    "prompt": "用「图书馆找资料」的完整类比，向面试官串讲：切分、混合检索、重排分别对应找书流程中的哪个环节？为什么缺一不可？",
+    "hint": "撕卡片（切分）→ 两个图书员搭档找（混合检索）→ 主管精读复核（重排）。",
+    "modelAnswer": "切分是撕卡片：一本厚教材撕成大小合适、写着出处的卡片，撕坏了后面全完——太小看不懂上下文，太大全是噪声。混合检索是派两个图书员：一个懂「意思相近」（向量），问激励理论能找到讲干劲的章节；一个认死理按字面找（BM25），搜编号一字不差；两人的清单用 RRF 合并，谁也别漏。重排是主管复核：粗翻 20 本候选、精读挑出 3 本真相关的。三步分别解决「资料被切碎」「字面与语义错配」「粗召回不够准」，对应检索链路的三道关——跳过任何一步，都会在对应类型的查询上翻车。"
+  },
+  "links": [
+    {
+      "to": "1-4b",
+      "text": "本页是 1.4b 那条最小 RAG 链路的「检索质量加强包」：链路先跑通，再回来按本页逐项优化"
+    },
+    {
+      "to": "2-9",
+      "text": "学完本考点后你会发现：2.9 的 RAG 评估体系正是本页优化的「裁判」——Recall@5 与忠实度就是切分/混合/重排的记分牌"
+    },
+    {
+      "to": "3-2",
+      "text": "学完本考点后你会发现：切分与元数据在 3.2 里会升级为生产级数据管线——增量更新、权限过滤都建立在「块带标签」之上"
+    }
+  ],
+  "interview": [
+    {
+      "q": "RAG 检索不准怎么排查和优化？切分策略怎么定？",
+      "stars": 4,
+      "source": "知乎·RAG 通关指南/牛客·字节二面真题",
+      "tip": "先答检索评估定位（Recall@5），再按 切分→混合检索→重排→查询改写 顺序给方案；块 300-500 字/15% 重叠/结构感知/带元数据"
+    },
+    {
+      "q": "为什么需要混合检索？Rerank 的 Bi-Encoder 和 Cross-Encoder 有什么区别？",
+      "stars": 4,
+      "source": "卡码笔记·RAG 大厂汇总/掘金·Rerank 全面介绍",
+      "tip": "向量懂语义怕专名，BM25 反之，RRF 融合；Bi 各自编码可离线建索引、快而粗，Cross 联合编码词级交互、准而贵，故两段式"
+    }
+  ],
+  "summary": "Q：块切多大合适？（答：经验值 300-500 字、块间重叠约 15%；以结构边界切，块带来源/章节/权限元数据。）\nQ：为什么纯向量检索会漏掉「API-2026-限流规范」这类查询？（答：编号专名没有稳定语义坐标，Embedding 匹配不上；BM25 字面匹配补位，RRF 融合。）\nQ：Rerank 为什么不全库扫？（答：Cross-Encoder 每个候选都要联合前向计算，全库扫成本爆炸；先 ANN/BM25 粗召回几十条再精排。})"
+}

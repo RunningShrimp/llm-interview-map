@@ -44,6 +44,11 @@
       "icon": "💼",
       "name": "面试新考点",
       "text": "2026 面试新问法：『用过 Coding Agent 吗？它哪里好用哪里翻车？』——考的是真实使用体感与边界认知。"
+    },
+    {
+      "icon": "🇨🇳",
+      "name": "中文题库新词：Harness Engineering",
+      "text": "2026 中文题库（代码随想录等）已把「Harness Engineering」列为独立考察词——能力边界来自 harness（工具链/脚手架）而非模型本身，与本页核心结论互证。"
     }
   ],
   "exercises": [
@@ -128,8 +133,12 @@
       "text": "它处理超长会话的 compaction 绝技——下一站上下文工程前沿实践"
     },
     {
-      "to": "e3-react-practice",
+      "to": "2-5",
       "text": "它的自主循环就是 L2 学的 ReAct——测试报错正是 Observation"
+    },
+    {
+      "to": "h8-agent-sandbox-reliability",
+      "text": "学完本考点后你会发现：Coding Agent 敢自动改代码的底气来自沙箱——下一站执行安全"
     }
   ],
   "interview": [

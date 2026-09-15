@@ -1,0 +1,25 @@
+{
+  "stage": "S1",
+  "project": "信息抽取器 / JSON 输出助手",
+  "intro": "rodmap 阶段1 里程碑：把一段非结构化文本（如招聘 JD、商品描述、会议记录）稳定抽取成符合 JSON Schema 的结构化数据——带校验、重试与评估。这是「LLM 作为组件」的第一个工程化应用。",
+  "steps": [
+    { "title": "定义 Schema 与金标集", "detail": "为抽取目标写 JSON Schema（字段、类型、必填）；手工标注 20 条输入-期望输出作为 golden set。" },
+    { "title": "实现抽取函数", "detail": "提示词中内嵌 Schema 与 2 个少样本示例；调用 API 的 JSON Mode/结构化输出；解析失败时把错误信息拼回提示词重试（最多 2 次）。" },
+    { "title": "代码层校验", "detail": "用 jsonschema 库做代码侧强校验：缺字段、类型错直接判失败，不信任模型自觉。" },
+    { "title": "写评估脚本", "detail": "对 20 条金标集跑字段级准确率，输出每字段命中率报表；换一版提示词再跑，对比分数。" },
+    { "title": "成本与日志", "detail": "记录每次调用的 token 用量与耗时；对 429/超时做指数退避。" }
+  ],
+  "checklist": [
+    "Schema 同时出现在提示词与代码校验两处，且保持一致",
+    "JSON 解析失败会带错误信息自动重试，重试上限 2 次",
+    "20 条金标集可一键重跑，输出字段级准确率",
+    "至少完成过一次「改提示词 → 重跑评估 → 分数对比」的迭代",
+    "日志包含耗时与 token 数；无明文密钥"
+  ],
+  "arch": "<div class='d-col' style='gap:6px'><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>📄 原始文本</div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>🧾 抽取提示词<br><span class='d-note'>Schema + 少样本</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>☁️ LLM（JSON Mode）</div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>✅ jsonschema 校验<br><span class='d-note'>失败→带错重试≤2</span></div></div><div class='d-row' style='gap:8px;flex-wrap:wrap;align-items:center;justify-content:center'><div class='d-card' style='text-align:center'>📦 结构化输出</div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>📏 评估脚本<br><span class='d-note'>20 条金标 · 字段级准确率</span></div><div class='d-arrow'>→</div><div class='d-card' style='text-align:center'>📈 迭代提示词</div></div></div>",
+  "tips": [
+    "「解析失败重试」的提示词里要附上具体的报错字段，模型自修成功率会高很多",
+    "枚举字段（如城市/类别）在 Schema 里写 enum，比在提示词里写「请从以下选择」更可靠",
+    "先跑通再优化：金标集 20 条足够发现 80% 的问题"
+  ]
+}

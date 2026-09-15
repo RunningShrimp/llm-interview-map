@@ -1,0 +1,153 @@
+{
+  "id": "0-2",
+  "title": "Python 工程底座：从脚本到服务",
+  "definition": "让脚本长成能上线的服务：用虚拟环境（venv，给每个项目独立的包仓库）隔离依赖，用 async/await（异步写法）让等待网络的时间重叠起来，用超时加重试扛住网络抖动，再用 Git 和测试守住协作底线。",
+  "analogies": [
+    {
+      "icon": "🛎️",
+      "name": "async = 会等菜的餐厅服务员",
+      "text": "同步服务员点完一桌单，就杵在厨房门口等这一桌菜出锅、端上桌，才去招呼下一桌——一单做完才做下一单。异步服务员点完单把小票丢给厨房，转身就去招呼下一桌，哪桌菜好了端哪桌。调 LLM 就是典型的『等菜』：90% 的时间在等模型吐字。异步让所有等待重叠起来，一个进程就能同时伺候几十桌。"
+    },
+    {
+      "icon": "🧰",
+      "name": "venv = 每个项目一个独立工具箱",
+      "text": "别把所有螺丝刀堆进一个抽屉：项目 A 要 2.1 版的扳手、项目 B 要 2.3 版的，混在一起迟早打架。虚拟环境给每个项目发一个独立工具箱，装什么只影响自己；再把清单写进 requirements.txt（依赖清单文件），同事拿到项目照单复刻一个一模一样的工具箱，『我电脑上能跑』的惨案就少了一大半。"
+    },
+    {
+      "icon": "🔁",
+      "name": "重试 = 快递没送到就再约一次",
+      "text": "网络抖动、对方限流是常态，不是事故。标准动作像约快递：没送到，隔一会儿再约，而且越失败等得越久（等 1 秒、2 秒、4 秒——这叫指数退避），免得人家正忙你还在疯狂敲门。但重试前先想一件事：同一单发两次会不会重复扣款？会的话（不幂等，即重复执行会产生重复后果的操作）就别盲目重试。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：同步 vs 异步计时器 + 重试求生记",
+    "description": "拖滑杆改请求数，用页签切换『同步/异步』看总耗时差多少倍；再一步步点『下一步』，看一次模型 API 调用如何靠超时和退避重试活下来。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px'><b>📥 要处理的请求数</b><input type='range' min='1' max='20' value='5' style='flex:1;min-width:180px' data-output='#m02e-n' data-suffix=' 个'><b id='m02e-n' style='min-width:70px;text-align:right'>5 个</b></div><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:10px'><button class='d-btn active' data-act='d-tab' data-group='m02g' data-tab='sync'>同步：一单做完再做下一单</button><button class='d-btn' data-act='d-tab' data-group='m02g' data-tab='async'>异步：一起等，好了就端</button></div><div data-pane='sync' data-group='m02g'><div class='d-row' style='margin-bottom:4px'><span class='d-tag red' style='width:120px;text-align:center;flex:none'>总耗时</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:calc(var(--v,5) * 5%);background:#ef4444'></div></div></div><div class='d-note'>串行模式：每个请求约 2 秒，一个等完再发下一个 → 总耗时 ≈ 请求数 × 2 秒。拉到 20 个请求，用户要干等 40 秒。</div></div><div data-pane='async' data-group='m02g' class='d-hidden'><div class='d-row' style='margin-bottom:4px'><span class='d-tag green' style='width:120px;text-align:center;flex:none'>总耗时</span><div class='d-bar' style='flex:1'><div class='d-fill d-pulse' style='width:5%;background:#34d399'></div></div></div><div class='d-note'>异步模式：请求同时发出去一起等，总耗时 ≈ 最慢的那一个（约 2 秒）。同样 20 个请求，从 40 秒缩到约 2 秒——这就是 LLM 应用岗必考 async/await 的原因。</div><div class='d-row' style='margin-top:6px'><button class='d-btn' data-act='d-toggle' data-target='#m02e-why'>为什么能快这么多？</button></div><div id='m02e-why' class='d-note d-hidden' style='margin-top:6px'>因为等模型吐字时 CPU 闲着：async/await 让程序在『等』的时候去发下一个请求、收上一份结果——事件循环（Event Loop）就是那只不停扫『谁好了』的眼睛。注意：收益大的是等网络的 IO 密集任务；纯计算任务异步帮不上忙。</div></div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><b>🔁 重试求生记：一次模型 API 调用的四步</b><div class='d-steps' id='m02e-retry' style='margin-top:10px'><div class='d-step active'><div class='d-row' style='margin-bottom:4px'><span class='d-tag red' style='width:110px;text-align:center;flex:none'>第 1 次：卡死</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:100%;background:#ef4444'></div></div></div><div class='d-note'>发请求调模型 API……半天没有任何响应。没设超时的话用户就一直转圈——所以每次调用都要设超时（比如 10 秒），到点就断。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag red' style='width:110px;text-align:center;flex:none'>第 2 次：限流</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:75%;background:#ef4444'></div></div></div><div class='d-note'>加了超时后再试，这次返回 429 限流（请求发太频了）。按指数退避来：先等 1 秒再发下一次，别疯狂敲门。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag amber' style='width:110px;text-align:center;flex:none'>第 3 次：退避</span><div class='d-bar' style='flex:1'><div class='d-fill' style='width:50%;background:#f59e0b'></div></div></div><div class='d-note'>等 2 秒、再失败就等 4 秒——每次翻倍，这就是指数退避。同时设重试上限（比如 3 次），防止网络长期故障时请求无限堆积。</div></div><div class='d-step'><div class='d-row' style='margin-bottom:4px'><span class='d-tag green' style='width:110px;text-align:center;flex:none'>第 4 次：成功</span><div class='d-bar' style='flex:1'><div class='d-fill d-pulse' style='width:15%;background:#34d399'></div></div></div><div class='d-note'>返回 200，拿到结果 🎉。口诀收好：设超时、指数退避、次数封顶、只重试幂等操作（重复发也不会重复扣款才敢重试）。</div></div></div><div class='d-row' style='margin-top:10px;gap:10px;align-items:center'><button class='d-btn' data-act='d-prev' data-steps='#m02e-retry' disabled>← 退一步</button><b data-steps-indicator='#m02e-retry'>1 / 4</b><button class='d-btn' data-act='d-next' data-steps='#m02e-retry'>下一步 →</button></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🧰",
+      "name": "venv 先行",
+      "text": "新项目先建虚拟环境再装包，依赖写进 requirements.txt——同事照单复刻，版本不打架。"
+    },
+    {
+      "icon": "🛎️",
+      "name": "async 是等菜的艺术",
+      "text": "LLM 调用九成时间在等响应；async/await 让等待重叠，一个进程顶几十个同步进程。"
+    },
+    {
+      "icon": "👁️",
+      "name": "事件循环是那只眼",
+      "text": "事件循环不停扫『谁好了就处理谁』；代码里写了 await 才会让出控制权，纯同步代码异步没意义。"
+    },
+    {
+      "icon": "🌊",
+      "name": "流式 SSE 是体验分水岭",
+      "text": "SSE（服务器一截一截往外吐字）让用户 1 秒看到首字，而不是干等 30 秒——FastAPI + 流式返回是 AI 应用标配。"
+    },
+    {
+      "icon": "🔁",
+      "name": "网络三件套",
+      "text": "超时 + 指数退避重试 + 次数上限；重试前先想幂等——重复发请求会不会造成重复扣款。"
+    },
+    {
+      "icon": "🧪",
+      "name": "Git 与测试是素养底线",
+      "text": "小步提交、写清提交说明，核心逻辑配 pytest 测试——面试聊项目时这是『工程靠谱』的信号。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】你的服务要串行调 10 次模型 API，每次约 2 秒。改成异步并发后，总耗时最接近多少？",
+      "options": [
+        "还是 20 秒，异步不省时间",
+        "约 2 秒，等待重叠在一起",
+        "0.2 秒，异步会加速每次调用",
+        "200 秒，并发反而更慢"
+      ],
+      "answer": 1,
+      "explain": "选 B。异步把『等待』重叠：10 个请求一起发出去一起等，总耗时约等于最慢的那一个，而不是 10 个相加。异步加速的是等待，不是每次调用本身。"
+    },
+    {
+      "type": "choice",
+      "q": "【场景题】同事克隆了你的项目，跑起来报『找不到某个包』。最标准的补救动作是？",
+      "options": [
+        "让他用管理员权限把所有包全局装一遍",
+        "把 requirements.txt 给他，让他建虚拟环境后执行 pip install -r requirements.txt",
+        "把整个 .venv 文件夹压缩发给他",
+        "让他换一台和你一模一样的电脑"
+      ],
+      "answer": 1,
+      "explain": "选 B。『虚拟环境 + 依赖清单』就是照单复刻工具箱：全局安装会污染系统，.venv 文件夹里的绝对路径换台机器通常就失效。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你的 FastAPI 服务上线后，用户反馈偶发『转圈 30 秒后报错』。日志显示是调模型 API 时偶发网络抖动。请给出两条工程改进，并说明为什么不能无限重试。",
+      "reference": "改进一：给每次模型调用设超时（比如 10 秒），不能让请求无限挂着——用户转圈 30 秒，多半就是没设超时或设得过长。改进二：加指数退避重试：失败后等 1 秒再试，再失败等 2 秒、4 秒，通常两三次就能扛过网络抖动；但要设重试上限（比如 3 次），并配合友好降级，比如返回『稍后再试』。不能无限重试的原因有两条：一是网络长期故障时，重试只会让请求越堆越多，雪上加霜拖垮自己的服务；二是重试要考虑幂等，如果这个操作重复执行会重复扣款或重复写库，盲目重试就会造成重复副作用。口诀：设超时、退避重试、次数封顶、只重试安全操作。",
+      "keyPoints": [
+        {
+          "point": "必设超时，防请求无限挂起",
+          "kw": [
+            "超时",
+            "无限挂"
+          ]
+        },
+        {
+          "point": "指数退避重试扛网络抖动",
+          "kw": [
+            "指数退避",
+            "重试",
+            "网络抖动"
+          ]
+        },
+        {
+          "point": "次数封顶 + 友好降级兜底",
+          "kw": [
+            "重试上限",
+            "降级"
+          ]
+        },
+        {
+          "point": "不能无限重试：请求堆积 + 幂等风险",
+          "kw": [
+            "雪上加霜",
+            "幂等",
+            "重复扣款"
+          ]
+        }
+      ],
+      "explain": "「会用」层级的场景题判分点是可照做的工程动作：超时、退避重试、封顶、幂等。能点出『无限重试拖垮自己服务』即为满分直觉。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：同样是点 10 杯奶茶（调 10 次 LLM），为什么懂异步的店员快得多？",
+    "hint": "用服务员等菜的类比：同步服务员杵在厨房门口，异步服务员点完单就去招呼下一桌；事件循环是那只扫『谁好了』的眼睛。",
+    "modelAnswer": "同步店员点完一单就站在厨房门口干等，等这一单好了才接下一单，10 杯就是 10 段等待加起来；异步店员点完单把小票丢给厨房就转身接客，10 张单同时在厨房做，他只负责哪杯好了端哪杯——等待全重叠了，总时间约等于最慢的那一杯。那只不停扫『哪杯好了』的眼睛就是事件循环，而他把单子丢出去的每个动作就是代码里的 await。"
+  },
+  "links": [
+    {
+      "to": "0-1",
+      "text": "上一关的数学在这里落地：模型接口返回的概率分数和向量数组，正是你在 Python 里每天要处理的日常数据"
+    },
+    {
+      "to": "0-3",
+      "text": "学完本考点后你会发现：训练模型本质也是跑 Python——工程底座打牢，下一关就去看模型到底是怎么学的"
+    }
+  ],
+  "interview": [
+    {
+      "q": "讲讲 Python 的 async/await 是怎么工作的？为什么 LLM 应用高并发场景要用异步？",
+      "stars": 5,
+      "source": "阿里云·65题Agent宝典/掘金FastAPI题库",
+      "tip": "用服务员等菜类比讲『等待重叠』，点出事件循环与 await 让出控制权，再补一句：收益大的是 IO 密集任务，纯计算帮不上忙。"
+    },
+    {
+      "q": "FastAPI 为什么适合做 AI 应用后端？SSE 流式输出是怎么实现的？",
+      "stars": 4,
+      "source": "阿里云·65题Agent宝典/掘金FastAPI题库",
+      "tip": "原生 async 支持、自动接口文档、依赖注入是三大卖点；SSE 用 StreamingResponse 一段一段 yield，让首字 1 秒内出现是体验关键。"
+    }
+  ],
+  "summary": "Q：虚拟环境解决什么问题？（答：每个项目独立工具箱，依赖不互相污染，清单照单复刻）\nQ：为什么 LLM 应用岗必考异步？（答：调模型九成时间在等，async/await 让等待重叠，一个进程扛几十路并发）\nQ：调外部 API 的容错口诀？（答：设超时、指数退避重试、次数封顶、只重试幂等操作）"
+}

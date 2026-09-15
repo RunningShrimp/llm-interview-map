@@ -1,0 +1,146 @@
+{
+  "id": "3-2",
+  "title": "企业级 RAG 数据管线与权限治理",
+  "definition": "生产级 RAG 的胜负手在数据面：多格式接入、增量更新流水线、权限（ACL/密级）前置过滤、审计合规。模型与检索算法决定上限，数据管线决定能不能稳定发挥出上限。",
+  "analogies": [
+    {
+      "icon": "🏗️",
+      "name": "自来水厂",
+      "text": "demo RAG 像手工烧水：接一桶水烧一壶。企业级 RAG 像自来水厂：原水（各种格式的文档）→ 沉淀过滤（解析清洗）→ 消毒（脱敏/密级标注）→ 管网（索引与分发）→ 水表（审计监控）。用户拧开龙头（提问）就要出水——稳定供水靠的是水厂，不是烧水壶。"
+    },
+    {
+      "icon": "🔐",
+      "name": "图书馆的钥匙",
+      "text": "企业知识有密级：工资制度只有 HR 能查。权限必须在『进书架之前』生效——无权者检索时那本书根本不在候选里（前置过滤）；如果书进了候选再让 AI『别说出去』，引用链接早就泄露了。检索层前置过滤是企业 RAG 的第一铁律。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：企业数据管线的五站",
+    "description": "点击『下一步』，看一份文档从上传到可检索的旅程。",
+    "html": "<div class=\"d-steps\" id=\"d11-steps\"><div class=\"d-step active\"><div class=\"demo-title\" style=\"font-size:13px\">站 1：多格式接入</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token\">PDF</span><span class=\"d-token\">Word</span><span class=\"d-token\">Confluence</span><span class=\"d-token\">邮件</span><span class=\"d-token\">表格</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">站 2：解析清洗</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">版式还原/表格转文本</span><span class=\"d-tag\">去重/去噪</span><span class=\"d-tag red d-shake\">敏感信息脱敏</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">站 3：结构化切块+密级标注</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token hot d-pulse\">块 + {部门, 密级, 生效时间, 版本}</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">站 4：增量索引</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag\">webhook 触发</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">新块入库、旧版本下架 → 当天生效</span></div></div><div class=\"d-step\"><div class=\"demo-title\" style=\"font-size:13px\">站 5：审计与监控</div><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-tag amber\">谁在何时查了什么</span><span class=\"d-tag amber\">管线失败告警</span></div></div></div><div class=\"d-row\" style=\"justify-content:center;margin-top:12px\"><button class=\"d-btn\" data-act=\"d-prev\" data-steps=\"#d11-steps\" disabled>← 上一步</button><span class=\"d-step-indicator\" data-steps-indicator=\"#d11-steps\">1 / 5</span><button class=\"d-btn\" data-act=\"d-next\" data-steps=\"#d11-steps\">下一步 →</button><button class=\"d-btn\" data-act=\"d-replay\" data-target=\"#d11-steps\">🔄 重播</button></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🔌",
+      "name": "多格式接入",
+      "text": "PDF 版式还原、Confluence API、表格转键值文本——每种格式都是独立的解析工程。"
+    },
+    {
+      "icon": "🔄",
+      "name": "增量更新流水线",
+      "text": "webhook 触发『解析→切块→向量化→替换旧版』，配失败监控——知识当天生效的保障。"
+    },
+    {
+      "icon": "🔐",
+      "name": "权限前置过滤",
+      "text": "ACL/密级作为元数据在检索前过滤——无权文档不进候选，这是安全铁律。"
+    },
+    {
+      "icon": "🧾",
+      "name": "审计合规",
+      "text": "查询日志（谁何时查了什么）、文档血缘（答案来自哪份文件哪一版）——合规与追责的基础。"
+    },
+    {
+      "icon": "📉",
+      "name": "管线即 SLA",
+      "text": "更新延迟、解析成功率、索引新鲜度都是需要监控的管线指标。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【架构题】企业知识库中『工资制度』只有 HR 可查，权限控制在哪实现？",
+      "options": [
+        "生成后让 LLM 隐藏敏感内容",
+        "检索层前置过滤：无权文档根本不进入候选集",
+        "提示词要求模型别泄露",
+        "把工资制度排除在知识库外"
+      ],
+      "answer": 1,
+      "explain": "选 B。无权文档若进上下文，模型可能复述且引用直接暴露——权限必须前置到检索层（元数据过滤）。"
+    },
+    {
+      "type": "choice",
+      "q": "『新制度上传当天必须可查』，技术上依赖什么？",
+      "options": [
+        "每周重新训练模型",
+        "webhook 触发的增量索引流水线：解析→切块→向量化→替换旧版，配失败监控",
+        "用户手动刷新",
+        "更大的上下文窗口"
+      ],
+      "answer": 1,
+      "explain": "选 B。知识时效性靠更新流水线保障——它是管线 SLA 的一部分（延迟指标+告警）。"
+    },
+    {
+      "type": "scenario",
+      "q": "【架构题】10 万份文档（PDF/Word/Confluence）、部门隔离、密级分级、新文档当天生效。请设计企业 RAG 数据面架构。",
+      "reference": "分四层设计。接入层：连接器池（Confluence API、网盘监听、邮件网关），统一事件总线——文档创建/更新/删除都产生事件；处理层：按格式路由到解析器（PDF 版式还原、表格转键值、扫描件 OCR），清洗脱敏（个人信息、密钥扫描），结构化切块（300~500 字、15% 重叠），每块打元数据（部门、密级、生效/失效时间、版本、来源血缘）；索引层：向量库按部门分区（配合权限前置过滤天然缩小候选），密级标签独立字段，增量写入+旧版本逻辑下架（保留血缘供审计），webhook 端到端延迟监控（目标 <1 小时）；服务层：检索时按用户身份做 ACL+密级前置过滤，查询审计日志（谁何时检索/引用了哪份文件），管线看板（新鲜度、解析成功率、失败队列告警）。安全设计要点：脱敏在入库前（源头治理）、权限在检索前（不进上下文就无泄露）、血缘全保留（答案可追溯到文件与版本）、删除权合规（用户可要求某文档全链路清除）。",
+      "keyPoints": [
+        {
+          "point": "四层架构：接入/处理/索引/服务",
+          "kw": [
+            "接入",
+            "解析",
+            "索引",
+            "服务",
+            "事件"
+          ]
+        },
+        {
+          "point": "元数据五件套（部门/密级/时间/版本/血缘）",
+          "kw": [
+            "部门",
+            "密级",
+            "版本",
+            "血缘",
+            "元数据"
+          ]
+        },
+        {
+          "point": "权限前置+脱敏在源头",
+          "kw": [
+            "前置过滤",
+            "acl",
+            "脱敏",
+            "入库前"
+          ]
+        },
+        {
+          "point": "SLA 与审计：新鲜度/成功率/日志",
+          "kw": [
+            "新鲜度",
+            "监控",
+            "审计",
+            "延迟",
+            "告警"
+          ]
+        }
+      ],
+      "explain": "数据面四层+每层的 SLA 与安全要点，是企业 RAG 架构题的核心。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：为什么说企业 RAG 的胜负手在数据管线？权限为什么要前置？",
+    "hint": "提示：自来水厂 + 图书馆的钥匙。",
+    "modelAnswer": "demo 级 RAG 是手工烧水，企业级是自来水厂：几万份各种格式的文档要经过解析、清洗、脱敏、切块、标注密级、进管网，还要保证新文档当天供水、管线坏了有人修——用户体验的稳定性全在水厂。权限像图书馆的钥匙：必须在进书架前过滤——无权的书根本不在候选里，就算 AI 被骗了也无密可泄；等书进了候选再叮嘱 AI『别说出去』就晚了。"
+  },
+  "links": [
+    {
+      "to": "4-2b",
+      "text": "下一站终极架构题：数据面只是其中一层——全案整合在此"
+    },
+    {
+      "to": "1-4c",
+      "text": "切块与元数据的实操基础——管线的站 2/3 由它支撑"
+    }
+  ],
+  "interview": [
+    {
+      "q": "企业级 RAG 的数据管线和权限治理怎么设计？",
+      "stars": 4,
+      "source": "知乎·腾讯真题（延伸）/JavaGuide（v2 检索证实）",
+      "tip": "四层管线+权限前置+SLA 度量，配 10 万文档案例。"
+    }
+  ],
+  "summary": "Q：管线五站？（答：接入、解析清洗、切块标注、增量索引、审计监控）\nQ：权限铁律？（答：检索层前置过滤——无权不进候选）\nQ：当天生效靠什么？（答：webhook 增量流水线+新鲜度 SLA）"
+}

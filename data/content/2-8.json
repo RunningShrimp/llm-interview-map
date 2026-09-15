@@ -1,0 +1,139 @@
+{
+  "id": "2-8",
+  "title": "多 Agent 协作：角色分工、通信与监督",
+  "definition": "多 Agent 协作＝把一个任务交给一支『AI 团队』：主管（Supervisor，拆活分任务的组长）把目标拆成子任务，工人（Worker，执行者）分头干，靠结构化消息（格式固定的『工单』）通信，最后由评审把关。",
+  "analogies": [
+    {
+      "icon": "🏗️",
+      "name": "主管-工人 = 装修队长与工人",
+      "text": "装修队长看图纸把活拆成水电、瓦工、油漆，工人分头进场，每晚交『工单』汇报进度，队长验收。对应多 Agent：主管拆任务，工人 Agent 并行执行，按格式回传。翻车点也同款：队长拆活说得含糊，工人就各干各的，最后拼不到一起。"
+    },
+    {
+      "icon": "🏭",
+      "name": "流水线 = 汽车装配线",
+      "text": "上一站的产出就是下一站的原料：调研→初稿→配图→校对，像传送带逐站加工。适合工序固定的活。风险在于传送带不回头：任何一站出错，错误会顺着线往后传，越滚越大，中途返工等于整条线倒带重来。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "辩论制 = 三方会审",
+      "text": "一个难题没有标准答案，就请几位『顾问』各自给方案，再互相挑刺，最后由主持人（裁判）汇总拍板。适合方案评审、事实核查这类要多角度把关的判断题。翻车点：人数×轮次让 token 成倍烧，可能吵半天谁也不服谁。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：三种协作模式对比台 + 工单通信揭秘",
+    "description": "上面点三个页签，对比主管-工人、流水线、辩论三种模式的结构、适用场景与翻车点；下面点『点我看答案』，揭示为什么子 Agent 之间要用工单式结构化消息、而不是自由群聊。",
+    "html": "<div class='d-col'><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px;margin-bottom:14px'><div class='d-row' style='flex-wrap:wrap;gap:8px;margin-bottom:12px'><button class='d-btn active' data-act='d-tab' data-group='d28g' data-tab='sup'>👔 主管-工人</button><button class='d-btn' data-act='d-tab' data-group='d28g' data-tab='pipe'>🏭 流水线</button><button class='d-btn' data-act='d-tab' data-group='d28g' data-tab='debate'>⚖️ 辩论制</button></div><div data-pane='sup' data-group='d28g'><div class='d-row' style='flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px'><span class='d-tag'>👔 主管</span><span class='d-arrow'>→ 拆单 →</span><span class='d-tag'>👷 工人A</span><span class='d-tag'>👷 工人B</span><span class='d-tag'>👷 工人C</span><span class='d-arrow'>→ 汇总 →</span><span class='d-tag'>👔 验收</span></div><div class='d-note' style='margin-bottom:6px'><span class='d-tag green'>适合</span> 任务可拆、子任务相互独立：多路资料搜集、批量摘要、多文件调研——并行开工最划算。</div><div class='d-note'><span class='d-tag red'>翻车点</span> 拆单太模糊→工人各跑各的；多个工人同时改一份稿→互相覆盖。</div></div><div data-pane='pipe' data-group='d28g' class='d-hidden'><div class='d-row' style='flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px'><span class='d-tag'>📥 调研</span><span class='d-arrow'>→</span><span class='d-tag'>✍️ 初稿</span><span class='d-arrow'>→</span><span class='d-tag'>🎨 配图</span><span class='d-arrow'>→</span><span class='d-tag'>🔍 校对</span></div><div class='d-note' style='margin-bottom:6px'><span class='d-tag green'>适合</span> 工序固定的一条龙生产：上一步的产出就是下一步的原料，逐站接力最省心。</div><div class='d-note'><span class='d-tag red'>翻车点</span> 上游错误顺流而下、越滚越大；中途要返工，整条传送带都得倒带。</div></div><div data-pane='debate' data-group='d28g' class='d-hidden'><div class='d-row' style='flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px'><span class='d-tag'>🧑‍🏫 顾问A</span><span class='d-tag'>🧑‍🏫 顾问B</span><span class='d-arrow'>→ 互相挑刺 →</span><span class='d-tag'>⚖️ 裁判汇总</span></div><div class='d-note' style='margin-bottom:6px'><span class='d-tag green'>适合</span> 没有标准答案的判断题：方案评审、事实核查、风险把关——多角度互评能逼出盲点。</div><div class='d-note'><span class='d-tag red'>翻车点</span> 人数×轮次＝token 成倍烧；可能吵半天谁也不服谁，还得裁判拍板。</div></div></div><div class='demo-box' style='padding:14px;border:1px solid #dbe3f3;border-radius:12px'><div class='d-row' style='align-items:center;gap:8px'><b>✉️ 子 Agent 之间怎么说话？</b><button class='d-btn' style='margin-left:auto' data-act='d-toggle' data-target='#d28-msg'>点我看答案</button></div><div id='d28-msg' class='d-hidden' style='margin-top:10px'><div class='d-note' style='margin-bottom:8px'><span class='d-tag red'>✗ 自由群聊</span> 每句话都要过一遍大模型：上下文越聊越长、token 越烧越贵，传话还会失真——A 说的到 C 耳朵里已经走样，最后谁也说不清哪个结论是谁给的。</div><div class='d-note'><span class='d-tag green'>✓ 结构化消息（工单）</span> 固定四件套：目标（查什么）＋问题清单＋交付格式＋回给谁。格式固定就能校验、能追责、能直接拼装，主管不用替工人『翻译』。</div></div></div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "👔",
+      "name": "主管-工人",
+      "text": "一个大脑拆单、多个工人并行执行，适合可拆解、子任务相互独立的活；拆单质量决定全局。"
+    },
+    {
+      "icon": "🏭",
+      "name": "流水线",
+      "text": "产出即原料、逐站接力，工序固定时最省心；代价是错误顺流而下，返工要整条线倒带。"
+    },
+    {
+      "icon": "⚖️",
+      "name": "辩论制",
+      "text": "多角度互评再由裁判汇总，适合无标准答案的判断题；轮次越多 token 越贵，还可能吵不出结论。"
+    },
+    {
+      "icon": "✉️",
+      "name": "结构化消息",
+      "text": "用格式固定的工单（目标/问题清单/交付格式/回给谁）代替自由对话，防上下文爆炸与传话失真。"
+    },
+    {
+      "icon": "🔍",
+      "name": "监督与质检",
+      "text": "主管或独立评审 Agent 按清单验收子 Agent 产出，不达标退回；未经检查的结果不直接采信。"
+    },
+    {
+      "icon": "🔗",
+      "name": "是放大不是替代",
+      "text": "多 Agent 不取代单 Agent 模式：每个工人脑子里跑的正是 2-7 的单 Agent 架构，多 Agent 把它放大成团队。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【直觉题】要做『分析 100 份财报、每份写一页摘要』，哪种协作方式最合适？",
+      "options": [
+        "辩论式：让几个 Agent 互相说服后再写",
+        "主管-工人：拆成 100 个子任务并行执行、各自回传一页",
+        "自由群聊：所有 Agent 在一个对话里边聊边写",
+        "不拆分，塞给一个 Agent 按顺序一份份做完"
+      ],
+      "answer": 1,
+      "explain": "选 B。任务天然可拆、子任务相互独立，正是主管-工人模式的甜点区：并行省时间、互不干扰。辩论适合判断题，群聊不可控且烧 token，串行单做白白浪费可并行性。"
+    },
+    {
+      "type": "choice",
+      "q": "【理解题】为什么子 Agent 之间不鼓励『自由对话』，而要用结构化消息？",
+      "options": [
+        "因为模型不支持多轮对话",
+        "因为每轮对话都要消耗 token、上下文越滚越长，且传话会失真，格式固定才可校验可拼装",
+        "因为自由对话违反法律法规",
+        "因为结构化消息响应速度比自由对话快 100 倍"
+      ],
+      "answer": 1,
+      "explain": "选 B。自由对话的两个代价：上下文与 token 随轮次膨胀、自然语言传话失真；结构化工单四件套（目标/问题/格式/回给谁）让消息可校验、可追责、可直接拼装成稿。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】主管把『调研竞品定价策略』拆给 3 个子 Agent，回收时发现 A 讲了定价、B 讲了渠道、C 只交了一句话，拼不成报告。请诊断问题，并给出至少两条改进。",
+      "reference": "诊断：主管拆单模糊——没有给每个子 Agent 明确的调研对象和交付物约定，C 的产出连验收标准都没达到；同时缺少质检环节，不合格的产出直接混进了汇总。改进一：用结构化工单拆单——给每个子 Agent 写清楚目标、要回答的问题、交付格式（如表格＋要点＋来源链接）和回给谁，让产出可以直接拼装；改进二：加监督与质检——主管或独立评审按清单验收每份产出，不达标退回重做或补查，而不是带病汇总；顺带检查：若期间发生过工人间自由对话，也应改为只走结构化汇报，问题会更早暴露。",
+      "keyPoints": [
+        {
+          "point": "诊断：拆单模糊、缺交付物与验收标准",
+          "kw": ["拆单模糊", "交付物", "验收标准"]
+        },
+        {
+          "point": "改进一：结构化工单（目标/问题/交付格式）",
+          "kw": ["结构化", "交付格式", "来源"]
+        },
+        {
+          "point": "改进二：评审质检，不达标退回",
+          "kw": ["质检", "验收", "退回"]
+        }
+      ],
+      "explain": "本题考把『角色分工＋结构化通信＋监督质检』三件事串起来用：能同时指出拆单、通信、质检三个层面即为优秀答案。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向不懂 AI 的朋友解释：为什么有时候要让几个 AI 组队干活，而不是一个 AI 全包？团队里谁说了算、怎么防止有人偷懒？",
+    "hint": "用装修队类比：队长拆活、工人分头干、工单汇报、队长验收；再补一句『工单为什么比群聊靠谱』。",
+    "modelAnswer": "活太大一个人干不完时就要组队：队长（主管）看目标把活拆成几份，工人（子 Agent）分头开工，每人交一张格式固定的工单——查了什么、结论是什么、证据在哪——最后队长验收拼装。防止偷懒靠两招：工单写清交付标准，验收不过就退回重做；工人之间不建群聊，只按工单说话，免得越聊越乱、传话走样。"
+  },
+  "links": [
+    {
+      "to": "2-7",
+      "text": "前置回看：主管-工人模式里每个工人脑中跑的，正是 2-7 学过的单 Agent 架构（ReAct/规划型等）——多 Agent 不是新物种，是把单 Agent 的循环放大成一支团队"
+    },
+    {
+      "to": "2-8b",
+      "text": "学完本考点后你会发现：会搭团队不等于该搭团队——下一课用 Anthropic 三条件和 15× token 的账本，正面回答『多 Agent 什么时候真的优于单 Agent』"
+    },
+    {
+      "to": "h5-a2a-protocol",
+      "text": "学完本考点后你会发现：本关的结构化消息只在自家系统内部通用；当 Agent 们分属不同厂商，就需要 A2A 协议这样的开放标准来互换『名片』与任务"
+    }
+  ],
+  "interview": [
+    {
+      "q": "主 Agent 和子 Agent 的通信链路是怎样的？为什么用多 Agent 而不是把能力做成 Tool？",
+      "stars": 4,
+      "source": "知乎《多 Agent 架构面试全解析》（zhuanlan.zhihu.com/p/2040834441451459515，2026，v2 已核实）",
+      "tip": "链路答『主管下发结构化任务书→子 Agent 独立执行→按约定格式回传，全程经主管汇总，子 Agent 间不自由对话』；为什么不用 Tool 答：Tool 是单次无状态调用，子 Agent 是带循环与独立上下文的自治单元，能自己多轮干完一段长任务并隔离上下文。"
+    },
+    {
+      "q": "多 Agent 系统的编排、通信、治理三层分别解决什么问题？",
+      "stars": 3,
+      "source": "知乎《多 Agent 架构面试全解析》/卡码《Multi-Agent Harness 面试详解》（notes.kamacoder.com/interview/llm/multi_agent_harness_interview.html，2026）",
+      "tip": "编排管拆单与先后并行（主管的角色）；通信管消息格式与传递（结构化工单）；治理管权限、预算、审计与失败兜底。可补一句：Harness 就是给 Agent 套的『管控脚手架』。"
+    }
+  ],
+  "summary": "Q：多 Agent 协作三种基本模式是什么？（答：主管-工人（拆单并行）、流水线（逐站接力）、辩论（多角度互评再裁决），分别适合可拆任务、固定工序、无标准答案的判断）\nQ：为什么子 Agent 之间不要自由对话？（答：每轮对话都烧 token 且上下文越滚越长，传话还会失真；改用格式固定的结构化工单，可校验、可追责、可拼装）\nQ：谁来保证子 Agent 的产出靠谱？（答：主管或独立评审 Agent 按清单验收，不达标退回，未经检查的产出不直接采信）"
+}

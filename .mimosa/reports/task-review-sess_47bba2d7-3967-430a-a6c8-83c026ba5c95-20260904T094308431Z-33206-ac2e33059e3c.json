@@ -1,0 +1,253 @@
+{
+  "schema_version": "mimosa-task-review/v2",
+  "run_id": "20260904T094308431Z-33206-ac2e33059e3c",
+  "run_status": "inconclusive",
+  "errors": [
+    {
+      "stage": "scan",
+      "target": "js/app.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "tools/validate.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "data/syllabus.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    }
+  ],
+  "coverage": {
+    "schema_version": "mimosa-hook-coverage/v1",
+    "status": "partial",
+    "scope": "hook_observed_diff",
+    "baseline": {
+      "complete": true,
+      "captured_files": 6,
+      "candidate_limit": 5000,
+      "truncated": false,
+      "enumeration_error_count": 0,
+      "snapshot_error_count": 0,
+      "compensated_target_count": 3
+    },
+    "change_tracking": {
+      "touched_observed": 1,
+      "touched_retained": 1,
+      "truncated": false,
+      "bash_mutation": true,
+      "bash_discovered": 3,
+      "bash_discovery_limit": 80,
+      "bash_discovery_truncated": false
+    },
+    "candidates": {
+      "eligible_files": 3,
+      "selected_files": 3,
+      "limit": 20,
+      "truncated": false
+    },
+    "scanning": {
+      "required_files": 3,
+      "scanned_files": 0,
+      "skipped_files": 0,
+      "failed_files": 3,
+      "project_checks_required": 0,
+      "project_checks_completed": 0
+    },
+    "notification": {
+      "eligible_findings": 0,
+      "detailed_findings": 0,
+      "detail_limit": 3,
+      "truncated": false
+    },
+    "reason_counts": {
+      "scanner_failed": 3,
+      "project_check_failed": 3,
+      "finding_ledger_read_failed": 1
+    },
+    "reasons": [
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "tools/validate.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "data/syllabus.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "tools/validate.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "data/syllabus.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "finding_ledger_read_failed",
+        "stage": "finding-ledger",
+        "target": ".",
+        "detail": "file:///Users/didi/.zcode/cli/plugins/cache/zcode-plugins-official/mimosa/1.0.3/payload/dist/cli.js:3 const path = require(\"node:path\"); ^ ReferenceError: require is not defined in ES module scope, you can use import instead This file is being treated as an ES module because it has a '.js' file exte",
+        "affects_completion": false
+      }
+    ],
+    "reasons_truncated": false
+  },
+  "generated_at": "2026-09-04T09:43:08.431Z",
+  "session_id": "sess_47bba2d7-3967-430a-a6c8-83c026ba5c95",
+  "target": ".",
+  "revision": "f5759a16390af7508ce5819411d723cac816ad3e",
+  "rules_version": "unavailable",
+  "diff_hash": "ec26989b3a7f5c055828c41b87e262f5835b5dd0ba197b31736bc3f7d21897e5",
+  "diff": {
+    "algorithm": "sha256",
+    "changed_file_count": 3,
+    "changed_files": [
+      {
+        "file": "data/syllabus.js",
+        "ranges": [
+          {
+            "start": 5,
+            "end": 5
+          },
+          {
+            "start": 49,
+            "end": 49
+          },
+          {
+            "start": 54,
+            "end": 54
+          },
+          {
+            "start": 65,
+            "end": 65
+          },
+          {
+            "start": 112,
+            "end": 113
+          },
+          {
+            "start": 127,
+            "end": 142
+          }
+        ],
+        "before_hash": "214ab82aed95f79b15a99fd66556d0f277bc74fb8540a3215430e35d453ccbb7",
+        "after_hash": "3e4eb521a211f0260e76a9a68e4e41446f9b7be0d7e9637eff2ca09271cfc97e"
+      },
+      {
+        "file": "js/app.js",
+        "ranges": [
+          {
+            "start": 294,
+            "end": 294
+          },
+          {
+            "start": 405,
+            "end": 407
+          }
+        ],
+        "before_hash": "77ccde0d4bc9dda2eb686409615e4c2bf36e2b05e8f3476bc118370b81b0c295",
+        "after_hash": "fc074faf818eb6864d9f9a4a346814a60c5dd4e2168ca53ea791a0dd9f4dd9a5"
+      },
+      {
+        "file": "tools/validate.js",
+        "ranges": [
+          {
+            "start": 39,
+            "end": 39
+          },
+          {
+            "start": 41,
+            "end": 41
+          },
+          {
+            "start": 63,
+            "end": 65
+          },
+          {
+            "start": 184,
+            "end": 184
+          }
+        ],
+        "before_hash": "4143870682ca0fce008b4dd195567790b2a77c46bfde9d295f3380aa2e278ba3",
+        "after_hash": "1fb1d0a13f2eb8a8f3467db49498530194f6b673d0fe937c94251000e6b575ef"
+      }
+    ]
+  },
+  "timing": {
+    "started_at": "2026-09-04T09:43:08.065Z",
+    "completed_at": "2026-09-04T09:43:08.431Z",
+    "duration_ms": 366,
+    "measurement": "hook_wall_clock"
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "model_calls": 0,
+    "measurement": "known-zero"
+  },
+  "telemetry": {
+    "schemaVersion": "mimosa-gate-telemetry/v1",
+    "profile": "gate",
+    "operation": "Stop",
+    "outcome": "partial/INCONCLUSIVE",
+    "latencyMs": 366,
+    "peakMemoryBytes": 119390208,
+    "memoryMeasurement": "max-observed-process-rss",
+    "scannedFiles": 0,
+    "cache": {
+      "hits": 0,
+      "misses": 0,
+      "measurement": "not-applicable"
+    },
+    "denyCount": 0,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0,
+      "modelCalls": 0,
+      "measurement": "known-zero"
+    }
+  },
+  "finding_count": 0,
+  "rewake_finding_count": 0,
+  "evidence_boundary": {
+    "scan": "candidate",
+    "static_fix_verification": "observed_static_only",
+    "runtime_verification": "not_performed"
+  },
+  "finding_events": [],
+  "findings": [],
+  "artifacts": {
+    "immutable_report": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95-20260904T094308431Z-33206-ac2e33059e3c.json",
+    "latest_report": ".mimosa/reports/task-review-sess_47bba2d7-3967-430a-a6c8-83c026ba5c95.json",
+    "history_summary": ".mimosa/history/run-20260904T094308431Z-33206-ac2e33059e3c.json"
+  }
+}

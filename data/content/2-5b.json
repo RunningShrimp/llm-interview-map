@@ -1,0 +1,144 @@
+{
+  "id": "2-5b",
+  "title": "ReAct 机制与失败模式分析",
+  "definition": "L2 会用 ReAct，L3 拆它的机制与失控模式：循环为何可能不终止、轨迹膨胀如何拖垮上下文、错误 Observation 如何污染决策。理解失败模式，防护设计才有的放矢。",
+  "analogies": [
+    {
+      "icon": "🌀",
+      "name": "洗衣机死循环",
+      "text": "ReAct 循环像洗衣机程序：正常是『转动→排水→进水』有限步；但若排水传感器坏了（工具总返回失败），机器可能永远『转动→尝试排水』——这就是死循环的机制：循环靠『观察结果驱动下一步』，观察信号一旦失真（空串、错误、重复），循环就失去终止动力。"
+    },
+    {
+      "icon": "📚",
+      "name": "越记越厚的笔记本",
+      "text": "每轮循环的 Thought 和 Observation 都要记进轨迹（上下文）。任务 20 步、每步观察 2000 字，轨迹就膨胀到几万字——早期的关键信息被挤到中部（lost in the middle），模型开始忘记最初的目标，开始原地打转。轨迹管理不是优化项，是正确性前提。"
+    }
+  ],
+  "demo": {
+    "title": "把玩：三种失控模式与对应刹车",
+    "description": "切换三种失控场景，看各自的机制根源与防护。",
+    "html": "<div class=\"d-row\" style=\"justify-content:center;margin-bottom:10px;flex-wrap:wrap\"><button class=\"d-btn active\" data-act=\"d-tab\" data-group=\"e8g\" data-tab=\"m1\">失控 1：永不终止</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"e8g\" data-tab=\"m2\">失控 2：轨迹膨胀</button><button class=\"d-btn\" data-act=\"d-tab\" data-group=\"e8g\" data-tab=\"m3\">失控 3：信号污染</button></div><div data-pane=\"m1\" data-group=\"e8g\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">失败→重试→失败→重试…</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">刹车：最大步数+重复指纹熔断</span></div><div class=\"d-note\">机制根源：终止动力来自『观察到成功』——观察持续失败时只有外部阈值能终止。</div></div><div data-pane=\"m2\" data-group=\"e8g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">轨迹 5 万字 → 忘记初始目标</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">刹车：Observation 摘要+关键状态外置</span></div><div class=\"d-note\">机制根源：自回归模型的注意力被长轨迹稀释——目标前置+压缩是解药。</div></div><div data-pane=\"m3\" data-group=\"e8g\" class=\"d-hidden\"><div class=\"d-row\" style=\"justify-content:center;flex-wrap:wrap\"><span class=\"d-token d-shake\" style=\"background:#fee2e2;border-color:#ef4444\">空串/错误结果被当真</span><span class=\"d-arrow\">→</span><span class=\"d-tag green\">刹车：结构化错误回传+失败标记</span></div><div class=\"d-note\">机制根源：模型无法区分『空结果』与『工具故障』——必须由系统显式标注。</div></div>"
+  },
+  "keyPoints": [
+    {
+      "icon": "🌀",
+      "name": "不终止的机制",
+      "text": "终止动力来自观察成功；持续失败时模型缺乏『放弃』的内建机制——必须靠外部阈值。"
+    },
+    {
+      "icon": "📚",
+      "name": "轨迹膨胀",
+      "text": "每轮 Thought+Observation 都进上下文：长任务必然膨胀，稀释注意力、污染目标。"
+    },
+    {
+      "icon": "🧭",
+      "name": "目标漂移",
+      "text": "轨迹变长后模型忘记初始目标，开始做无关动作——把目标固定在系统提示最前+阶段性重申。"
+    },
+    {
+      "icon": "📡",
+      "name": "信号质量",
+      "text": "Observation 是循环的燃料：空串、堆栈、重复内容都会污染决策——结构化+摘要化。"
+    },
+    {
+      "icon": "🔬",
+      "name": "可观测性",
+      "text": "完整轨迹落盘才能复盘失控：哪一步开始偏、哪个信号误导——轨迹回放是调优的前提。"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "choice",
+      "q": "【原理题】ReAct 循环『永不终止』的机制根源是？",
+      "options": [
+        "模型太笨",
+        "终止动力来自观察成功，持续失败时模型缺乏放弃机制，必须靠外部阈值终止",
+        "工具太多",
+        "提示词太短"
+      ],
+      "answer": 1,
+      "explain": "选 B。循环由观察驱动，观察持续失败时只有外部刹车（步数/预算阈值）能保证终止——这就是为什么防护必须工程化。"
+    },
+    {
+      "type": "choice",
+      "q": "长任务中 Agent 开始忘记初始目标、原地打转，机制上最可能发生了什么？",
+      "options": [
+        "模型被降级",
+        "轨迹膨胀稀释注意力：早期目标信息被挤到注意力低效区",
+        "用户改了需求",
+        "温度太高"
+      ],
+      "answer": 1,
+      "explain": "选 B。轨迹每轮膨胀，目标信息被稀释——对策是目标固定前置、Observation 摘要、关键状态外置。"
+    },
+    {
+      "type": "scenario",
+      "q": "【场景题】你的 Agent 在长任务（30+ 步）中表现怪异：开始重复已经做过的动作、引用早已失败的工具。请从机制层诊断，并给出三条系统性修复。",
+      "reference": "机制诊断：这是长轨迹的典型综合征。重复已做动作说明模型对『已完成状态』失去感知——轨迹太长，早先的成功 Observation 被稀释；引用失败工具说明失败信号也丢了或被后续内容淹没——错误回传被挤出了有效注意力。三条系统性修复：第一，状态外置——维护一个结构化的『任务清单/已完成项』状态块，每轮以固定格式注入上下文最前部，让模型始终看得见进度，而不是依赖它从长轨迹里自己回忆；第二，轨迹压缩——对超过 N 轮的 Observation 做摘要（保留关键结果与错误码），把轨迹长度控制在窗口的固定比例内；第三，信号强化——失败的工具在后续轮次中以显式标记（『此前已失败』）再次注入，配合指纹熔断防止重入。修复后再用同一批长任务回归验证步数与成功率——机制层的病要靠机制层的药。",
+      "keyPoints": [
+        {
+          "point": "诊断：长轨迹稀释状态与信号",
+          "kw": [
+            "轨迹",
+            "稀释",
+            "状态",
+            "信号",
+            "长"
+          ]
+        },
+        {
+          "point": "修复一：任务状态外置+固定注入",
+          "kw": [
+            "状态",
+            "外置",
+            "清单",
+            "注入"
+          ]
+        },
+        {
+          "point": "修复二：Observation 摘要压缩",
+          "kw": [
+            "摘要",
+            "压缩",
+            "轨迹",
+            "窗口"
+          ]
+        },
+        {
+          "point": "修复三：失败显式标记+熔断防重入",
+          "kw": [
+            "失败",
+            "标记",
+            "熔断",
+            "重入"
+          ]
+        }
+      ],
+      "explain": "能从注意力机制层面解释症状，并给出状态外置类方案，是 Agent 工程师进阶的标志。"
+    }
+  ],
+  "feynman": {
+    "prompt": "请用自己的话向室友解释：ReAct 循环为什么会失控？三种失控分别像什么？",
+    "hint": "提示：洗衣机死循环、越记越厚的笔记本、失真的传感器。",
+    "modelAnswer": "ReAct 靠『观察结果』驱动下一步，所以有三种失控：观察一直失败，模型没有放弃机制就会像排水口坏掉的洗衣机永远转下去——要装外部刹车；每轮的思考与结果都记进轨迹，任务长了笔记本越来越厚，模型忘了最初要干嘛开始原地打转——要把状态单独记在一张卡上、旧观察写成摘要；观察信号失真（空结果、报错被当真）会误导每一步决策——系统必须把失败显式标出来。失控不可怕，知道机制才能对症下药。"
+  },
+  "links": [
+    {
+      "to": "2-3",
+      "text": "L2 的四件套防护正是本页失败模式的工程解药——机制与实践对照"
+    },
+    {
+      "to": "2-9b",
+      "text": "L4 的轨迹评估与治理体系：把本页的复盘方法制度化"
+    }
+  ],
+  "interview": [
+    {
+      "q": "ReAct 的失败模式有哪些？从机制上怎么解释？",
+      "stars": 3,
+      "source": "牛客·Top50（延伸）/内置知识",
+      "tip": "不终止/轨迹膨胀/信号污染三模式，每个配机制根源与刹车。"
+    }
+  ],
+  "summary": "Q：为什么不终止？（答：终止动力来自观察成功，失败时只能靠外部阈值）\nQ：轨迹膨胀的后果？（答：注意力稀释→目标漂移→原地打转）\nQ：系统性修复？（答：状态外置+轨迹压缩+失败显式标记）"
+}

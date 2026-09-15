@@ -44,6 +44,11 @@
       "icon": "🔮",
       "name": "状态：趋势观察",
       "text": "协议已进入 Linux Foundation、主流框架开始支持，但面试真题尚少——关注生态落地速度。"
+    },
+    {
+      "icon": "📜",
+      "name": "v1.0 定稿（2026-03）",
+      "text": "A2A 已于 2026-03 在 Linux Foundation 正式定稿 v1.0，150+ 组织参与，新增签名 Agent Card（Signed Agent Cards）并进入主流云平台——引用时注意版本口径。"
     }
   ],
   "exercises": [
@@ -123,11 +128,11 @@
   },
   "links": [
     {
-      "to": "e9-multi-agent-platform",
+      "to": "4-7",
       "text": "平台内部的 Agent 编排（E9）与跨组织的 A2A 互操作——内外两层"
     },
     {
-      "to": "e6-mcp-practice",
+      "to": "2-3b",
       "text": "MCP 连工具、A2A 连 Agent——回到 L2 复习垂直接入层"
     }
   ],
