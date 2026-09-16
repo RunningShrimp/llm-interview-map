@@ -43,7 +43,7 @@
 ### 硬性要求（validate.js 校验）
 | 字段 | 要求 |
 |---|---|
-| definition | ≤120 字，术语随文解释 |
+| definition | ≤100 字，术语随文解释 |
 | analogies | ≥1，场景化 |
 | demo | ≥1 个且**必须可交互把玩**：range 滑杆改参数观察变化（data-output + `--v` CSS 变量）、d-tab 切换对比、d-toggle 揭示、d-steps 步进；纯自动播放动画不算达标 |
 | keyPoints | 3-8 条 |

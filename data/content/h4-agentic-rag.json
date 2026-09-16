@@ -1,7 +1,7 @@
 {
   "id": "h4-agentic-rag",
   "title": "Agentic RAG 与自主检索智能体",
-  "definition": "Agentic RAG 让 Agent 接管检索决策：自己判断要不要查、查什么、查几轮、结果够不够——把固定 RAG 流水线升级为会规划-检索-反思的自主智能体。2025-2026 RAG 演进的主线。",
+  "definition": "Agentic RAG 让 Agent 接管检索决策：自己判断要不要查、查什么、查几轮、结果够不够——把固定 RAG 流水线升级为会规划-检索-反思的自主智能体。RAG 演进主线。",
   "analogies": [
     {
       "icon": "🧑‍🔬",

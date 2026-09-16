@@ -1,7 +1,7 @@
 {
   "id": "3-6",
   "title": "推理服务化认知：vLLM 部署一条龙",
-  "definition": "推理框架把 KV Cache 管理、连续批处理等优化打包成开箱即用的引擎：vLLM 是吞吐王者（生态最全、OpenAI 兼容 API）、TensorRT-LLM 极致延迟、llama.cpp 边缘端。选型三问：延迟、吞吐、部署环境。",
+  "definition": "推理框架把 KV Cache 管理、连续批处理打包成开箱即用的引擎：vLLM 吞吐王者（生态最全）、TensorRT-LLM 极致延迟、llama.cpp 边缘端。选型三问：延迟、吞吐、部署环境。",
   "analogies": [
     {
       "icon": "🚚",

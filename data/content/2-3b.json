@@ -1,7 +1,7 @@
 {
   "id": "2-3b",
   "title": "MCP 实操：工具即插即用",
-  "definition": "MCP（Model Context Protocol）是模型连接工具/数据源的开放标准：工具方实现一次 MCP Server，任何支持 MCP 的客户端即插即用——把 M×N 套私有集成变成 M+N，被称为 AI 应用的 USB-C。",
+  "definition": "MCP 是模型连接工具/数据源的开放标准：工具方实现一次 MCP Server，任何支持 MCP 的客户端即插即用——把 M×N 套私有集成变成 M+N，被称为 AI 应用的 USB-C。",
   "analogies": [
     {
       "icon": "🔌",

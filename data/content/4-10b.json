@@ -1,7 +1,7 @@
 {
   "id": "4-10b",
   "title": "STAR 法：把项目讲成有证据链的故事",
-  "definition": "STAR = 情境（Situation）-任务（Task）-行动（Action）-结果（Result）。项目深挖的本质是验证据链：面试官追问『数字怎么来的』就是在敲墙——每句结论都要踩在可复现的证据上。",
+  "definition": "STAR＝情境（Situation）-任务（Task）-行动（Action）-结果（Result）。项目深挖的本质是验证据链：追问『数字怎么来的』就是在敲墙——每句结论都踩在可复现的证据上。",
   "analogies": [
     {
       "icon": "🎬",

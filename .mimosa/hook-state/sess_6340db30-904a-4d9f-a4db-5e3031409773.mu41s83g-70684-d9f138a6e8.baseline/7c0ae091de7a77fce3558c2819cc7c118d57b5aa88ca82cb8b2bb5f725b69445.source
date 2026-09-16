@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /* ============================================================
- * validate.js v2 — 大纲 / 知识点内容 / Boss 题库 完整性校验
- * 用法：node tools/validate.js [--module A] （可 A,D 逗号分隔）
- * 校验：模块×层级区间、层级均衡(≥10)、deps 顺序、内容 schema、
- *      判题自洽（场景题 kw ⊆ reference）、Boss 题库、内容覆盖率
+ * validate.js v4 — rodmap 锚点 × 七关卡 大纲/内容/Boss/任务卡 校验
+ * 用法：node tools/validate.js [--module 2.5]（可 0.4,H 逗号分隔）
+ * 校验：43 锚点全覆盖、每锚点 1-4 点（主点+≤3子点）、总点数 60-95、
+ *      🆕≥10、选修标记、deps 顺序、内容 schema、判题自洽、
+ *      Boss s0-s6 题库、任务卡 t0-t6 结构
  * 退出码：0 全部通过；1 存在问题
  * ============================================================ */
 "use strict";
@@ -17,50 +18,76 @@ const S = globalThis.SYLLABUS;
 const args = process.argv.slice(2);
 let filter = null;
 const mi = args.indexOf("--module");
-if (mi !== -1 && args[mi + 1]) filter = args[mi + 1].split(",").map(s => s.trim().toUpperCase());
+if (mi !== -1 && args[mi + 1]) filter = args[mi + 1].split(",").map(s => s.trim());
 
 const norm = s => String(s == null ? "" : s).toLowerCase().replace(/\s+/g, "");
 const issues = [], warns = [];
 const err = m => issues.push(m);
 const warn = m => warns.push(m);
 
-/* ---------- 学习顺序：层级优先，同级 A→G ---------- */
-const LEVEL_INDEX = {};
-S.levels.forEach((lv, i) => { LEVEL_INDEX[lv.id] = i; });
+/* rodmap.md 权威锚点清单（43 个） */
+const RODMAP_ANCHORS = [
+  "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7",
+  "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7",
+  "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9",
+  "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10",
+  "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "4.9", "4.10"
+];
+const OPTIONAL_ANCHORS = new Set(["3.3", "4.4"]);
+const STAGES = ["S0", "S1", "S2", "S3", "S4", "S5", "S6"];
+const MASTERY = /^(了解|理解|会用|熟练|精通)(-(了解|理解|会用|熟练|精通))?$/;
+
+/* ---------- 学习顺序：关卡 → 锚点（rodmap 顺序）→ 主点/子点 ---------- */
+const STAGE_INDEX = {};
+S.levels.forEach((lv, i) => { STAGE_INDEX[lv.id] = i; });
 const ORDER = [];
 S.levels.forEach(lv => {
-  S.modules.forEach(m => m.points.forEach(p => { if (p.level === lv.id) ORDER.push({ m, p }); }));
+  S.modules.forEach(m => m.points.forEach(p => { if (p.stage === lv.id) ORDER.push({ m, p }); }));
 });
 const allIds = new Set(ORDER.map(e => e.p.id));
 const orderIdx = {};
 ORDER.forEach((e, i) => { orderIdx[e.p.id] = i; });
 
-/* ---------- 1. 矩阵结构 ---------- */
-const MODULE_RANGES = { A: [10, 14], B: [10, 13], C: [8, 11], D: [9, 13], E: [9, 13], F: [9, 12], G: [6, 9], H: [4, 8] };
-const LEVEL_MIN = 10;
-if (!S || !Array.isArray(S.modules) || S.modules.length !== 8) err("大纲：模块数应为 8");
-if (!Array.isArray(S.levels) || S.levels.length !== 4) err("大纲：层级数应为 4");
-const levelCount = { L1: 0, L2: 0, L3: 0, L4: 0 };
+/* ---------- 1. 大纲结构 ---------- */
+if (!S || !Array.isArray(S.levels) || S.levels.length !== 7) err("大纲：关卡数应为 7");
+S.levels.forEach((lv, i) => {
+  if (lv.id !== STAGES[i]) err(`大纲：第 ${i + 1} 关应为 ${STAGES[i]}`);
+  if (i > 0 && lv.unlockBy !== STAGES[i - 1]) err(`大纲：${lv.id} unlockBy 应为 ${STAGES[i - 1]}`);
+  if (!lv.project) err(`大纲：${lv.id} 缺里程碑项目`);
+});
+if (!Array.isArray(S.modules) || S.modules.length !== 44) err(`大纲：锚点数应为 44（43+H），实际 ${S.modules && S.modules.length}`);
+
 const seenIds = new Set();
+const anchorIds = new Set();
+const stageCount = {};
+let total = 0;
 (S.modules || []).forEach(m => {
-  const range = MODULE_RANGES[m.id];
-  if (range && (m.points.length < range[0] || m.points.length > range[1]))
-    err(`大纲：模块 ${m.id} 点数 ${m.points.length} 超出区间 ${range[0]}-${range[1]}`);
-  m.points.forEach(p => {
+  anchorIds.add(m.id);
+  if (m.id !== "H") {
+    if (!/^[0-4]\.[0-9]+$/.test(m.id)) err(`大纲：锚点编号非法 ${m.id}`);
+  }
+  if (OPTIONAL_ANCHORS.has(m.id) !== !!m.optional) err(`大纲：${m.id} 选修标记应为 ${OPTIONAL_ANCHORS.has(m.id)}`);
+  if (!m.keyQuestion) err(`大纲：锚点 ${m.id} 缺 keyQuestion`);
+  if (!m.mastery || !MASTERY.test(m.mastery)) err(`大纲：锚点 ${m.id} 掌握程度非法 ${m.mastery}`);
+  const maxPts = m.id === "H" ? 8 : 4;
+  if (m.points.length < 1 || m.points.length > maxPts) err(`大纲：锚点 ${m.id} 点数 ${m.points.length} 超出 1-${maxPts}`);
+  m.points.forEach((p, pi) => {
+    total++;
     if (seenIds.has(p.id)) err(`大纲：id 重复 ${p.id}`);
     seenIds.add(p.id);
-    if (!levelCount[p.level] && levelCount[p.level] !== 0) err(`大纲：${p.id} 层级非法 ${p.level}`);
-    else levelCount[p.level]++;
+    if (!STAGES.includes(p.stage)) err(`大纲：${p.id} 关卡非法 ${p.stage}`);
+    stageCount[p.stage] = (stageCount[p.stage] || 0) + 1;
     if (!p.title || !p.oneLiner) err(`大纲：${p.id} 缺 title/oneLiner`);
     if (!(p.stars >= 1 && p.stars <= 5)) err(`大纲：${p.id} 星级非法`);
     if (!p.source) err(`大纲：${p.id} 缺来源`);
+    if (pi === 0 && p.id !== m.id.replace(/\./g, "-") && !/^h\d/.test(p.id))
+      err(`大纲：锚点 ${m.id} 主知识点 id 应为锚点号 ${p.id}`);
+    if (p.optional && !m.optional) err(`大纲：${p.id} 标选修但锚点非选修`);
   });
 });
-Object.keys(levelCount).forEach(k => {
-  if (levelCount[k] < LEVEL_MIN) err(`大纲：层级 ${k} 仅 ${levelCount[k]} 点（要求 ≥${LEVEL_MIN}）`);
-});
-const total = ORDER.length;
-if (total < 65 || total > 95) err(`大纲：总点数 ${total} 超出 65-95`);
+RODMAP_ANCHORS.forEach(a => { if (!anchorIds.has(a)) err(`大纲：rodmap 锚点缺失 ${a}`); });
+if (!anchorIds.has("H")) err("大纲：缺增量模块H");
+if (total < 60 || total > 95) err(`大纲：总点数 ${total} 超出 60-95`);
 const frontierCount = ORDER.filter(e => e.p.frontier).length;
 if (frontierCount < 10) err(`大纲：🆕 前沿点数 ${frontierCount}（要求 ≥10）`);
 ORDER.forEach(e => {
@@ -144,7 +171,7 @@ function checkContent(e) {
       }
       if (!l.text) err(`${pid}：links[${i}] 缺 text`);
     });
-    if (!hasBack && (p.deps || []).length) warn(`${pid}：无前向低层级链接（依赖 ${p.deps.join(",")} 未出现在 links）`);
+    if (!hasBack && (p.deps || []).length) warn(`${pid}：无前置链接（依赖 ${p.deps.join(",")} 未出现在 links）`);
     if (!hasFwd && orderIdx[pid] < ORDER.length - 1) warn(`${pid}：无后继链接`);
   }
   if (!Array.isArray(c.interview) || c.interview.length < 1) err(`${pid}：interview ≥1`);
@@ -154,45 +181,71 @@ function checkContent(e) {
 }
 
 /* ---------- 3. Boss 题库 ---------- */
-function checkBoss(lv) {
-  const f = path.join(ROOT, "data", "boss", lv.toLowerCase() + ".json");
-  if (!fs.existsSync(f)) { err(`Boss：缺少 ${lv.toLowerCase()}.json`); return; }
+function checkBoss(sid) {
+  const f = path.join(ROOT, "data", "boss", sid.toLowerCase() + ".json");
+  if (!fs.existsSync(f)) { err(`Boss：缺少 ${sid.toLowerCase()}.json`); return; }
   let b;
   try { b = JSON.parse(fs.readFileSync(f, "utf8")); }
-  catch (e2) { err(`Boss：${lv}.json 解析失败：${e2.message}`); return; }
+  catch (e2) { err(`Boss：${sid}.json 解析失败：${e2.message}`); return; }
   const qs = b.questions || [];
-  if (qs.length < 8) err(`Boss ${lv}：题目应 ≥8，实际 ${qs.length}`);
-  const levelPts = new Set(ORDER.filter(e => e.p.level === lv).map(e => e.p.id));
+  if (qs.length !== 10) err(`Boss ${sid}：题目应恰好 10 道，实际 ${qs.length}`);
+  const stagePts = new Set(ORDER.filter(e => e.p.stage === sid).map(e => e.p.id));
   qs.forEach((q, i) => {
-    if (!q.q) err(`Boss ${lv}：第 ${i + 1} 题缺题干`);
-    if (!Array.isArray(q.options) || q.options.length < 2) err(`Boss ${lv}：第 ${i + 1} 题选项不足`);
+    if (!q.q) err(`Boss ${sid}：第 ${i + 1} 题缺题干`);
+    if (!Array.isArray(q.options) || q.options.length < 2) err(`Boss ${sid}：第 ${i + 1} 题选项不足`);
     if (!(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < (q.options || []).length))
-      err(`Boss ${lv}：第 ${i + 1} 题 answer 非法`);
-    if (!q.explain) err(`Boss ${lv}：第 ${i + 1} 题缺解析`);
-    if (q.ref && !allIds.has(q.ref)) err(`Boss ${lv}：第 ${i + 1} 题 ref 不存在 ${q.ref}`);
-    else if (q.ref && !levelPts.has(q.ref)) warn(`Boss ${lv}：第 ${i + 1} 题 ref 不属于本层级（${q.ref}）`);
+      err(`Boss ${sid}：第 ${i + 1} 题 answer 非法`);
+    if (!q.explain) err(`Boss ${sid}：第 ${i + 1} 题缺解析`);
+    if (q.ref && !allIds.has(q.ref)) err(`Boss ${sid}：第 ${i + 1} 题 ref 不存在 ${q.ref}`);
+    else if (q.ref && !stagePts.has(q.ref)) warn(`Boss ${sid}：第 ${i + 1} 题 ref 不属于本关卡（${q.ref}）`);
+  });
+  const covered = new Set(qs.map(q => q.ref).filter(Boolean));
+  if (covered.size < 5) warn(`Boss ${sid}：仅覆盖 ${covered.size} 个考点（建议 ≥5）`);
+}
+
+/* ---------- 4. 实战任务卡 ---------- */
+function checkTask(sid) {
+  const f = path.join(ROOT, "data", "tasks", sid.toLowerCase() + ".json");
+  if (!fs.existsSync(f)) { err(`任务卡：缺少 ${sid.toLowerCase()}.json`); return; }
+  let t;
+  try { t = JSON.parse(fs.readFileSync(f, "utf8")); }
+  catch (e2) { err(`任务卡：${sid}.json 解析失败：${e2.message}`); return; }
+  if (t.stage !== sid) err(`任务卡 ${sid}：stage=${t.stage} 不符`);
+  if (!t.project) err(`任务卡 ${sid}：缺 project`);
+  if (!Array.isArray(t.steps) || t.steps.length < 3) err(`任务卡 ${sid}：steps 应 ≥3`);
+  else t.steps.forEach((s2, i) => { if (!s2.title || !s2.detail) err(`任务卡 ${sid}：steps[${i}] 缺字段`); });
+  if (!Array.isArray(t.checklist) || t.checklist.length < 3) err(`任务卡 ${sid}：checklist 应 ≥3`);
+  if (t.arch && /https?:\/\//i.test(t.arch)) err(`任务卡 ${sid}：arch 含外部 URL`);
+  if (!Array.isArray(t.tips) || t.tips.length < 1) warn(`任务卡 ${sid}：建议补 tips`);
+}
+
+/* ---------- 5. 执行与报告 ---------- */
+const targets = filter ? S.modules.filter(m => filter.includes(m.id)) : S.modules;
+targets.forEach(m => m.points.forEach(p => checkContent({ m, p })));
+const checkAll = !filter;
+if (checkAll) {
+  STAGES.forEach(checkBoss);
+  STAGES.forEach(checkTask);
+  /* 退役文件检查：data/content 中不应残留大纲外的旧文件 */
+  fs.readdirSync(JSONDIR).forEach(fn => {
+    if (!fn.endsWith(".json")) return;
+    const id = fn.slice(0, -5);
+    if (!allIds.has(id)) err(`内容：${fn} 不在大纲中（退役未清理）`);
   });
 }
 
-/* ---------- 4. 执行与报告 ---------- */
-const targets = filter ? S.modules.filter(m => filter.includes(m.id)) : S.modules;
-targets.forEach(m => m.points.forEach(p => checkContent({ m, p })));
-const checkAllBoss = !filter;
-if (checkAllBoss) ["L1", "L2", "L3", "L4"].forEach(checkBoss);
-
-console.log("=== 矩阵校验 ===");
-console.log(`总点数 ${total}（65-95）｜ 🆕前沿 ${frontierCount} ｜ 层级分布 L1:${levelCount.L1} L2:${levelCount.L2} L3:${levelCount.L3} L4:${levelCount.L4}（每级 ≥${LEVEL_MIN}）`);
+console.log("=== 大纲校验（v4 七关卡 × 43 锚点）===");
+console.log(`总点数 ${total}（60-95）｜ 🆕前沿 ${frontierCount} ｜ 锚点 ${anchorIds.size}/44`);
+console.log(`关卡分布 ` + STAGES.map(s2 => `${s2}:${stageCount[s2] || 0}`).join(" "));
 S.modules.forEach(m => {
-  const r = MODULE_RANGES[m.id];
-  const ok = m.points.length >= r[0] && m.points.length <= r[1];
-  const dist = ["L1", "L2", "L3", "L4"].map(l => m.points.filter(p => p.level === l).length).join("/");
-  console.log(`  模块${m.id} ${m.points.length}点（L1/L2/L3/L4=${dist}）${ok ? "✓" : "✗超区间"}`);
+  const st = m.points.map(p => p.stage).filter((v, i, a) => a.indexOf(v) === i).join(",");
+  console.log(`  锚点 ${m.id}${m.optional ? "*" : ""} ${m.points.length}点（${st}）`);
 });
 const scopeIds = [];
 targets.forEach(m => m.points.forEach(p => scopeIds.push(p.id)));
 const have = scopeIds.filter(id => fs.existsSync(path.join(JSONDIR, id + ".json"))).length;
 console.log(`=== 内容覆盖 === ${have}/${scopeIds.length}（当前范围）`);
-if (warns.length) { console.log("=== 警告 ==="); warns.forEach(w => console.log("  ⚠ " + w)); }
+if (warns.length) { console.log(`=== 警告（${warns.length}）===`); warns.forEach(w => console.log("  ⚠ " + w)); }
 if (issues.length) {
   console.log(`=== 问题（${issues.length}）===`);
   issues.forEach(e2 => console.log("  ✗ " + e2));

@@ -1,7 +1,7 @@
 {
   "id": "h3-context-engineering-practice",
   "title": "Context Engineering 前沿实践",
-  "definition": "Context Engineering（上下文工程）是 2025 年取代『提示词工程』的体系化学科：不只写指令，而是管理模型每一步『看见什么』——压缩（compaction）、记忆工具、子代理隔离、按需检索，是长任务 Agent 的生命线。",
+  "definition": "Context Engineering（上下文工程）是取代『提示词工程』的体系化学科：管理模型每一步『看见什么』——压缩、记忆工具、子代理隔离、按需检索，是长任务 Agent 的生命线。",
   "analogies": [
     {
       "icon": "🎬",

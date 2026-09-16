@@ -1,9 +1,10 @@
 /* ============================================================
- * app.js v2 — 四级晋升 + 游戏化
+ * app.js v4 — 七关卡晋升 + rodmap 锚点体系 + 实战任务卡
  * 路由：#/ 首页 ｜ #/map 技能树 ｜ #/knowledge/:id 知识点
- *      #/boss/:level Boss 战 ｜ #/wrongbook 错题本 ｜ #/progress 战绩
- * 体系：XP 经验值 → 头衔晋升；Boss 战 ≥80% 解锁下一层级；
- *      错题自动收录 + 1/3/7 天间隔重复复习提醒。
+ *      #/boss/:stage Boss 战 ｜ #/task/:stage 实战任务卡
+ *      #/wrongbook 错题本 ｜ #/progress 战绩
+ * 体系：XP → 七级头衔（AI 新手→…→准专家）；每关 Boss ≥80% 解锁下一关；
+ *      锚点标注（编号/掌握程度/关键问题）；选修*不强制；错题 1/3/7 间隔重复。
  * ============================================================ */
 (function () {
   "use strict";
@@ -35,28 +36,28 @@
     return d.toISOString().slice(0, 10);
   }
 
-  /* ---------- 大纲索引：学习顺序 = 层级优先，同级按模块 A→G ---------- */
-  var LEVEL_INDEX = {};
-  S.levels.forEach(function (lv, i) { LEVEL_INDEX[lv.id] = i; });
+  /* ---------- 大纲索引：学习顺序 = 关卡 → 锚点（rodmap 顺序）→ 主点/子点 ---------- */
+  var STAGE_INDEX = {};
+  S.levels.forEach(function (lv, i) { STAGE_INDEX[lv.id] = i; });
   var ORDER = []; /* [{m, p}] */
   S.levels.forEach(function (lv) {
     S.modules.forEach(function (m) {
-      m.points.forEach(function (p) { if (p.level === lv.id) ORDER.push({ m: m, p: p }); });
+      m.points.forEach(function (p) { if (p.stage === lv.id) ORDER.push({ m: m, p: p }); });
     });
   });
   var byId = {};
   ORDER.forEach(function (e) { byId[e.p.id] = e; });
-  function moduleById(mid) {
-    return S.modules.filter(function (m) { return m.id.toLowerCase() === String(mid).toLowerCase(); })[0];
+  function stageById(sid) {
+    return S.levels.filter(function (l) { return l.id === String(sid).toUpperCase(); })[0];
   }
 
   /* ---------- 本地进度（localStorage） ---------- */
-  var KEY = "llm-quest:v2";
+  var KEY = "llm-quest:v4";
   function defaultState() {
     return {
       xp: 0,
       visited: {}, choice: {}, scenario: {}, feynman: {}, teachback: {},
-      boss: {}, wrongbook: {}, last: null
+      boss: {}, wrongbook: {}, tasks: {}, last: null
     };
   }
   var state = (function () {
@@ -72,23 +73,23 @@
   })();
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 配额忽略 */ } }
 
-  /* ---------- 等级/解锁/头衔 ---------- */
-  function levelUnlocked(lid) {
-    var lv = S.levels[LEVEL_INDEX[lid]];
-    if (!lv.unlockBy) return true;
-    var prev = state.boss[lv.unlockBy];
-    return !!(prev && prev.passed);
+  /* ---------- 关卡/解锁/头衔 ---------- */
+  function stageUnlocked(sid) {
+    var idx = STAGE_INDEX[sid];
+    if (!idx) return true;
+    var prev = S.levels[idx - 1];
+    var rec = state.boss[prev.id];
+    return !!(rec && rec.passed);
   }
-  function isUnlocked(entry) { return levelUnlocked(entry.p.level); }
+  function isUnlocked(entry) { return stageUnlocked(entry.p.stage); }
   function currentTitleIdx() {
     var t = S.titleThresholds, idx = 0;
     for (var i = 0; i < t.length; i++) if (state.xp >= t[i]) idx = i;
     return idx;
   }
-  function currentLevelProgress() {
-    /* 已解锁的最高层级 */
+  function currentStageProgress() {
     var maxIdx = 0;
-    S.levels.forEach(function (lv, i) { if (levelUnlocked(lv.id)) maxIdx = i; });
+    S.levels.forEach(function (lv, i) { if (stageUnlocked(lv.id)) maxIdx = i; });
     return maxIdx;
   }
   function addXp(n) {
@@ -111,12 +112,21 @@
       .catch(function () { return null; });
   }
   var bossCache = {};
-  function getBoss(lid) {
-    var key = lid.toLowerCase();
+  function getBoss(sid) {
+    var key = String(sid).toLowerCase();
     if (bossCache[key]) return Promise.resolve(bossCache[key]);
     return fetch("./data/boss/" + key + ".json")
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (j) { bossCache[key] = j; return j; })
+      .catch(function () { return null; });
+  }
+  var taskCache = {};
+  function getTask(sid) {
+    var key = String(sid).toLowerCase();
+    if (taskCache[key]) return Promise.resolve(taskCache[key]);
+    return fetch("./data/tasks/" + key + ".json")
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) { taskCache[key] = j; return j; })
       .catch(function () { return null; });
   }
 
@@ -127,7 +137,8 @@
     if (parts.length === 0) return { page: "home" };
     if (parts[0] === "map") return { page: "map" };
     if (parts[0] === "knowledge" && parts[1]) return { page: "knowledge", id: parts[1] };
-    if (parts[0] === "boss" && parts[1]) return { page: "boss", level: parts[1].toUpperCase() };
+    if (parts[0] === "boss" && parts[1]) return { page: "boss", stage: parts[1].toUpperCase() };
+    if (parts[0] === "task" && parts[1]) return { page: "task", stage: parts[1].toUpperCase() };
     if (parts[0] === "wrongbook") return { page: "wrongbook" };
     if (parts[0] === "progress") return { page: "progress" };
     return { page: "home" };
@@ -136,24 +147,17 @@
   function headerHud() {
     var el = $("#header-hud");
     if (!el) return;
-    var lvIdx = currentLevelProgress();
+    var lvIdx = currentStageProgress();
     var lv = S.levels[lvIdx];
     var tIdx = currentTitleIdx();
     var prevT = S.titleThresholds[tIdx] || 0;
     var nextT = tIdx + 1 < S.titleThresholds.length ? S.titleThresholds[tIdx + 1] : state.xp;
     var pct = nextT > prevT ? Math.min(100, Math.round((state.xp - prevT) / (nextT - prevT) * 100)) : 100;
     el.innerHTML =
-      '<span class="hud-level" style="--lc:' + lv.color + '">' + lv.icon + " " + lv.id + " " + lv.name + "</span>" +
+      '<span class="hud-level" style="--lc:' + lv.color + '">' + lv.icon + " " + lv.name + "</span>" +
       '<span class="hud-title">' + esc(lv.title) + "</span>" +
       '<div class="hud-xp"><div class="bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
       "<span>" + state.xp + " XP</span></div>";
-  }
-
-  /* ---------- Boss 可挑战判定 ---------- */
-  function bossOpen(lid) {
-    var lv = S.levels[LEVEL_INDEX[lid]];
-    /* Boss Lx 需要先解锁层级 Lx（即上一级 Boss 已通过） */
-    return levelUnlocked(lid);
   }
 
   function celebrateIfPending() {
@@ -170,7 +174,7 @@
     overlay.innerHTML =
       confetti +
       '<div class="celebrate-card d-anim">🎉<h2>晋升成功！</h2><p>你已晋升为 <b style="color:' + lv.color + '">' + esc(lv.title) + "</b></p>" +
-      '<p class="dim">新的层级已解锁，继续向架构师之路前进！</p><button class="btn primary" onclick="this.closest(\'.celebrate-overlay\').remove()">继续冒险 →</button></div>';
+      '<p class="dim">新关卡「' + esc(lv.name) + '」已解锁，继续向准专家之路前进！</p><button class="btn primary" onclick="this.closest(\'.celebrate-overlay\').remove()">继续冒险 →</button></div>';
     document.body.appendChild(overlay);
     setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 6000);
   }
@@ -183,7 +187,8 @@
     else if (r.page === "map") renderSkillTree(app);
     else if (r.page === "progress") app.innerHTML = renderProgress();
     else if (r.page === "wrongbook") renderWrongbook(app);
-    else if (r.page === "boss") renderBoss(app, r.level);
+    else if (r.page === "boss") renderBoss(app, r.stage);
+    else if (r.page === "task") renderTask(app, r.stage);
     else if (r.page === "knowledge") renderKnowledge(app, r.id);
     celebrateIfPending();
     window.scrollTo(0, 0);
@@ -199,107 +204,126 @@
     return n;
   }
 
+  function stageStats(sid) {
+    var pts = ORDER.filter(function (e) { return e.p.stage === sid; });
+    var done = pts.filter(function (e) { return state.visited[e.p.id]; }).length;
+    return { pts: pts, done: done };
+  }
+
   function renderHome() {
-    var lvIdx = currentLevelProgress();
+    var lvIdx = currentStageProgress();
     var lv = S.levels[lvIdx];
-    var tIdx = currentTitleIdx();
     var resume = state.last && byId[state.last] ? "#/knowledge/" + state.last
       : (ORDER[0] ? "#/knowledge/" + ORDER[0].p.id : "#/map");
     var nextBoss = null;
     for (var i = 0; i < S.levels.length; i++) {
+      var unlocked = stageUnlocked(S.levels[i].id);
       var b = state.boss[S.levels[i].id];
-      if (!(b && b.passed)) { nextBoss = S.levels[i]; break; }
+      if (unlocked && !(b && b.passed)) { nextBoss = S.levels[i]; break; }
     }
-    var levelCards = S.levels.map(function (l, idx) {
-      var pts = ORDER.filter(function (e) { return e.p.level === l.id; });
-      var done = pts.filter(function (e) { return state.visited[e.p.id]; }).length;
-      var unlocked = levelUnlocked(l.id);
+    var stageCards = S.levels.map(function (l) {
+      var st = stageStats(l.id);
+      var unlocked = stageUnlocked(l.id);
       var boss = state.boss[l.id];
-      var pct = pts.length ? Math.round(done / pts.length * 100) : 0;
+      var pct = st.pts.length ? Math.round(st.done / st.pts.length * 100) : 0;
+      var task = state.tasks[l.id];
       return (
         '<div class="level-card ' + (unlocked ? "" : "locked") + '" style="--lc:' + l.color + '">' +
           '<div class="lc-head"><span class="lc-icon">' + l.icon + "</span>" +
           '<div><div class="lc-name">' + l.id + " " + l.name + ' <span class="badge" style="background:' + l.color + ';color:#fff">' + esc(l.title) + "</span></div>" +
-          '<div class="lc-desc">' + esc(l.desc) + "</div></div>" +
-          (unlocked ? '<span class="lc-open">🔓</span>' : '<span class="lc-lock" title="需先通过 ' + esc(l.unlockBy) + ' Boss 战">🔒</span>') + "</div>" +
-          '<div class="lc-bar-row"><div class="bar"><div class="fill" style="width:' + pct + '%"></div></div><span>' + done + "/" + pts.length + "</span></div>" +
+          '<div class="lc-desc">' + esc(l.desc) + " ｜ 🎯 里程碑：" + esc(l.project) + "</div></div>" +
+          (unlocked ? '<span class="lc-open">🔓</span>' : '<span class="lc-lock" title="需先通过上一关 Boss 战">🔒</span>') + "</div>" +
+          '<div class="lc-bar-row"><div class="bar"><div class="fill" style="width:' + pct + '%"></div></div><span>' + st.done + "/" + st.pts.length + "</span></div>" +
           '<div class="lc-actions">' +
-            '<a class="btn small" href="#/map' + '">进入关卡</a>' +
+            '<a class="btn small" href="#/map">进入关卡</a>' +
             (unlocked
-              ? '<a class="btn small primary" href="#/boss/' + l.id + '">' + (boss && boss.passed ? "🏆 Boss 战已通过（" + boss.best + " 分）" : "⚔️ 挑战 Boss 战") + "</a>"
-              : '<span class="dim small-note">🔒 通过 ' + esc(l.unlockBy) + ' Boss 战解锁</span>') +
+              ? '<a class="btn small primary" href="#/boss/' + l.id + '">' + (boss && boss.passed ? "🏆 Boss 已通过（" + boss.best + " 分）" : "⚔️ 挑战 Boss 战") + "</a>" +
+                '<a class="btn small" href="#/task/' + l.id + '">🧰 ' + (task && task.done ? "任务卡已自评 ✓" : "实战任务卡") + "</a>"
+              : '<span class="dim small-note">🔒 通过上一关 Boss 战解锁</span>') +
           "</div>" +
         "</div>"
       );
     }).join("");
     var due = dueCount();
+    var doneAll = ORDER.filter(function (e) { return state.visited[e.p.id]; }).length;
     return (
       '<div class="hero fade-in">' +
-        "<h1>🧭 LLM 应用开发 · 四级晋升之路</h1>" +
-        "<p>从小白到架构师的系统路线：<b>L1 筑基 → L2 应用 → L3 原理 → L4 专家</b>，共 " + ORDER.length +
-        " 个考点。完成知识点与例题赚 XP，每级末尾通过 <b>Boss 模拟面试（≥80%）</b> 解锁下一级。</p>" +
+        "<h1>🧭 AI Agent 与 AI 工程化 · 七关晋升之路</h1>" +
+        "<p>零基础到独立交付 Agent 的系统路线：<b>关0 基础热身 → 关6 综合项目与作品集</b>，共 " + ORDER.length +
+        " 个考点（rodmap 43 锚点全覆盖 + 2026 前沿）。完成知识点与例题赚 XP，每关通过 <b>Boss 模拟面试（≥80%）</b>解锁下一关，并用 <b>实战任务卡</b>完成里程碑项目自评。</p>" +
         '<div class="hud-row">' +
           '<span class="badge" style="background:' + lv.color + ';color:#fff">当前头衔：' + esc(lv.title) + "</span>" +
           "<span>" + state.xp + " XP</span>" +
-          (nextBoss ? '<a class="btn small primary" href="#/boss/' + nextBoss.id + '">⚔️ 下一场 Boss：' + nextBoss.id + " " + nextBoss.name + "</a>" : '<span class="badge">👑 全部层级通关！</span>') +
+          (nextBoss ? '<a class="btn small primary" href="#/boss/' + nextBoss.id + '">⚔️ 下一场 Boss：' + nextBoss.name + "</a>" : '<span class="badge">👑 全部关卡通关！</span>') +
           (due ? '<a class="btn small" style="border-color:#f59e0b;color:#b45309" href="#/wrongbook">📖 错题复习 ' + due + " 条到期</a>" : "") +
         "</div>" +
-        '<div class="cta-row"><a class="btn primary" href="' + resume + '">▶ ' + (state.last ? "继续上次学习" : "开始 L1 之旅") + "</a>" +
+        '<div class="cta-row"><a class="btn primary" href="' + resume + '">▶ ' + (state.last ? "继续上次学习" : "开始关0 之旅") + "</a>" +
         '<a class="btn" href="#/map">🗺️ 技能树</a><a class="btn" href="#/wrongbook">📖 错题本</a><a class="btn" href="#/progress">📈 战绩</a></div>' +
       "</div>" +
-      '<h1 class="page-title">四大关卡</h1><p class="lead">逐级推进：完成本级知识点并打赢 Boss 战，才能解锁下一级。</p>' +
-      '<div class="level-grid">' + levelCards + "</div>" +
+      '<h1 class="page-title">七大关卡</h1><p class="lead">逐关推进：学考点 → 打 Boss（≥80%）→ 做里程碑任务卡 → 解锁下一关。</p>' +
+      '<div class="level-grid">' + stageCards + "</div>" +
       '<div class="about-box fade-in">' +
         "<h3>玩法说明</h3><ul>" +
-          "<li>读知识点 +10 XP，答对选择题 +15，场景题要点命中 ≥80% +25，Boss 战答对每题 +10、首次通关 +100。</li>" +
-          "<li>XP 对应头衔晋升（小白 → 应用工程师 → 原理达人 → 面试架构师）；层级解锁由 Boss 战把守（≥80% 通过）。</li>" +
-          "<li>答错的题自动进错题本，按 1/3/7 天间隔重复提醒复习，复习答对即移出。</li>" +
-          "<li>L4 专家级每个考点含「出一道题考别人」费曼终极练习——能出题才是真掌握。</li>" +
+          "<li>读知识点 +10 XP，答对选择题 +15，场景题要点命中 ≥80% +25，Boss 战答对每题 +10、首次通关 +100，任务卡自评完成 +60。</li>" +
+          "<li>XP 对应头衔晋升（AI 新手 → 应用工程师 → 单 Agent 工程师 → RAG 工程师 → AI 工程化工程师 → 多 Agent 工程师 → 准专家）；关卡解锁由 Boss 战把守。</li>" +
+          "<li>每个考点页顶部标注 <b>rodmap 锚点编号、建议掌握程度与关键问题</b>；带 * 的锚点为进阶选修，不强制通关。</li>" +
+          "<li>答错的题自动进错题本，按 1/3/7 天间隔重复提醒复习；「精通」级考点含「出一道题考别人」费曼终极练习。</li>" +
         "</ul>" +
-        "<h3>内容来源</h3><ul><li>考点来自牛客网面经、小林coding、《AI Agent 面试 Top50 必刷题》等公开资料，每页标注星级与来源；仅供学习参考。</li></ul>" +
+        "<h3>内容来源</h3><ul><li>考点与真题来自牛客网面经、小林coding、卡码笔记、《AI Agent 面试 Top50》及 OpenAI/Anthropic/DeepSeek 官方文档与 arXiv 论文（2025-2026），每页标注星级与来源；🆕 为 2025-09 后前沿点。仅供学习参考。</li></ul>" +
       "</div>"
     );
   }
 
   /* ---------- 技能树 ---------- */
+  function masteryBadge(mv) {
+    return '<span class="badge mastery-badge">' + esc(mv) + "</span>";
+  }
+
   function renderSkillTree(app) {
-    var html = '<h1 class="page-title">🗺️ 技能树</h1>' +
-      '<p class="lead">层级为关卡、知识点为节点；完成节点即点亮，击败层级 Boss 解锁下一关。</p>';
+    var html = '<h1 class="page-title">🗺️ 技能树 · 七关学习地图</h1>' +
+      '<p class="lead">关卡为地图区域、锚点为分组、知识点为节点；完成点亮，击败关卡 Boss 解锁下一关。带 <span class="opt-badge">*</span> 为选修锚点（不强制通关），<span class="f-badge">🆕</span> 为 2026 前沿。</p>';
     S.levels.forEach(function (lv) {
-      var unlocked = levelUnlocked(lv.id);
-      var pts = ORDER.filter(function (e) { return e.p.level === lv.id; });
-      var done = pts.filter(function (e) { return state.visited[e.p.id]; }).length;
+      var unlocked = stageUnlocked(lv.id);
+      var st = stageStats(lv.id);
       var boss = state.boss[lv.id];
       html += '<div class="level-section" style="--lc:' + lv.color + '">' +
-        '<div class="ls-head">' + lvsLabel(lv) +
-          '<span class="badge">' + done + "/" + pts.length + " 节点点亮</span>" +
+        '<div class="ls-head">' +
+          '<span class="ls-level" style="background:' + lv.color + '">' + lv.icon + " " + lv.id + " · " + lv.name + "</span>" +
+          '<span class="ls-title">头衔目标：' + esc(lv.title) + "</span>" +
+          '<span class="badge">' + st.done + "/" + st.pts.length + " 节点点亮</span>" +
           (boss && boss.passed ? '<span class="badge" style="background:#10b981;color:#fff">🏆 Boss 已通关 ' + boss.best + "</span>" : "") +
           (!unlocked ? '<span class="lock-note">🔒 需通过 ' + esc(lv.unlockBy) + " Boss 战解锁</span>" : "") +
         "</div>";
       if (unlocked) {
         html += '<div class="ls-body">';
         S.modules.forEach(function (m) {
-          var mp = m.points.filter(function (p) { return p.level === lv.id; });
+          var mp = m.points.filter(function (p) { return p.stage === lv.id; });
           if (!mp.length) return;
           var mdone = mp.filter(function (p) { return state.visited[p.id]; }).length;
-          html += '<details class="tree-module" style="--mod:' + m.color + '"' + (mp.some(function (p) { return !state.visited[p.id]; }) ? " open" : "") + ">" +
-            "<summary><span>" + m.icon + '</span><span class="tm-name">模块' + m.id + " · " + esc(m.name) + "</span>" +
+          var lc = S.layerColors[m.layer] || "#64748b";
+          html += '<details class="tree-module" style="--mod:' + lc + '"' + (mp.some(function (p) { return !state.visited[p.id]; }) ? " open" : "") + ">" +
+            "<summary><span>" + m.icon + '</span><span class="tm-name">锚点 ' + m.id + " · " + esc(m.name) + (m.optional ? ' <span class="opt-badge">*选修</span>' : "") + "</span>" +
+            masteryBadge(m.mastery) +
             '<span class="mm-count">' + mdone + "/" + mp.length + "</span><span class=\"arrow\">▶</span></summary>" +
+            '<div class="anchor-goal">🎯 锚点关键问题：' + esc(m.keyQuestion) + '</div>' +
             '<div class="tree-flow">' +
             mp.map(function (p, i) {
               var isDone = !!state.visited[p.id];
               return (i > 0 ? '<svg class="flow-arrow" width="14" height="26" viewBox="0 0 14 26"><line class="d-flow-line" x1="7" y1="0" x2="7" y2="18" stroke="currentColor" stroke-width="2"/><polygon points="2,16 12,16 7,25" fill="currentColor"/></svg>' : "") +
                 '<a class="tree-node' + (isDone ? " done" : "") + '" href="#/knowledge/' + p.id + '">' +
-                  '<span class="tn-badge" style="background:' + m.color + '">' + p.num + "</span>" +
-                  '<span class="tn-body"><span class="tn-title">' + esc(p.title) + (p.frontier ? ' <span class="f-badge">🆕</span>' : '') + "</span>" +
+                  '<span class="tn-badge" style="background:' + lc + '">' + p.num + "</span>" +
+                  '<span class="tn-body"><span class="tn-title">' + esc(p.title) + (p.frontier ? ' <span class="f-badge">🆕</span>' : "") + (p.optional ? ' <span class="opt-badge">*选修</span>' : "") + "</span>" +
                   '<span class="tn-meta"><span class="stars">' + starHtml(p.stars) + "</span><span> +" + S.xp.visit + " XP</span></span></span>" +
                   '<span class="tn-check">' + (isDone ? "✓" : "") + "</span></a>";
             }).join("") +
             "</div></details>";
         });
-        html += '<a class="boss-gate" href="#/boss/' + lv.id + '" style="--lc:' + lv.color + '">' +
-          "⚔️ 关卡 Boss：模拟面试 · " + lv.id + " 层级高频真题 · 通过率 ≥80% 解锁" +
-          (S.levels[LEVEL_INDEX[lv.id] + 1] ? "「" + S.levels[LEVEL_INDEX[lv.id] + 1].name + "」" : "（终极通关）") + " →</a>";
+        html += '<div class="stage-extras">' +
+          '<a class="boss-gate" href="#/boss/' + lv.id + '" style="--lc:' + lv.color + '">' +
+          "⚔️ 关卡 Boss：模拟面试 · 本关高频真题 · 通过率 ≥80% 解锁" +
+          (S.levels[STAGE_INDEX[lv.id] + 1] ? "「" + S.levels[STAGE_INDEX[lv.id] + 1].name + "」" : "（终极通关）") + " →</a>" +
+          '<a class="task-gate" href="#/task/' + lv.id + '">🧰 实战任务卡：' + esc(lv.project) + (state.tasks[lv.id] && state.tasks[lv.id].done ? "（已自评 ✓）" : "") + " →</a>" +
+          "</div>";
         html += "</div>";
       } else {
         html += '<div class="ls-locked">🔒 通过 <b>' + esc(lv.unlockBy) + " Boss 战</b> 后解锁本关卡全部节点</div>";
@@ -308,12 +332,9 @@
     });
     app.innerHTML = html;
   }
-  function lvsLabel(lv) {
-    return '<span class="ls-level" style="background:' + lv.color + '">' + lv.icon + " " + lv.id + " · " + lv.name + "</span><span class=\"ls-title\">" + esc(lv.title) + "</span>";
-  }
 
   /* ---------- 知识点页 ---------- */
-  var currentPoint = null, currentContent = null, currentQuiz = null;
+  var currentPoint = null, currentContent = null;
 
   function renderKnowledge(app, id) {
     var entry = byId[id];
@@ -322,12 +343,12 @@
       return;
     }
     var m = entry.m, p = entry.p;
-    var lv = S.levels[LEVEL_INDEX[p.level]];
-    var unlocked = levelUnlocked(p.level);
+    var lv = stageById(p.stage);
+    var unlocked = stageUnlocked(p.stage);
     if (!unlocked) {
       app.innerHTML =
         '<div class="content-pending lock-page" style="--lc:' + lv.color + '">' +
-          "<h2>🔒 该关卡尚未解锁</h2><p>「" + lv.id + " " + lv.name + " · " + esc(lv.title) + "」层级需要先通过 <b>" +
+          "<h2>🔒 该关卡尚未解锁</h2><p>「" + lv.id + " " + lv.name + " · " + esc(lv.title) + "」需要先通过 <b>" +
           esc(lv.unlockBy) + " Boss 战</b>（≥80%）解锁。</p>" +
           '<a class="btn primary" href="#/boss/' + lv.unlockBy + '">⚔️ 去挑战 ' + lv.unlockBy + " Boss 战</a> " +
           '<a class="btn" href="#/map">返回技能树</a></div>';
@@ -376,12 +397,12 @@
       }).join("");
 
       var teachback = "";
-      if (p.level === "L4") {
+      if (String(m.mastery).indexOf("精通") >= 0 || (p.frontier && String(m.layer) === "H")) {
         var tb = state.teachback[id];
         teachback =
-          '<section class="k-section" style="--mod:' + m.color + '">' +
+          '<section class="k-section" style="--mod:' + (S.layerColors[m.layer] || "#64748b") + '">' +
             '<div class="sec-title"><span class="sec-ico">🎓</span>费曼终极检验：出一道题考别人</div>' +
-            '<p>架构师的证明是能出题。请基于本考点出一道面试题（题干 + 参考答案要点），出完自检三项。</p>' +
+            '<p>精通的证明是能出题。请基于本考点出一道面试题（题干 + 参考答案要点），出完自检三项。</p>' +
             '<textarea class="ex-input" data-role="tb-q" placeholder="题目：例如「为什么 X 场景下不用 Y？请说明权衡」……">' + (tb ? esc(tb.q) : "") + "</textarea>" +
             '<textarea class="ex-input" data-role="tb-a" placeholder="参考答案要点：判卷标准是什么？">' + (tb ? esc(tb.a) : "") + "</textarea>" +
             '<div class="tb-checks">' +
@@ -390,61 +411,66 @@
                 return '<label class="tb-check"><input type="checkbox" data-tbc="' + i + '"' + (on ? " checked" : "") + "> " + t + "</label>";
               }).join("") +
             "</div>" +
-            '<div class="ex-foot"><button class="btn small primary" data-act="teachback-save">提交我的考题（+' + (S.xp.scenario) + " XP）</button>" +
+            '<div class="ex-foot"><button class="btn small primary" data-act="teachback-save">提交我的考题（+' + S.xp.scenario + " XP）</button>" +
             '<span class="ex-result-chip" data-role="tb-result">' + (tb ? "✅ 已提交" : "") + "</span></div>" +
           "</section>";
       }
 
+      var lc = S.layerColors[m.layer] || "#64748b";
       app.innerHTML =
-        '<div class="breadcrumb"><a href="#/">首页</a> / <a href="#/map">' + lv.id + " " + lv.name + "</a> / 模块" + m.id + " / " + p.num + "</div>" +
+        '<div class="breadcrumb"><a href="#/">首页</a> / <a href="#/map">' + lv.id + " " + lv.name + "</a> / 锚点 " + m.id + " / " + p.num + "</div>" +
         '<div class="level-strip" style="--lc:' + lv.color + '">' + lv.icon + " <b>" + lv.id + " " + lv.name + "</b> · 目标头衔 " + esc(lv.title) +
-          " · <span class='dim'>完成本考点 +" + S.xp.visit + " XP</span></div>" +
-        '<header class="k-head" style="--mod:' + m.color + '">' +
-          "<h1>" + p.num + " · " + esc(p.title) + "</h1>" +
+          " · <span class='dim'>完成本考点 +" + S.xp.visit + " XP</span>" +
+          ' · <a style="color:inherit" href="#/task/' + lv.id + '">🧰 本关任务卡</a></div>' +
+        '<header class="k-head" style="--mod:' + lc + '">' +
+          "<h1>" + p.num + " · " + esc(p.title) + (p.frontier ? ' <span class="f-badge">🆕</span>' : "") + "</h1>" +
           '<div class="k-meta"><span class="stars">' + starHtml(p.stars) + "</span>" +
-            '<span class="badge">' + p.level + " 层级</span>" +
+            '<span class="badge">锚点 ' + m.id + "（" + esc(m.name) + "）</span>" +
+            '<span class="badge mastery-badge">建议掌握：' + esc(m.mastery) + "</span>" +
+            (p.optional || m.optional ? '<span class="badge opt-badge">*进阶选修</span>' : "") +
             (p.frontier ? '<span class="badge f-badge">🆕 2026 前沿</span>' : "") +
             "<span>来源：" + esc(p.source) + "</span>" +
             "<span>前置依赖：" + depsHtml + "</span></div>" +
+          '<div class="key-question">🎯 本页学习目标（锚点关键问题）：<b>' + esc(m.keyQuestion) + "</b></div>" +
         "</header>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🍼</span>小白定义</div><p>' + esc(c.definition) + "</p></section>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🎯</span>生活类比</div>' +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🍼</span>小白定义</div><p>' + esc(c.definition) + "</p></section>" +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🎯</span>生活类比</div>' +
           (c.analogies || []).map(function (a, i) {
             return '<div class="analog-card"><span class="an-icon">' + (a.icon || "💡") + "</span><div><div class=\"an-name\">类比 " + (i + 1) + "：" + esc(a.name) + "</div><p>" + esc(a.text) + "</p></div></div>";
           }).join("") +
         "</section>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🕹️</span>交互演示（动手把玩）</div>' +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🕹️</span>交互演示（动手把玩）</div>' +
           '<div class="demo-box"><div class="demo-title">' + esc(c.demo.title) + "</div>" +
           '<div class="demo-desc">' + esc(c.demo.description) + "</div>" + sanitizeDemo(c.demo.html) + "</div></section>" +
-        ((c.keyPoints || []).length ? '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">📌</span>核心要点</div><ul class="kp-list">' +
+        ((c.keyPoints || []).length ? '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">📌</span>核心要点</div><ul class="kp-list">' +
           c.keyPoints.map(function (k2) {
             return '<li><span class="kp-ico">' + (k2.icon || "📌") + '</span><span><b>' + esc(k2.name) + "</b>：" + esc(k2.text) + "</span></li>";
           }).join("") + "</ul></section>" : "") +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">✍️</span>例题实战（答对得 XP）</div>' + exercises + "</section>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🗣️</span>费曼复述</div>' +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">✍️</span>例题实战（答对得 XP）</div>' + exercises + "</section>" +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🗣️</span>费曼复述</div>' +
           "<p><b>任务：</b>" + esc(c.feynman.prompt) + "</p>" +
           '<textarea class="ex-input" data-role="feynman" placeholder="用你自己的话写下来……">' + (state.feynman[id] ? esc(state.feynman[id].text || "") : "") + "</textarea>" +
           '<div class="feynman-hint">💡 提示：' + esc(c.feynman.hint) + "</div>" +
           '<div class="ex-foot"><button class="btn small" data-act="feynman-reveal">对照参考表达</button></div>' +
           '<div class="reveal-box hidden" data-role="feynman-model"><div class="rb-title">📖 参考表达</div>' + esc(c.feynman.modelAnswer) + "</div>" +
         "</section>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🔗</span>知识联系（前后呼应）</div><div class="link-cards">' +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🔗</span>知识联系（前后呼应）</div><div class="link-cards">' +
           back.concat(fwd).join("") + "</div></section>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">💼</span>面试视角</div>' +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">💼</span>面试视角</div>' +
           (c.interview || []).map(function (q) {
             return '<div class="interview-item"><div class="iq">❓ ' + esc(q.q) + '<span class="stars">' + starHtml(q.stars || p.stars) + "</span></div>" +
               '<div class="isrc">来源：' + esc(q.source || p.source) + "</div>" +
               (q.tip ? '<div class="itip">💡 答题要点：' + esc(q.tip) + "</div>" : "") + "</div>";
           }).join("") +
         "</section>" +
-        '<section class="k-section" style="--mod:' + m.color + '"><div class="sec-title"><span class="sec-ico">🧠</span>提问式小结</div>' +
+        '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🧠</span>提问式小结</div>' +
           '<div class="summary-box">' + summaryHtml(c.summary) + "</div></section>" +
         teachback +
         '<nav class="knav">' +
           (prev ? '<a href="#/knowledge/' + prev.p.id + '"><div class="kn-lbl">← 上一考点</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
                 : '<a href="#/map"><div class="kn-lbl">←</div><div class="kn-t">返回技能树</div></a>') +
           (next ? '<a class="next" href="#/knowledge/' + next.p.id + '"><div class="kn-lbl">下一考点 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
-                : '<a class="next" href="#/boss/' + p.level + '"><div class="kn-lbl">🎉 本层级知识点已尽</div><div class="kn-t">⚔️ 挑战 ' + p.level + " Boss 战 →</div></a>") +
+                : '<a class="next" href="#/boss/' + p.stage + '"><div class="kn-lbl">🎉 本关知识点已尽</div><div class="kn-t">⚔️ 挑战 ' + p.stage + " Boss 战 →</div></a>") +
         "</nav>";
 
       restoreExercises(p, c);
@@ -553,29 +579,29 @@
   }
 
   /* ---------- Boss 战 ---------- */
-  function renderBoss(app, lid) {
-    var lv = S.levels[LEVEL_INDEX[lid]];
-    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该层级。<br><br><a class="btn" href="#/map">返回技能树</a></div>'; return; }
-    if (!bossOpen(lid)) {
-      var prevLv = S.levels[LEVEL_INDEX[lid] - 1];
+  function renderBoss(app, sid) {
+    var lv = stageById(sid);
+    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该关卡。<br><br><a class="btn" href="#/map">返回技能树</a></div>'; return; }
+    if (!stageUnlocked(sid)) {
+      var prevLv = S.levels[STAGE_INDEX[sid] - 1];
       app.innerHTML = '<div class="content-pending lock-page" style="--lc:' + lv.color + '"><h2>🔒 Boss 未解锁</h2>' +
         "<p>需要先通过 <b>" + (prevLv ? prevLv.id : "") + " Boss 战</b>才能挑战本关。</p>" +
-        '<a class="btn primary" href="#/boss/' + (prevLv ? prevLv.id : "L1") + '">⚔️ 去打上一关 Boss</a></div>';
+        '<a class="btn primary" href="#/boss/' + (prevLv ? prevLv.id : "S0") + '">⚔️ 去打上一关 Boss</a></div>';
       return;
     }
-    getBoss(lid).then(function (boss) {
+    getBoss(sid).then(function (boss) {
       if (!boss || !(boss.questions || []).length) {
-        app.innerHTML = '<div class="content-pending">⚔️ ' + lid + ' Boss 战题库生成中……<br><br><a class="btn" href="#/map">返回技能树</a></div>';
+        app.innerHTML = '<div class="content-pending">⚔️ ' + sid + ' Boss 战题库生成中……<br><br><a class="btn" href="#/map">返回技能树</a></div>';
         return;
       }
       var qs = boss.questions;
       var need = Math.ceil(qs.length * S.quizPassRatio);
-      var rec = state.boss[lid];
+      var rec = state.boss[sid];
       app.innerHTML =
         '<div class="boss-head" style="--lc:' + lv.color + '">' +
           '<div class="boss-title">⚔️ Boss 战 · ' + lv.id + " " + lv.name + " 模拟面试</div>" +
           '<div class="boss-sub">' + qs.length + " 道高频真题 · 每题 60 秒 · 答对 " + need + "/" + qs.length +
-          " 通过解锁" + (S.levels[LEVEL_INDEX[lid] + 1] ? "「" + S.levels[LEVEL_INDEX[lid] + 1].name + "」层级" : "终极成就") +
+          " 通过解锁" + (S.levels[STAGE_INDEX[sid] + 1] ? "「" + S.levels[STAGE_INDEX[sid] + 1].name + "」" : "终极成就") +
           (rec && rec.passed ? " · <b>历史最佳 " + rec.best + "/" + qs.length + "（已通过）</b>" : "") + "</div>" +
           '<div class="boss-timer"><span id="boss-clock">60</span>s</div>' +
         "</div>" +
@@ -635,48 +661,86 @@
         var score = 0;
         qs.forEach(function (q, i) { if (picks[i] === q.answer) score++; });
         var passed = score >= need;
-        var firstPass = passed && !(state.boss[lid] && state.boss[lid].passed);
-        var prevBest = state.boss[lid] ? state.boss[lid].best || 0 : 0;
+        var firstPass = passed && !(state.boss[sid] && state.boss[sid].passed);
+        var prevBest = state.boss[sid] ? state.boss[sid].best || 0 : 0;
         if (score > prevBest) {
-          var earned = 0;
-          /* XP：答对每题 +bossQuestion（仅当本题首次答对——简化：按本次答对数计，通关 bonus 仅首次） */
-          earned = score * S.xp.bossQuestion;
-          state.boss[lid] = { passed: passed || (state.boss[lid] && state.boss[lid].passed), best: score, total: qs.length, date: today() };
+          var earned = score * S.xp.bossQuestion;
+          state.boss[sid] = { passed: passed || (state.boss[sid] && state.boss[sid].passed), best: score, total: qs.length, date: today() };
           if (firstPass) earned += S.xp.bossPass;
           addXp(earned);
         }
         save(); headerHud();
-        var lvNext = S.levels[LEVEL_INDEX[lid] + 1];
+        var lvNext = S.levels[STAGE_INDEX[sid] + 1];
         $('[data-role="boss-result"]').innerHTML =
           '<div class="quiz-result-card"><div class="qr-score ' + (passed ? "pass" : "fail") + '">' + score + " / " + qs.length + "</div>" +
           '<div class="qr-msg">' + (passed
-            ? "🏆 Boss 战通过！" + (firstPass ? " +" + (score * S.xp.bossQuestion + S.xp.bossPass) + " XP" : "") + (lvNext ? " 「" + lvNext.name + "」层级已解锁！" : " 你已完成全部层级！")
+            ? "🏆 Boss 战通过！" + (firstPass ? " +" + (score * S.xp.bossQuestion + S.xp.bossPass) + " XP" : "") +
+              (lvNext ? " 「" + esc(lvNext.name) + "」已解锁！别忘了完成本关 <a href='#/task/" + sid + "'>🧰 实战任务卡</a>。" : "你已完成全部关卡！")
             : "💪 差一点点：需答对 " + need + " 题（当前 " + score + "）。错题已收进错题本，复习后再来挑战！") + "</div>" +
           '<div class="ex-foot" style="justify-content:center">' +
-          (passed ? '<a class="btn primary" href="#/map">返回技能树解锁下一关 →</a>' : '<button class="btn primary" id="boss-retry">再战一次</button>') +
+          (passed ? '<a class="btn primary" href="#/map">返回技能树' + (lvNext ? "解锁下一关" : "") + " →</a>" : '<button class="btn primary" id="boss-retry">再战一次</button>') +
           '<a class="btn" href="#/wrongbook">📖 查看错题本</a></div></div>';
         /* 错题收录 */
         qs.forEach(function (q, i) {
           if (picks[i] !== q.answer) {
-            addWrong(lid + "#boss" + i, { ref: q.ref || "", type: "boss", q: q.q });
-          } else if (state.wrongbook[lid + "#boss" + i]) {
-            clearWrong(lid + "#boss" + i);
+            addWrong(sid + "#boss" + i, { ref: q.ref || "", type: "boss", q: q.q });
+          } else if (state.wrongbook[sid + "#boss" + i]) {
+            clearWrong(sid + "#boss" + i);
           }
         });
         save();
         var retry = $("#boss-retry");
-        if (retry) retry.addEventListener("click", function () { render($("#app") ? window : window); render(); });
+        if (retry) retry.addEventListener("click", function () { render(); });
       }
       $("#boss-start").addEventListener("click", function () {
         this.disabled = true;
         showQ();
       });
-      /* Boss 选项点击（委托到 arena） */
       arena.addEventListener("click", function (e) {
         var el = e.target.closest('[data-act="bpick"]');
         if (!el || el.disabled) return;
         lockAndNext(+el.getAttribute("data-opt"));
       });
+    });
+  }
+
+  /* ---------- 实战任务卡 ---------- */
+  function renderTask(app, sid) {
+    var lv = stageById(sid);
+    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该关卡。<br><br><a class="btn" href="#/map">返回技能树</a></div>'; return; }
+    if (!stageUnlocked(sid)) {
+      app.innerHTML = '<div class="content-pending lock-page" style="--lc:' + lv.color + '"><h2>🔒 任务卡未解锁</h2><p>先通过上一关 Boss 战解锁本关。</p><a class="btn" href="#/map">返回技能树</a></div>';
+      return;
+    }
+    getTask(sid).then(function (t) {
+      if (!t) {
+        app.innerHTML = '<div class="content-pending">🧰 任务卡生成中……<br><br><a class="btn" href="#/map">返回技能树</a></div>';
+        return;
+      }
+      var rec = state.tasks[sid] || {};
+      var steps = (t.steps || []).map(function (s2, i) {
+        return '<div class="task-step"><span class="ts-num">' + (i + 1) + "</span><div><b>" + esc(s2.title) + "</b><p>" + esc(s2.detail) + "</p></div></div>";
+      }).join("");
+      var checks = (t.checklist || []).map(function (c2, i) {
+        var on = rec.checks && rec.checks[i];
+        return '<label class="task-check"><input type="checkbox" data-task-check="' + i + '"' + (on ? " checked" : "") + (rec.done ? " disabled" : "") + "> " + esc(c2) + "</label>";
+      }).join("");
+      app.innerHTML =
+        '<div class="boss-head" style="--lc:' + lv.color + '">' +
+          '<div class="boss-title">🧰 实战任务卡 · ' + lv.id + " " + lv.name + "</div>" +
+          '<div class="boss-sub">里程碑项目：<b>' + esc(t.project || lv.project) + "</b> · 步骤指引 + 自查清单 + 参考架构 · 完成自评 +" + S.xp.task + " XP" +
+          (rec.done ? " · <b>✅ 已完成自评（" + rec.date + "）</b>" : "") + "</div>" +
+        "</div>" +
+        '<section class="k-section"><div class="sec-title"><span class="sec-ico">📦</span>项目简介</div><p>' + esc(t.intro) + "</p></section>" +
+        '<section class="k-section"><div class="sec-title"><span class="sec-ico">🪜</span>步骤指引</div>' + steps + "</section>" +
+        (t.arch ? '<section class="k-section"><div class="sec-title"><span class="sec-ico">🏗️</span>参考架构图</div><div class="task-arch">' + sanitizeDemo(t.arch) + "</div></section>" : "") +
+        '<section class="k-section"><div class="sec-title"><span class="sec-ico">✅</span>自查清单（全勾后提交自评）</div><div class="task-checks">' + checks + "</div>" +
+          '<div class="ex-foot"><button class="btn primary" data-act="task-submit" data-stage="' + sid + '"' + (rec.done ? " disabled" : "") + ">提交自评（+" + S.xp.task + " XP）</button>" +
+          '<span class="ex-result-chip" data-role="task-result">' + (rec.done ? "✅ 已提交" : "") + "</span></div></section>" +
+        (t.tips ? '<section class="k-section"><div class="sec-title"><span class="sec-ico">💡</span>避坑提示</div><ul class="kp-list">' +
+          t.tips.map(function (x) { return "<li><span class='kp-ico'>💡</span><span>" + esc(x) + "</span></li>"; }).join("") + "</ul></section>" : "") +
+        '<nav class="knav"><a href="#/map"><div class="kn-lbl">←</div><div class="kn-t">返回技能树</div></a>' +
+        '<a class="next" href="#/boss/' + sid + '"><div class="kn-lbl">挑战关底 →</div><div class="kn-t">⚔️ ' + sid + " Boss 战</div></a></nav>";
     });
   }
 
@@ -715,15 +779,15 @@
     var pct = ORDER.length ? Math.round(visited / ORDER.length * 100) : 0;
     var tIdx = currentTitleIdx();
     var lvCards = S.levels.map(function (lv) {
-      var pts = ORDER.filter(function (e) { return e.p.level === lv.id; });
-      var done = pts.filter(function (e) { return state.visited[e.p.id]; }).length;
+      var st = stageStats(lv.id);
       var b = state.boss[lv.id];
-      var mpct = pts.length ? Math.round(done / pts.length * 100) : 0;
+      var mpct = st.pts.length ? Math.round(st.done / st.pts.length * 100) : 0;
       return '<div class="prog-card" style="--mod:' + lv.color + '"><div class="pc-head"><span>' + lv.icon + "</span><span>" + lv.id + " " + lv.name +
         '（' + esc(lv.title) + '）</span><span class="pc-pct">' + mpct + "%</span></div>" +
         '<div class="bar"><div class="fill" style="width:' + mpct + '%"></div></div>' +
-        '<div class="pc-meta"><span>节点 <b>' + done + "/" + pts.length + "</b></span>" +
-        "<span>Boss <b>" + (b ? (b.passed ? "🏆 通过 " + b.best + "/" + b.total : "最佳 " + b.best + "/" + b.total) : "未挑战") + "</b></span></div></div>";
+        '<div class="pc-meta"><span>节点 <b>' + st.done + "/" + st.pts.length + "</b></span>" +
+        "<span>Boss <b>" + (b ? (b.passed ? "🏆 通过 " + b.best + "/" + b.total : "最佳 " + b.best + "/" + b.total) : "未挑战") + "</b></span>" +
+        "<span>任务卡 <b>" + (state.tasks[lv.id] && state.tasks[lv.id].done ? "✅" : "—") + "</b></span></div></div>";
     }).join("");
     return '<h1 class="page-title">📈 我的战绩</h1>' +
       '<div class="stats-row">' +
@@ -822,6 +886,24 @@
       return;
     }
 
+    if (act === "task-submit") {
+      var sid = el.getAttribute("data-stage");
+      var boxes = $$('[data-task-check]');
+      var allChecked = boxes.length && boxes.every(function (b2) { return b2.checked; });
+      var chip5 = $('[data-role="task-result"]');
+      if (!allChecked) { chip5.textContent = "请先完成全部自查项再提交"; chip5.className = "ex-result-chip bad"; return; }
+      var prevTask = state.tasks[sid] || {};
+      var firstAward = !prevTask.awarded;
+      state.tasks[sid] = { done: true, awarded: true, checks: boxes.map(function (b3) { return b3.checked; }), date: today() };
+      if (firstAward) addXp(S.xp.task);
+      chip5.textContent = "✅ 已提交" + (firstAward ? "（+" + S.xp.task + " XP）" : "");
+      chip5.className = "ex-result-chip ok";
+      el.disabled = true;
+      boxes.forEach(function (b4) { b4.disabled = true; });
+      save(); headerHud();
+      return;
+    }
+
     if (act === "d-next" || act === "d-prev") {
       var wrap = document.querySelector(el.getAttribute("data-steps"));
       if (!wrap) return;
@@ -865,6 +947,21 @@
     }
   });
 
+  /* 自查清单勾选状态暂存（未提交时也记住） */
+  document.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.matches && t.matches("[data-task-check]")) {
+      var r = parseHash();
+      if (r.page !== "task") return;
+      var rec = state.tasks[r.stage] || {};
+      if (rec.done) { t.checked = true; return; }
+      var boxes = $$("[data-task-check]");
+      rec.checks = boxes.map(function (b) { return b.checked; });
+      state.tasks[r.stage] = rec;
+      save();
+    }
+  });
+
   document.addEventListener("input", function (e) {
     var t = e.target;
     if (t.matches && t.matches('input[type="range"][data-output]')) {
@@ -890,3 +987,9 @@
   window.addEventListener("hashchange", render);
   render();
 })();
+
+/* SW 注册（推广自标杆 architect-exam-learning app.js:996-998，OPT-01） */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  try { var __swUrl = new URL('../sw.js', (document.currentScript && document.currentScript.src) || location.href).pathname;
+    navigator.serviceWorker.register(__swUrl).catch(function () {}); } catch (e) {}
+}

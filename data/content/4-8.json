@@ -1,7 +1,7 @@
 {
   "id": "4-8",
   "title": "评估与红队：OWASP 双 Top10 与对抗测试",
-  "definition": "功能评估证明 Agent『会干活』，安全评估才证明『不被使坏』。红队把 OWASP 双 Top10（LLM 与 Agentic 两份风险清单）变成攻击用例，用 Promptfoo、DeepTeam 自动化扫描，发现即修复并回归。",
+  "definition": "功能评估证明 Agent『会干活』，安全评估才证明『不被使坏』。红队把 OWASP 双 Top10 变成攻击用例，用 Promptfoo、DeepTeam 自动化扫描，发现即修复并回归。",
   "analogies": [
     {
       "icon": "🔴",

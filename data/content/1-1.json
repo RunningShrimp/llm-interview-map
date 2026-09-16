@@ -1,7 +1,7 @@
 {
   "id": "1-1",
   "title": "主流模型家族速览与选型",
-  "definition": "Transformer 三种拼法：Encoder-only（BERT，会读，做理解检索）、Decoder-only（GPT，会写，做生成对话）、Enc-Dec（T5，先懂后写）。当今主流大模型几乎全是 Decoder-only。",
+  "definition": "Transformer 三拼：Encoder-only（BERT，会读）、Decoder-only（GPT，会写）、Enc-Dec（T5，先懂后写）。主流大模型几乎全是 Decoder-only。",
   "analogies": [
     {
       "icon": "👥",

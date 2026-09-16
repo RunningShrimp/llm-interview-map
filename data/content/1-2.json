@@ -1,7 +1,7 @@
 {
   "id": "1-2",
   "title": "思维链 CoT 与推理增强",
-  "definition": "思维链（CoT, Chain-of-Thought）是在提示中让模型『一步步写出推理过程再给答案』。中间步骤给模型更多计算空间，复杂问题准确率显著提升。进阶变体：Self-Consistency 多路投票、ToT 树状探索。",
+  "definition": "思维链（CoT）是让模型『一步步写出推理过程再给答案』：中间步骤给模型更多计算空间，复杂问题准确率显著提升。进阶变体：Self-Consistency 多路投票、ToT 树状探索。",
   "analogies": [
     {
       "icon": "🧮",

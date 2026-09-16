@@ -1,7 +1,7 @@
 {
   "id": "2-1",
   "title": "Agent 是什么：给 AI 装上手手脚",
-  "definition": "AI Agent = 以 LLM 为大脑的智能体：外加任务清单（规划）、笔记本（记忆）、门禁卡（工具）三件套，能自己拆解目标、调工具干活。Chatbot 只动嘴，Agent 能动手——这是 AI 应用的下一个台阶。",
+  "definition": "AI Agent = 以 LLM 为大脑的智能体：外加任务清单（规划）、笔记本（记忆）、门禁卡（工具）三件套，能自己拆目标、调工具干活。Chatbot 只动嘴，Agent 能动手。",
   "analogies": [
     {
       "icon": "🧑‍💻",

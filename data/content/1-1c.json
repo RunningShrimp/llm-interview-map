@@ -1,7 +1,7 @@
 {
   "id": "1-1c",
   "title": "LLM API 实务（参数/流式/限流重试/成本）",
-  "definition": "调 LLM API 的工程四件套：采样参数（temperature 控随机性、top_p 控候选范围）、流式输出（SSE 逐字返回降延迟）、限流与重试（429 退避重试、超时与降级）、成本核算（按 token 计费、上下文缓存省钱）。",
+  "definition": "调 LLM API 的工程四件套：采样参数（temperature/top_p）、流式输出（SSE 逐字降延迟）、限流与重试（429 退避、超时降级）、成本核算（按 token 计费、缓存省钱）。",
   "analogies": [
     {
       "icon": "🎚️",

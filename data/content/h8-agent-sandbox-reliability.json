@@ -1,7 +1,7 @@
 {
   "id": "h8-agent-sandbox-reliability",
   "title": "Agent 沙箱与可靠执行",
-  "definition": "让 Agent 敢执行代码与命令的前提是隔离：沙箱（容器/微 VM）把『Agent 的每个动作』关进一次性环境里——坏了就销毁、逃不出去、可复现。它是 Agent 从『建议者』变成『执行者』的安全基石（趋势观察）。",
+  "definition": "让 Agent 敢执行代码的前提是隔离：沙箱（容器/微 VM）把每个动作关进一次性环境——坏了就销毁、逃不出去、可复现。是 Agent 从『建议者』变成『执行者』的安全基石（趋势观察）。",
   "analogies": [
     {
       "icon": "🧪",

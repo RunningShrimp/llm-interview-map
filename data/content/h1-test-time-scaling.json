@@ -1,7 +1,7 @@
 {
   "id": "h1-test-time-scaling",
   "title": "推理模型与测试时扩展（R1/o 系列）",
-  "definition": "测试时扩展（Test-Time Scaling）= 回答问题时给模型更多『思考算力』：推理模型（DeepSeek-R1、OpenAI o 系列）先生成长思维链再给答案——思考越久越准，用推理成本换准确率。",
+  "definition": "测试时扩展＝回答问题时给模型更多『思考算力』：推理模型（DeepSeek-R1、o 系列）先生成长思维链再给答案——思考越久越准，用推理成本换准确率。",
   "analogies": [
     {
       "icon": "📝",

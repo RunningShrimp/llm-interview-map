@@ -1,7 +1,7 @@
 {
   "id": "h6-ai-coding-agents",
   "title": "AI Coding 智能体（Claude Code/Cursor 类）",
-  "definition": "AI Coding 智能体 = 自主操作代码库的开发 Agent：读仓库、改多文件、跑测试、自我修错、提交 PR（Claude Code/Cursor/Codex 类）。它既是 2026 最热的产品形态，也是 Agent 工程的最佳教科书。",
+  "definition": "AI Coding 智能体＝自主操作代码库的开发 Agent：读仓库、改多文件、跑测试、自我修错、提交 PR（Claude Code/Cursor 类）。2026 最热产品形态与最佳教科书。",
   "analogies": [
     {
       "icon": "🧑‍💻",

@@ -1,7 +1,7 @@
 {
   "id": "3-3",
   "title": "编排框架选型：LangGraph/LlamaIndex/OpenAI SDK/MCP",
-  "definition": "编排框架管 Agent 的状态与流程：LangGraph 图状态机、Agents SDK 轻量原语、LlamaIndex 数据索引；MCP 统一工具接入。口诀：流程复杂用图、知识密集看 LlamaIndex、轻量用 SDK，开放标准防锁定。",
+  "definition": "编排框架管 Agent 的状态与流程：LangGraph 图状态机、Agents SDK 轻量原语、LlamaIndex 数据索引；MCP 统一工具接入。口诀：复杂流程用图、知识密集看 Llama。",
   "analogies": [
     {
       "icon": "🏠",

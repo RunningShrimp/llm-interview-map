@@ -1,7 +1,7 @@
 {
   "id": "2-2",
   "title": "任务分解与规划：把模糊目标拆成步骤",
-  "definition": "规划（Planning）是 Agent 把「调研 X 并写报告」这类模糊目标，拆成带依赖的可执行子任务的能力。主流做法：Plan-and-Execute 先生成计划再执行、ReWOO 一次规划批量并行省 token，失败后回炉重规划。",
+  "definition": "规划（Planning）＝把模糊目标拆成带依赖的可执行子任务。主流做法：Plan-and-Execute 先计划后执行、ReWOO 一次规划批量并行省 token，失败后回炉重规划。",
   "analogies": [
     {
       "icon": "🗺️",

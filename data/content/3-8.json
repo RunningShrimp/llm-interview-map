@@ -1,7 +1,7 @@
 {
   "id": "3-8",
   "title": "Agent 最小权限、合规与审计",
-  "definition": "Agent 能读私有数据、执行代码、修改外部系统，因此它的安全模型必须从「防说错话」升级为「防做错事」：按任务动态授予最小权限、任务结束权限衰减、高危操作人工确认、PII 脱敏、全链路操作留痕——目标是出事可定位、行为可审计、损失可兜底。",
+  "definition": "Agent 能读私有数据、执行代码、改外部系统，安全模型必须从「防说错话」升级为「防做错事」：按任务动态最小授权、任务结束权限衰减、高危操作人审、PII 脱敏、全链路留痕。",
   "analogies": [
     {
       "icon": "🔑",
@@ -20,12 +20,36 @@
     "html": "<div style='margin-bottom:10px'><span class='d-note'>任务生命周期：<b id='d38-t'>开始</b></span><input type='range' min='0' max='4' step='1' value='0' data-output='#d38-t' data-suffix='' style='width:100%'><div class='d-row' style='gap:6px;flex-wrap:wrap'><div class='d-card' style='flex:1;min-width:100px'><b>环境权限</b><div class='d-bar'><div class='d-fill' style='width:calc(100 - var(--v,0)*20%);background:#ef4444'></div></div><span class='d-note'>默认=全部（危险）</span></div><div class='d-card' style='flex:1;min-width:100px'><b>最小授权后</b><div class='d-bar'><div class='d-fill' style='width:calc(40 - var(--v,0)*8%);background:#f59e0b'></div></div><span class='d-note'>按任务裁剪</span></div><div class='d-card' style='flex:1;min-width:100px'><b>衰减中的实际可用</b><div class='d-bar'><div class='d-fill' style='width:calc(40 - var(--v,0)*9.5%);background:#10b981'></div></div><span class='d-note'>随时间/进度收缩</span></div></div><div class='d-note'>滑到最右：任务结束，所有临时凭证失效——这就是权限衰减（权限随任务推进单调递减）</div></div><div class='d-steps' id='d38-audit'><div class='d-step active'><b>① 触发</b>：Agent 请求执行「删除过期测试数据」<span class='d-tag amber'>高危操作 → 拦截</span></div><div class='d-step'><b>② 授权</b>：审批队列生成工单，值班工程师确认范围（test_db.orders，限定 2025 年）并批准<span class='d-tag'>人工在环 · 决策留痕</span></div><div class='d-step'><b>③ 执行</b>：以只读+限时删除的临时凭证执行，删除语句与影响行数（3,207 行）写入审计日志<span class='d-tag'>最小权限 · 全量留痕</span></div><div class='d-step'><b>④ 回收</b>：任务结束临时凭证自动失效，审计记录归档 180 天<span class='d-tag green'>权限衰减 · 可倒查</span></div></div><div class='d-row' style='gap:8px;margin-top:8px'><button class='d-btn' data-act='d-prev' data-steps='#d38-audit'>← 上一步</button><button class='d-btn' data-act='d-next' data-steps='#d38-audit'>下一步 →</button><span class='d-note' data-steps-indicator='#d38-audit'>1 / 4</span></div>"
   },
   "keyPoints": [
-    { "icon": "🔑", "name": "最小权限原则", "text": "默认权限是「无限」的——先假设 Agent 什么都能做，再按任务裁剪：只读账号、白名单工具、限定数据范围。" },
-    { "icon": "⏳", "name": "权限衰减", "text": "临时凭证随任务推进/时间收缩，任务结束自动失效；杜绝「一次授权终身有效」的万能工牌。" },
-    { "icon": "🚫", "name": "子 Agent 不继承全部权限", "text": "子 Agent 按自己的子任务单独授权——主管能查财务不代表跑腿的也要带财务钥匙，这是 2026 高频追问。" },
-    { "icon": "🙋", "name": "高危操作人审", "text": "删除、付款、对外发送类动作挂起等人工批准；审批要带明确范围（哪个库/哪批数据），批准记录留痕。" },
-    { "icon": "🕵️", "name": "PII 脱敏与数据合规", "text": "日志与 trace 是泄露重灾区：身份证、手机号入日志前先脱敏；训练/评估数据要过合规审查（GDPR/个保法）。" },
-    { "icon": "📜", "name": "全链路审计", "text": "谁（用户）、让 Agent 做了什么（动作+参数）、影响多少数据、谁批准的——四问都能在审计日志里 5 分钟内答出，才算合规。" }
+    {
+      "icon": "🔑",
+      "name": "最小权限原则",
+      "text": "默认权限是「无限」的——先假设 Agent 什么都能做，再按任务裁剪：只读账号、白名单工具、限定数据范围。"
+    },
+    {
+      "icon": "⏳",
+      "name": "权限衰减",
+      "text": "临时凭证随任务推进/时间收缩，任务结束自动失效；杜绝「一次授权终身有效」的万能工牌。"
+    },
+    {
+      "icon": "🚫",
+      "name": "子 Agent 不继承全部权限",
+      "text": "子 Agent 按自己的子任务单独授权——主管能查财务不代表跑腿的也要带财务钥匙，这是 2026 高频追问。"
+    },
+    {
+      "icon": "🙋",
+      "name": "高危操作人审",
+      "text": "删除、付款、对外发送类动作挂起等人工批准；审批要带明确范围（哪个库/哪批数据），批准记录留痕。"
+    },
+    {
+      "icon": "🕵️",
+      "name": "PII 脱敏与数据合规",
+      "text": "日志与 trace 是泄露重灾区：身份证、手机号入日志前先脱敏；训练/评估数据要过合规审查（GDPR/个保法）。"
+    },
+    {
+      "icon": "📜",
+      "name": "全链路审计",
+      "text": "谁（用户）、让 Agent 做了什么（动作+参数）、影响多少数据、谁批准的——四问都能在审计日志里 5 分钟内答出，才算合规。"
+    }
   ],
   "exercises": [
     {
@@ -57,11 +81,41 @@
       "q": "面试官：「我们的数据分析 Agent 要给运营同学开放『查询并导出订单数据』的能力，怎么设计权限与审计？」请给出完整方案（权限模型、高危控制、脱敏、审计四方面）。",
       "reference": "权限模型：运营同学先经 SSO 登录并按角色授权——普通运营只能查自己负责品类的聚合数据，负责人可查明细；Agent 使用独立的只读数据库账号，绝不复用 root 或业务写账号；查询走白名单接口（预定义的参数化查询模板），不允许 Agent 自由拼 SQL 直连。高危控制：导出超过一万行或包含用户手机号字段的请求自动升级人工审批，审批人需确认用途与范围；导出文件加水印并记录接收人。脱敏：手机号、收货地址默认脱敏展示，日志与 trace 中的查询参数先脱敏再落盘，防止审计日志本身变成泄露源。审计：每次查询记录发起人、时间、查询模板与参数、返回行数、是否触发审批，日志不可篡改并保存 180 天，可按人与时间检索。这套设计回答rodmap 的关键问题——最小权限靠「角色+只读账号+白名单」三层落地，可审计靠「四要素留痕+可检索」。",
       "keyPoints": [
-        { "point": "按角色授权 + 独立只读账号", "kw": ["角色", "只读"] },
-        { "point": "白名单参数化查询，不允许自由拼 SQL", "kw": ["白名单", "SQL"] },
-        { "point": "大批量/敏感字段导出升级人审", "kw": ["审批", "导出"] },
-        { "point": "数据与日志双重脱敏", "kw": ["脱敏", "日志"] },
-        { "point": "四要素审计留痕可检索", "kw": ["审计", "留痕"] }
+        {
+          "point": "按角色授权 + 独立只读账号",
+          "kw": [
+            "角色",
+            "只读"
+          ]
+        },
+        {
+          "point": "白名单参数化查询，不允许自由拼 SQL",
+          "kw": [
+            "白名单",
+            "SQL"
+          ]
+        },
+        {
+          "point": "大批量/敏感字段导出升级人审",
+          "kw": [
+            "审批",
+            "导出"
+          ]
+        },
+        {
+          "point": "数据与日志双重脱敏",
+          "kw": [
+            "脱敏",
+            "日志"
+          ]
+        },
+        {
+          "point": "四要素审计留痕可检索",
+          "kw": [
+            "审计",
+            "留痕"
+          ]
+        }
       ],
       "explain": "点评：评分要点是「权限三层（角色/账号/白名单）+ 高危人审 + 双重脱敏 + 结构化审计」。能主动指出「审计日志本身要脱敏，否则审计系统成为最大泄露源」的候选人，面试官会眼前一亮。"
     }

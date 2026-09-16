@@ -1,7 +1,7 @@
 {
   "id": "h2-rlvr-grpo",
   "title": "RLVR 与 GRPO 对齐前沿",
-  "definition": "对齐的最新演进：RLVR 用『可验证奖励』（答案对错程序判定）替代人类偏好；GRPO 用组内相对优势替代 PPO 的价值模型。两者合流催生了 DeepSeek-R1 式推理模型——刷题刷出的深度思考能力。",
+  "definition": "对齐的最新演进：RLVR 用『可验证奖励』（对错程序判定）替代人类偏好；GRPO 用组内相对优势替代 PPO 的价值模型。两者合流催生 DeepSeek-R1 式推理模型。",
   "analogies": [
     {
       "icon": "🏁",

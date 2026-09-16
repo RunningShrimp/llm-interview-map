@@ -1,7 +1,7 @@
 {
   "id": "4-10",
   "title": "作品集与复盘：让别人相信你能做",
-  "definition": "作品集是工程能力的证明文件：架构图、指标表、可演示 Demo、复盘文档四件套，外加 STAR 法则讲项目故事。它回答 rodmap 4.10 的关键问题「如何让别人相信我能做」——面试官不信形容词，只信可验证的证据链与诚实的取舍分析。",
+  "definition": "作品集是工程能力的证明文件：架构图、指标表、可演示 Demo、复盘文档四件套，外加 STAR 讲项目故事。面试官不信形容词，只信可验证的证据链与诚实的取舍分析。",
   "analogies": [
     {
       "icon": "🖼️",
@@ -20,12 +20,36 @@
     "html": "<div class='d-row' style='gap:6px;flex-wrap:wrap;justify-content:center'><button class='d-btn' data-act='d-toggle' data-target='#d410-1'>🏗️ 架构图</button><button class='d-btn' data-act='d-toggle' data-target='#d410-2'>📊 指标表</button><button class='d-btn' data-act='d-toggle' data-target='#d410-3'>🎥 可演示 Demo</button><button class='d-btn' data-act='d-toggle' data-target='#d410-4'>📝 复盘文档</button></div><div class='d-col' style='gap:6px;margin-top:8px'><div id='d410-1' class='d-hidden d-card'><b>架构图</b>：分层清楚、每个组件写一句「为什么需要它」。证明：你对系统有全局认知。</div><div id='d410-2' class='d-hidden d-card'><b>指标表</b>：评估分、p95 延迟、单次成本、红队结果——每个数字旁标测量方法。证明：你用数据说话，且知道数字怎么来的。</div><div id='d410-3' class='d-hidden d-card'><b>可演示 Demo</b>：3 分钟视频或在线链接，一镜到底走主流程。证明：东西真的存在且能跑。</div><div id='d410-4' class='d-hidden d-card'><b>复盘文档</b>：踩坑、取舍（放弃 X 因为 Y）、指标与预期的差距分析。证明：你有思考深度，不是教程复刻。</div></div><div style='margin-top:10px'><span class='d-note'>已点亮件数：<b id='d410-n'>0</b> / 4 ｜ 面试说服力</span><input type='range' min='0' max='4' value='0' data-output='#d410-n' data-suffix=' / 4' style='width:100%'><div class='d-bar'><div class='d-fill' style='width:calc(var(--v,0)*25%)'></div></div><span class='d-note'>只写代码不整理 = 说服力 25%；四件套齐全 = 证据链闭环</span></div><div class='d-steps' id='d410-star' style='margin-top:10px'><div class='d-step active'><b>S 情境</b>：公司客服知识散落在 3 个系统，新人培训要两周<span class='d-tag'>一句话说清背景痛点</span></div><div class='d-step'><b>T 任务</b>：我负责搭建知识库问答 Agent，目标解决率 ≥70%、p95 ≤15s<span class='d-tag amber'>目标带数字</span></div><div class='d-step'><b>A 行动</b>：RAG 链路+混合检索+评估门禁；重点讲一个难点：切分策略迭代三轮才达标<span class='d-tag amber'>挑最有含金量的讲</span></div><div class='d-step'><b>R 结果</b>：解决率 76%、p95 11s、单次成本 $0.02；复用到了第二个业务线<span class='d-tag green'>结果+测量方法+溢出价值</span></div></div><div class='d-row' style='gap:8px;margin-top:6px'><button class='d-btn' data-act='d-prev' data-steps='#d410-star'>←</button><button class='d-btn' data-act='d-next' data-steps='#d410-star'>STAR 下一步 →</button><span class='d-note' data-steps-indicator='#d410-star'>1 / 4</span></div>"
   },
   "keyPoints": [
-    { "icon": "🏗️", "name": "架构图带「为什么」", "text": "每个组件旁一句存在理由（删掉它会坏什么）——图不是画给面试官看的，是替你回答追问的。" },
-    { "icon": "📊", "name": "指标必须带测量法", "text": "「解决率 76%（人工标注 200 例）」「p95 11s（压测脚本）」——每个数字能回答「怎么测的」才可信。" },
-    { "icon": "🎥", "name": "Demo 三分钟一镜到底", "text": "问题→架构→演示→指标；在线 Demo 要有兜底（演示脚本+录屏备份），现场翻车是最大事故。" },
-    { "icon": "📝", "name": "复盘写取舍与差距", "text": "「放弃了 X 因为 Y」「指标没达预期的原因与后续」——诚实的差距分析比全绿的指标更赢得尊重。" },
-    { "icon": "⭐", "name": "STAR 讲述法", "text": "情境-任务-行动-结果，每个环节备好证据链；「行动」挑一个最有含金量的难点深讲，不要流水账。" },
-    { "icon": "🧯", "name": "追问防线：删掉测试", "text": "自测法：把项目里任一组件拿出来问「删掉会坏什么」——答不出说明你还没真正理解自己的系统（g8 权衡表达法）。" }
+    {
+      "icon": "🏗️",
+      "name": "架构图带「为什么」",
+      "text": "每个组件旁一句存在理由（删掉它会坏什么）——图不是画给面试官看的，是替你回答追问的。"
+    },
+    {
+      "icon": "📊",
+      "name": "指标必须带测量法",
+      "text": "「解决率 76%（人工标注 200 例）」「p95 11s（压测脚本）」——每个数字能回答「怎么测的」才可信。"
+    },
+    {
+      "icon": "🎥",
+      "name": "Demo 三分钟一镜到底",
+      "text": "问题→架构→演示→指标；在线 Demo 要有兜底（演示脚本+录屏备份），现场翻车是最大事故。"
+    },
+    {
+      "icon": "📝",
+      "name": "复盘写取舍与差距",
+      "text": "「放弃了 X 因为 Y」「指标没达预期的原因与后续」——诚实的差距分析比全绿的指标更赢得尊重。"
+    },
+    {
+      "icon": "⭐",
+      "name": "STAR 讲述法",
+      "text": "情境-任务-行动-结果，每个环节备好证据链；「行动」挑一个最有含金量的难点深讲，不要流水账。"
+    },
+    {
+      "icon": "🧯",
+      "name": "追问防线：删掉测试",
+      "text": "自测法：把项目里任一组件拿出来问「删掉会坏什么」——答不出说明你还没真正理解自己的系统（g8 权衡表达法）。"
+    }
   ],
   "exercises": [
     {
@@ -57,11 +81,41 @@
       "q": "你要把「知识库问答 Agent」整理成作品集参加面试。请列出作品集的四件套内容与各自要点，并写出演示当天防翻车的三个预案。",
       "reference": "四件套一，架构图：五层结构（接入、网关、编排、数据、可观测），每个组件标注一句存在理由与关键选型依据（如选混合检索是因为 30% 编号类查询）。四件套二，指标表：检索 Recall@5 从 60% 到 89% 的迭代记录、回答忠实度人工评分、p95 延迟、单次成本，每个数字旁写测量方法（评估集大小、标注方式、压测脚本）。四件套三，可演示 Demo：三分钟一镜到底视频（问题→检索命中展示→带引用回答→指标页），或在线链接。四件套四，复盘文档：三个踩坑（切分策略、嵌入模型选型、权限过滤）与两个「放弃的方案」（语义缓存、全量微调）及原因。演示日防翻车三预案：一，现场网络不可控，准备本地热备环境与离线录屏，Demo 前跑一遍冒烟脚本；二，演示数据固定为预演过的三个问题，临时提问则引导「课后可以体验线上版」避免不可控输入；三，指标页截图备份，即使服务宕机也能用静态材料完成讲述，把事故变成「我们连故障预案都演示了」的加分项。",
       "keyPoints": [
-        { "point": "架构图带组件存在理由与选型依据", "kw": ["架构图", "选型"] },
-        { "point": "指标表带测量方法与迭代记录", "kw": ["指标", "测量"] },
-        { "point": "三分钟一镜到底 Demo", "kw": ["Demo", "三分钟"] },
-        { "point": "复盘写踩坑与放弃的方案", "kw": ["复盘", "放弃"] },
-        { "point": "热备/固定问题/静态备份三预案", "kw": ["预案", "备份"] }
+        {
+          "point": "架构图带组件存在理由与选型依据",
+          "kw": [
+            "架构图",
+            "选型"
+          ]
+        },
+        {
+          "point": "指标表带测量方法与迭代记录",
+          "kw": [
+            "指标",
+            "测量"
+          ]
+        },
+        {
+          "point": "三分钟一镜到底 Demo",
+          "kw": [
+            "Demo",
+            "三分钟"
+          ]
+        },
+        {
+          "point": "复盘写踩坑与放弃的方案",
+          "kw": [
+            "复盘",
+            "放弃"
+          ]
+        },
+        {
+          "point": "热备/固定问题/静态备份三预案",
+          "kw": [
+            "预案",
+            "备份"
+          ]
+        }
       ],
       "explain": "点评：评分要点是「四件套完整且每件能防追问 + 翻车预案具体可执行」。把翻车预案讲成「连故障演练都准备了」的加分项，体现的是运维思维（4.9）自然外溢——作品集本身也在展示工程素养。"
     }

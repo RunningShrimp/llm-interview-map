@@ -1,0 +1,933 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - link "🧭 AI Agent 七关晋升" [ref=f1e3] [cursor=pointer]:
+      - /url: "#/map"
+    - navigation [ref=f1e4]:
+      - link "🗺️ 学习地图" [ref=f1e5] [cursor=pointer]:
+        - /url: "#/map"
+      - link "🔎 知识点索引" [ref=f1e6] [cursor=pointer]:
+        - /url: "#/index"
+      - link "📖 错题本与复习" [ref=f1e7] [cursor=pointer]:
+        - /url: "#/mistakes"
+      - link "⚔️ Boss 战" [ref=f1e8] [cursor=pointer]:
+        - /url: "#/boss"
+      - link "🧰 实战任务卡" [ref=f1e9] [cursor=pointer]:
+        - /url: "#/tasks"
+    - generic [ref=f1e10]:
+      - generic [ref=f1e11]: 🌱 基础热身
+      - generic [ref=f1e12]: AI 新手
+      - generic [ref=f1e13]: 0 XP
+  - main [ref=f1e16]:
+    - heading "🔎 知识点索引 · 全量平铺（无门禁）" [level=1] [ref=f1e17]
+    - paragraph [ref=f1e18]: 与技能树主线并行的第二通道：全部 82 个知识点在此平铺，含未解锁关卡内容（带关卡归属标记），点击直达。技能树管「按节奏学」，本页管「按需查、按薄弱点复习」。
+    - generic [ref=f1e19]:
+      - generic [ref=f1e20]:
+        - searchbox "搜索：锚点编号 / 标题 / 关键词（输入即出结果）" [ref=f1e21]
+        - button "⏰ 今日待复习" [ref=f1e22] [cursor=pointer]
+        - button "🎲 随机考我" [ref=f1e23] [cursor=pointer]
+        - button "🔥 高频考点（⭐4+）" [ref=f1e24] [cursor=pointer]
+        - button "↺ 重置" [ref=f1e25] [cursor=pointer]
+      - generic [ref=f1e26]:
+        - generic [ref=f1e27]:
+          - text: 关卡
+          - combobox "关卡" [ref=f1e28] [cursor=pointer]:
+            - option "全部" [selected]
+            - option "S0 基础热身"
+            - option "S1 LLM 应用入门"
+            - option "S2 单 Agent 核心"
+            - option "S3 RAG 与工具增强"
+            - option "S4 AI 工程化"
+            - option "S5 多 Agent 与生产"
+            - option "S6 综合项目与作品集"
+        - generic [ref=f1e29]:
+          - text: 模块
+          - combobox "模块" [ref=f1e30] [cursor=pointer]:
+            - option "全部" [selected]
+            - option "0 基础层"
+            - option "1 LLM 应用层"
+            - option "2 Agent 核心层"
+            - option "3 AI 工程化层"
+            - option "4 实战层"
+            - option "H 2026 前沿层"
+        - generic [ref=f1e31]:
+          - text: 掌握程度
+          - combobox "掌握程度" [ref=f1e32] [cursor=pointer]:
+            - option "全部" [selected]
+            - option "了解"
+            - option "理解"
+            - option "会用"
+            - option "熟练"
+            - option "精通"
+        - generic [ref=f1e33]:
+          - text: 星级/🆕
+          - combobox "星级/🆕" [ref=f1e34] [cursor=pointer]:
+            - option "全部" [selected]
+            - option "⭐⭐⭐⭐ 以上"
+            - option "⭐⭐⭐⭐⭐"
+            - option "🆕 2026 前沿"
+        - generic [ref=f1e35]:
+          - text: 学习状态
+          - combobox "学习状态" [ref=f1e36] [cursor=pointer]:
+            - option "全部" [selected]
+            - option "未开始"
+            - option "学习中"
+            - option "已通过"
+            - option "待复习"
+            - option "今日到期"
+        - generic [ref=f1e37]:
+          - text: 排序
+          - combobox "排序" [ref=f1e38] [cursor=pointer]:
+            - option "按锚点编号" [selected]
+            - option "按星级降序（高频优先）"
+      - generic [ref=f1e39]: 显示 82 / 82 条（其中已读 0）
+    - generic [ref=f1e41]:
+      - link "0.1 AI 需要的数学：向量、概率与损失 锚点 0.1 · 数学与统计基础 了解-理解 S0 ★★★★★ 未开始" [ref=f1e42] [cursor=pointer]:
+        - /url: "#/knowledge/0-1"
+        - generic [ref=f1e43]: "0.1"
+        - generic [ref=f1e44]:
+          - generic [ref=f1e45]: AI 需要的数学：向量、概率与损失
+          - generic [ref=f1e46]: 锚点 0.1 · 数学与统计基础
+        - generic [ref=f1e47]: 了解-理解
+        - generic [ref=f1e49]: S0
+        - generic [ref=f1e50]: ★★★★★
+        - generic [ref=f1e51]: 未开始
+      - link "0.2 Python 工程底座：从脚本到服务 锚点 0.2 · Python 工程基础 会用 S0 ★★★★★ 未开始" [ref=f1e53] [cursor=pointer]:
+        - /url: "#/knowledge/0-2"
+        - generic [ref=f1e54]: "0.2"
+        - generic [ref=f1e55]:
+          - generic [ref=f1e56]: Python 工程底座：从脚本到服务
+          - generic [ref=f1e57]: 锚点 0.2 · Python 工程基础
+        - generic [ref=f1e58]: 会用
+        - generic [ref=f1e60]: S0
+        - generic [ref=f1e61]: ★★★★★
+        - generic [ref=f1e62]: 未开始
+      - link "0.3 模型是怎么学的：训练、验证与过拟合直觉 锚点 0.3 · 机器学习/深度学习基础 了解-理解 S0 ★★★★★ 未开始" [ref=f1e64] [cursor=pointer]:
+        - /url: "#/knowledge/0-3"
+        - generic [ref=f1e65]: "0.3"
+        - generic [ref=f1e66]:
+          - generic [ref=f1e67]: 模型是怎么学的：训练、验证与过拟合直觉
+          - generic [ref=f1e68]: 锚点 0.3 · 机器学习/深度学习基础
+        - generic [ref=f1e69]: 了解-理解
+        - generic [ref=f1e71]: S0
+        - generic [ref=f1e72]: ★★★★★
+        - generic [ref=f1e73]: 未开始
+      - link "0.4 Transformer 直觉版：AI 怎么读句子 锚点 0.4 · NLP 与 Transformer 理解 S0 ★★★★★ 未开始" [ref=f1e75] [cursor=pointer]:
+        - /url: "#/knowledge/0-4"
+        - generic [ref=f1e76]: "0.4"
+        - generic [ref=f1e77]:
+          - generic [ref=f1e78]: Transformer 直觉版：AI 怎么读句子
+          - generic [ref=f1e79]: 锚点 0.4 · NLP 与 Transformer
+        - generic [ref=f1e80]: 理解
+        - generic [ref=f1e82]: S0
+        - generic [ref=f1e83]: ★★★★★
+        - generic [ref=f1e84]: 未开始
+      - link "0.4b 分词与 token：计费与上下文的计量单位 锚点 0.4 · NLP 与 Transformer 理解 S0 ★★★★★ 未开始" [ref=f1e86] [cursor=pointer]:
+        - /url: "#/knowledge/0-4b"
+        - generic [ref=f1e87]: 0.4b
+        - generic [ref=f1e88]:
+          - generic [ref=f1e89]: 分词与 token：计费与上下文的计量单位
+          - generic [ref=f1e90]: 锚点 0.4 · NLP 与 Transformer
+        - generic [ref=f1e91]: 理解
+        - generic [ref=f1e93]: S0
+        - generic [ref=f1e94]: ★★★★★
+        - generic [ref=f1e95]: 未开始
+      - link "0.4c Self-Attention 与 QKV：注意力机制原理 锚点 0.4 · NLP 与 Transformer 理解 S0 ★★★★★ 未开始" [ref=f1e97] [cursor=pointer]:
+        - /url: "#/knowledge/0-4c"
+        - generic [ref=f1e98]: 0.4c
+        - generic [ref=f1e99]:
+          - generic [ref=f1e100]: Self-Attention 与 QKV：注意力机制原理
+          - generic [ref=f1e101]: 锚点 0.4 · NLP 与 Transformer
+        - generic [ref=f1e102]: 理解
+        - generic [ref=f1e104]: S0
+        - generic [ref=f1e105]: ★★★★★
+        - generic [ref=f1e106]: 未开始
+      - link "0.4d 位置编码与 RoPE：AI 怎么知道词序 锚点 0.4 · NLP 与 Transformer 理解 S0 ★★★★★ 未开始" [ref=f1e108] [cursor=pointer]:
+        - /url: "#/knowledge/0-4d"
+        - generic [ref=f1e109]: 0.4d
+        - generic [ref=f1e110]:
+          - generic [ref=f1e111]: 位置编码与 RoPE：AI 怎么知道词序
+          - generic [ref=f1e112]: 锚点 0.4 · NLP 与 Transformer
+        - generic [ref=f1e113]: 理解
+        - generic [ref=f1e115]: S0
+        - generic [ref=f1e116]: ★★★★★
+        - generic [ref=f1e117]: 未开始
+      - link "0.5 什么是大模型：能力、幻觉与上下文从哪来 锚点 0.5 · LLM 基础 理解 S0 ★★★★★ 未开始" [ref=f1e119] [cursor=pointer]:
+        - /url: "#/knowledge/0-5"
+        - generic [ref=f1e120]: "0.5"
+        - generic [ref=f1e121]:
+          - generic [ref=f1e122]: 什么是大模型：能力、幻觉与上下文从哪来
+          - generic [ref=f1e123]: 锚点 0.5 · LLM 基础
+        - generic [ref=f1e124]: 理解
+        - generic [ref=f1e126]: S0
+        - generic [ref=f1e127]: ★★★★★
+        - generic [ref=f1e128]: 未开始
+      - link "0.5b 预训练与 SFT：AI 的三段成长 锚点 0.5 · LLM 基础 理解 S0 ★★★★★ 未开始" [ref=f1e130] [cursor=pointer]:
+        - /url: "#/knowledge/0-5b"
+        - generic [ref=f1e131]: 0.5b
+        - generic [ref=f1e132]:
+          - generic [ref=f1e133]: 预训练与 SFT：AI 的三段成长
+          - generic [ref=f1e134]: 锚点 0.5 · LLM 基础
+        - generic [ref=f1e135]: 理解
+        - generic [ref=f1e137]: S0
+        - generic [ref=f1e138]: ★★★★★
+        - generic [ref=f1e139]: 未开始
+      - link "0.5c RLHF 与 DPO：模型怎么变听话 锚点 0.5 · LLM 基础 理解 S0 ★★★★★ 未开始" [ref=f1e141] [cursor=pointer]:
+        - /url: "#/knowledge/0-5c"
+        - generic [ref=f1e142]: 0.5c
+        - generic [ref=f1e143]:
+          - generic [ref=f1e144]: RLHF 与 DPO：模型怎么变听话
+          - generic [ref=f1e145]: 锚点 0.5 · LLM 基础
+        - generic [ref=f1e146]: 理解
+        - generic [ref=f1e148]: S0
+        - generic [ref=f1e149]: ★★★★★
+        - generic [ref=f1e150]: 未开始
+      - link "0.5d 幻觉机理：似真不等于为真 锚点 0.5 · LLM 基础 理解 S0 ★★★★★ 未开始" [ref=f1e152] [cursor=pointer]:
+        - /url: "#/knowledge/0-5d"
+        - generic [ref=f1e153]: 0.5d
+        - generic [ref=f1e154]:
+          - generic [ref=f1e155]: 幻觉机理：似真不等于为真
+          - generic [ref=f1e156]: 锚点 0.5 · LLM 基础
+        - generic [ref=f1e157]: 理解
+        - generic [ref=f1e159]: S0
+        - generic [ref=f1e160]: ★★★★★
+        - generic [ref=f1e161]: 未开始
+      - link "0.6 和 AI 对话的第一课：把话说清楚 锚点 0.6 · 提示工程基础 会用 S0 ★★★★★ 未开始" [ref=f1e163] [cursor=pointer]:
+        - /url: "#/knowledge/0-6"
+        - generic [ref=f1e164]: "0.6"
+        - generic [ref=f1e165]:
+          - generic [ref=f1e166]: 和 AI 对话的第一课：把话说清楚
+          - generic [ref=f1e167]: 锚点 0.6 · 提示工程基础
+        - generic [ref=f1e168]: 会用
+        - generic [ref=f1e170]: S0
+        - generic [ref=f1e171]: ★★★★★
+        - generic [ref=f1e172]: 未开始
+      - link "0.6b 结构化 Prompt 五件套实操 锚点 0.6 · 提示工程基础 会用 S0 ★★★★★ 未开始" [ref=f1e174] [cursor=pointer]:
+        - /url: "#/knowledge/0-6b"
+        - generic [ref=f1e175]: 0.6b
+        - generic [ref=f1e176]:
+          - generic [ref=f1e177]: 结构化 Prompt 五件套实操
+          - generic [ref=f1e178]: 锚点 0.6 · 提示工程基础
+        - generic [ref=f1e179]: 会用
+        - generic [ref=f1e181]: S0
+        - generic [ref=f1e182]: ★★★★★
+        - generic [ref=f1e183]: 未开始
+      - link "0.7 Embedding 初体验：语义坐标 锚点 0.7 · 向量与嵌入基础 会用 S0 ★★★★★ 未开始" [ref=f1e185] [cursor=pointer]:
+        - /url: "#/knowledge/0-7"
+        - generic [ref=f1e186]: "0.7"
+        - generic [ref=f1e187]:
+          - generic [ref=f1e188]: Embedding 初体验：语义坐标
+          - generic [ref=f1e189]: 锚点 0.7 · 向量与嵌入基础
+        - generic [ref=f1e190]: 会用
+        - generic [ref=f1e192]: S0
+        - generic [ref=f1e193]: ★★★★★
+        - generic [ref=f1e194]: 未开始
+      - link "0.7b 向量检索原理：ANN 与 HNSW/IVF 锚点 0.7 · 向量与嵌入基础 会用 S0 ★★★★★ 未开始" [ref=f1e196] [cursor=pointer]:
+        - /url: "#/knowledge/0-7b"
+        - generic [ref=f1e197]: 0.7b
+        - generic [ref=f1e198]:
+          - generic [ref=f1e199]: 向量检索原理：ANN 与 HNSW/IVF
+          - generic [ref=f1e200]: 锚点 0.7 · 向量与嵌入基础
+        - generic [ref=f1e201]: 会用
+        - generic [ref=f1e203]: S0
+        - generic [ref=f1e204]: ★★★★★
+        - generic [ref=f1e205]: 未开始
+      - link "1.1 主流模型家族速览与选型 锚点 1.1 · LLM API 与模型选型 会用 S1 ★★★★★ 未开始" [ref=f1e207] [cursor=pointer]:
+        - /url: "#/knowledge/1-1"
+        - generic [ref=f1e208]: "1.1"
+        - generic [ref=f1e209]:
+          - generic [ref=f1e210]: 主流模型家族速览与选型
+          - generic [ref=f1e211]: 锚点 1.1 · LLM API 与模型选型
+        - generic [ref=f1e212]: 会用
+        - generic [ref=f1e214]: S1
+        - generic [ref=f1e215]: ★★★★★
+        - generic [ref=f1e216]: 未开始
+      - link "1.1b 解码参数实操：temperature/top_p 怎么调 锚点 1.1 · LLM API 与模型选型 会用 S1 ★★★★★ 未开始" [ref=f1e218] [cursor=pointer]:
+        - /url: "#/knowledge/1-1b"
+        - generic [ref=f1e219]: 1.1b
+        - generic [ref=f1e220]:
+          - generic [ref=f1e221]: 解码参数实操：temperature/top_p 怎么调
+          - generic [ref=f1e222]: 锚点 1.1 · LLM API 与模型选型
+        - generic [ref=f1e223]: 会用
+        - generic [ref=f1e225]: S1
+        - generic [ref=f1e226]: ★★★★★
+        - generic [ref=f1e227]: 未开始
+      - link "1.1c 采样机制的数学：温度与核采样 锚点 1.1 · LLM API 与模型选型 会用 S1 ★★★★★ 未开始" [ref=f1e229] [cursor=pointer]:
+        - /url: "#/knowledge/1-1c"
+        - generic [ref=f1e230]: 1.1c
+        - generic [ref=f1e231]:
+          - generic [ref=f1e232]: 采样机制的数学：温度与核采样
+          - generic [ref=f1e233]: 锚点 1.1 · LLM API 与模型选型
+        - generic [ref=f1e234]: 会用
+        - generic [ref=f1e236]: S1
+        - generic [ref=f1e237]: ★★★★★
+        - generic [ref=f1e238]: 未开始
+      - link "1.2 进阶提示工程：少样本、CoT 与自洽性 锚点 1.2 · Prompt Engineering 进阶 会用 S1 ★★★★★ 未开始" [ref=f1e240] [cursor=pointer]:
+        - /url: "#/knowledge/1-2"
+        - generic [ref=f1e241]: "1.2"
+        - generic [ref=f1e242]:
+          - generic [ref=f1e243]: 进阶提示工程：少样本、CoT 与自洽性
+          - generic [ref=f1e244]: 锚点 1.2 · Prompt Engineering 进阶
+        - generic [ref=f1e245]: 会用
+        - generic [ref=f1e247]: S1
+        - generic [ref=f1e248]: ★★★★★
+        - generic [ref=f1e249]: 未开始
+      - link "1.2b Prompt 注入防护实操 锚点 1.2 · Prompt Engineering 进阶 会用 S1 ★★★★★ 未开始" [ref=f1e251] [cursor=pointer]:
+        - /url: "#/knowledge/1-2b"
+        - generic [ref=f1e252]: 1.2b
+        - generic [ref=f1e253]:
+          - generic [ref=f1e254]: Prompt 注入防护实操
+          - generic [ref=f1e255]: 锚点 1.2 · Prompt Engineering 进阶
+        - generic [ref=f1e256]: 会用
+        - generic [ref=f1e258]: S1
+        - generic [ref=f1e259]: ★★★★★
+        - generic [ref=f1e260]: 未开始
+      - link "1.3 结构化输出与 JSON Mode 三道关 锚点 1.3 · 结构化输出与 Function Calling 会用 S1 ★★★★★ 未开始" [ref=f1e262] [cursor=pointer]:
+        - /url: "#/knowledge/1-3"
+        - generic [ref=f1e263]: "1.3"
+        - generic [ref=f1e264]:
+          - generic [ref=f1e265]: 结构化输出与 JSON Mode 三道关
+          - generic [ref=f1e266]: 锚点 1.3 · 结构化输出与 Function Calling
+        - generic [ref=f1e267]: 会用
+        - generic [ref=f1e269]: S1
+        - generic [ref=f1e270]: ★★★★★
+        - generic [ref=f1e271]: 未开始
+      - link "1.3b 工具调用的直觉：点餐小票 锚点 1.3 · 结构化输出与 Function Calling 会用 S1 ★★★★★ 未开始" [ref=f1e273] [cursor=pointer]:
+        - /url: "#/knowledge/1-3b"
+        - generic [ref=f1e274]: 1.3b
+        - generic [ref=f1e275]:
+          - generic [ref=f1e276]: 工具调用的直觉：点餐小票
+          - generic [ref=f1e277]: 锚点 1.3 · 结构化输出与 Function Calling
+        - generic [ref=f1e278]: 会用
+        - generic [ref=f1e280]: S1
+        - generic [ref=f1e281]: ★★★★★
+        - generic [ref=f1e282]: 未开始
+      - link "1.3c Function Calling 与参数校验实操 锚点 1.3 · 结构化输出与 Function Calling 会用 S1 ★★★★★ 未开始" [ref=f1e284] [cursor=pointer]:
+        - /url: "#/knowledge/1-3c"
+        - generic [ref=f1e285]: 1.3c
+        - generic [ref=f1e286]:
+          - generic [ref=f1e287]: Function Calling 与参数校验实操
+          - generic [ref=f1e288]: 锚点 1.3 · 结构化输出与 Function Calling
+        - generic [ref=f1e289]: 会用
+        - generic [ref=f1e291]: S1
+        - generic [ref=f1e292]: ★★★★★
+        - generic [ref=f1e293]: 未开始
+      - link "1.4 开卷考试：RAG 直觉版 锚点 1.4 · RAG 熟练 S3 ★★★★★ 未开始" [ref=f1e295] [cursor=pointer]:
+        - /url: "#/knowledge/1-4"
+        - generic [ref=f1e296]: "1.4"
+        - generic [ref=f1e297]:
+          - generic [ref=f1e298]: 开卷考试：RAG 直觉版
+          - generic [ref=f1e299]: 锚点 1.4 · RAG
+        - generic [ref=f1e300]: 熟练
+        - generic [ref=f1e302]: S3
+        - generic [ref=f1e303]: ★★★★★
+        - generic [ref=f1e304]: 未开始
+      - link "1.4b RAG 最小可用版：搭一条完整链路 锚点 1.4 · RAG 熟练 S3 ★★★★★ 未开始" [ref=f1e306] [cursor=pointer]:
+        - /url: "#/knowledge/1-4b"
+        - generic [ref=f1e307]: 1.4b
+        - generic [ref=f1e308]:
+          - generic [ref=f1e309]: RAG 最小可用版：搭一条完整链路
+          - generic [ref=f1e310]: 锚点 1.4 · RAG
+        - generic [ref=f1e311]: 熟练
+        - generic [ref=f1e313]: S3
+        - generic [ref=f1e314]: ★★★★★
+        - generic [ref=f1e315]: 未开始
+      - link "1.4c 检索质量优化：切分、混合检索与重排 锚点 1.4 · RAG 熟练 S3 ★★★★★ 未开始" [ref=f1e317] [cursor=pointer]:
+        - /url: "#/knowledge/1-4c"
+        - generic [ref=f1e318]: 1.4c
+        - generic [ref=f1e319]:
+          - generic [ref=f1e320]: 检索质量优化：切分、混合检索与重排
+          - generic [ref=f1e321]: 锚点 1.4 · RAG
+        - generic [ref=f1e322]: 熟练
+        - generic [ref=f1e324]: S3
+        - generic [ref=f1e325]: ★★★★★
+        - generic [ref=f1e326]: 未开始
+      - link "1.4d RAG vs 微调 vs 长上下文选型 锚点 1.4 · RAG 熟练 S3 ★★★★★ 未开始" [ref=f1e328] [cursor=pointer]:
+        - /url: "#/knowledge/1-4d"
+        - generic [ref=f1e329]: 1.4d
+        - generic [ref=f1e330]:
+          - generic [ref=f1e331]: RAG vs 微调 vs 长上下文选型
+          - generic [ref=f1e332]: 锚点 1.4 · RAG
+        - generic [ref=f1e333]: 熟练
+        - generic [ref=f1e335]: S3
+        - generic [ref=f1e336]: ★★★★★
+        - generic [ref=f1e337]: 未开始
+      - link "1.5 多轮对话与上下文管理实操 锚点 1.5 · 记忆与上下文管理 会用 S1 ★★★★★ 未开始" [ref=f1e339] [cursor=pointer]:
+        - /url: "#/knowledge/1-5"
+        - generic [ref=f1e340]: "1.5"
+        - generic [ref=f1e341]:
+          - generic [ref=f1e342]: 多轮对话与上下文管理实操
+          - generic [ref=f1e343]: 锚点 1.5 · 记忆与上下文管理
+        - generic [ref=f1e344]: 会用
+        - generic [ref=f1e346]: S1
+        - generic [ref=f1e347]: ★★★★★
+        - generic [ref=f1e348]: 未开始
+      - link "1.6 怎么知道应用变好了：评估与 LLM-as-Judge 入门 锚点 1.6 · LLM 应用评估与可观测性 理解-会用 S1 ★★★★★ 未开始" [ref=f1e350] [cursor=pointer]:
+        - /url: "#/knowledge/1-6"
+        - generic [ref=f1e351]: "1.6"
+        - generic [ref=f1e352]:
+          - generic [ref=f1e353]: 怎么知道应用变好了：评估与 LLM-as-Judge 入门
+          - generic [ref=f1e354]: 锚点 1.6 · LLM 应用评估与可观测性
+        - generic [ref=f1e355]: 理解-会用
+        - generic [ref=f1e357]: S1
+        - generic [ref=f1e358]: ★★★★★
+        - generic [ref=f1e359]: 未开始
+      - link "1.7 生产四座大山：安全、权限、成本、延迟入门 锚点 1.7 · 安全、权限、成本与延迟 理解-会用 S1 ★★★★★ 未开始" [ref=f1e361] [cursor=pointer]:
+        - /url: "#/knowledge/1-7"
+        - generic [ref=f1e362]: "1.7"
+        - generic [ref=f1e363]:
+          - generic [ref=f1e364]: 生产四座大山：安全、权限、成本、延迟入门
+          - generic [ref=f1e365]: 锚点 1.7 · 安全、权限、成本与延迟
+        - generic [ref=f1e366]: 理解-会用
+        - generic [ref=f1e368]: S1
+        - generic [ref=f1e369]: ★★★★★
+        - generic [ref=f1e370]: 未开始
+      - link "1.7b 幻觉治理的分层防御体系 锚点 1.7 · 安全、权限、成本与延迟 理解-会用 S1 ★★★★★ 未开始" [ref=f1e372] [cursor=pointer]:
+        - /url: "#/knowledge/1-7b"
+        - generic [ref=f1e373]: 1.7b
+        - generic [ref=f1e374]:
+          - generic [ref=f1e375]: 幻觉治理的分层防御体系
+          - generic [ref=f1e376]: 锚点 1.7 · 安全、权限、成本与延迟
+        - generic [ref=f1e377]: 理解-会用
+        - generic [ref=f1e379]: S1
+        - generic [ref=f1e380]: ★★★★★
+        - generic [ref=f1e381]: 未开始
+      - link "2.1 Agent 是什么：给 AI 装上手手脚 锚点 2.1 · Agent 定义与范式 理解 S2 ★★★★★ 未开始" [ref=f1e383] [cursor=pointer]:
+        - /url: "#/knowledge/2-1"
+        - generic [ref=f1e384]: "2.1"
+        - generic [ref=f1e385]:
+          - generic [ref=f1e386]: Agent 是什么：给 AI 装上手手脚
+          - generic [ref=f1e387]: 锚点 2.1 · Agent 定义与范式
+        - generic [ref=f1e388]: 理解
+        - generic [ref=f1e390]: S2
+        - generic [ref=f1e391]: ★★★★★
+        - generic [ref=f1e392]: 未开始
+      - link "2.2 任务分解与规划：把模糊目标拆成步骤 锚点 2.2 · 规划 Planning 熟练 S2 ★★★★★ 未开始" [ref=f1e394] [cursor=pointer]:
+        - /url: "#/knowledge/2-2"
+        - generic [ref=f1e395]: "2.2"
+        - generic [ref=f1e396]:
+          - generic [ref=f1e397]: 任务分解与规划：把模糊目标拆成步骤
+          - generic [ref=f1e398]: 锚点 2.2 · 规划 Planning
+        - generic [ref=f1e399]: 熟练
+        - generic [ref=f1e401]: S2
+        - generic [ref=f1e402]: ★★★★★
+        - generic [ref=f1e403]: 未开始
+      - link "2.3 工具调用异常与死循环防护实操 锚点 2.3 · 工具使用 Tool Use 熟练 S2 ★★★★★ 未开始" [ref=f1e405] [cursor=pointer]:
+        - /url: "#/knowledge/2-3"
+        - generic [ref=f1e406]: "2.3"
+        - generic [ref=f1e407]:
+          - generic [ref=f1e408]: 工具调用异常与死循环防护实操
+          - generic [ref=f1e409]: 锚点 2.3 · 工具使用 Tool Use
+        - generic [ref=f1e410]: 熟练
+        - generic [ref=f1e412]: S2
+        - generic [ref=f1e413]: ★★★★★
+        - generic [ref=f1e414]: 未开始
+      - link "2.3b MCP 实操：工具即插即用 锚点 2.3 · 工具使用 Tool Use 熟练 S2 ★★★★★ 未开始" [ref=f1e416] [cursor=pointer]:
+        - /url: "#/knowledge/2-3b"
+        - generic [ref=f1e417]: 2.3b
+        - generic [ref=f1e418]:
+          - generic [ref=f1e419]: MCP 实操：工具即插即用
+          - generic [ref=f1e420]: 锚点 2.3 · 工具使用 Tool Use
+        - generic [ref=f1e421]: 熟练
+        - generic [ref=f1e423]: S2
+        - generic [ref=f1e424]: ★★★★★
+        - generic [ref=f1e425]: 未开始
+      - link "2.4 Agent 记忆机制原理 锚点 2.4 · 记忆 Memory 熟练 S2 ★★★★★ 未开始" [ref=f1e427] [cursor=pointer]:
+        - /url: "#/knowledge/2-4"
+        - generic [ref=f1e428]: "2.4"
+        - generic [ref=f1e429]:
+          - generic [ref=f1e430]: Agent 记忆机制原理
+          - generic [ref=f1e431]: 锚点 2.4 · 记忆 Memory
+        - generic [ref=f1e432]: 熟练
+        - generic [ref=f1e434]: S2
+        - generic [ref=f1e435]: ★★★★★
+        - generic [ref=f1e436]: 未开始
+      - link "2.5 ReAct 循环实操：边想边做 锚点 2.5 · 执行循环与状态机 熟练 S2 ★★★★★ 未开始" [ref=f1e438] [cursor=pointer]:
+        - /url: "#/knowledge/2-5"
+        - generic [ref=f1e439]: "2.5"
+        - generic [ref=f1e440]:
+          - generic [ref=f1e441]: ReAct 循环实操：边想边做
+          - generic [ref=f1e442]: 锚点 2.5 · 执行循环与状态机
+        - generic [ref=f1e443]: 熟练
+        - generic [ref=f1e445]: S2
+        - generic [ref=f1e446]: ★★★★★
+        - generic [ref=f1e447]: 未开始
+      - link "2.5b ReAct 失败模式与状态机恢复 锚点 2.5 · 执行循环与状态机 熟练 S2 ★★★★★ 未开始" [ref=f1e449] [cursor=pointer]:
+        - /url: "#/knowledge/2-5b"
+        - generic [ref=f1e450]: 2.5b
+        - generic [ref=f1e451]:
+          - generic [ref=f1e452]: ReAct 失败模式与状态机恢复
+          - generic [ref=f1e453]: 锚点 2.5 · 执行循环与状态机
+        - generic [ref=f1e454]: 熟练
+        - generic [ref=f1e456]: S2
+        - generic [ref=f1e457]: ★★★★★
+        - generic [ref=f1e458]: 未开始
+      - link "2.6 反思与自我修正：让 Agent 知错能改 锚点 2.6 · 反思与自我修正 理解-会用 S2 ★★★★★ 未开始" [ref=f1e460] [cursor=pointer]:
+        - /url: "#/knowledge/2-6"
+        - generic [ref=f1e461]: "2.6"
+        - generic [ref=f1e462]:
+          - generic [ref=f1e463]: 反思与自我修正：让 Agent 知错能改
+          - generic [ref=f1e464]: 锚点 2.6 · 反思与自我修正
+        - generic [ref=f1e465]: 理解-会用
+        - generic [ref=f1e467]: S2
+        - generic [ref=f1e468]: ★★★★★
+        - generic [ref=f1e469]: 未开始
+      - link "2.7 单 Agent 四大架构模式：工具型/RAG型/工作流型/自主型 锚点 2.7 · 单 Agent 架构模式 熟练 S3 ★★★★★ 未开始" [ref=f1e471] [cursor=pointer]:
+        - /url: "#/knowledge/2-7"
+        - generic [ref=f1e472]: "2.7"
+        - generic [ref=f1e473]:
+          - generic [ref=f1e474]: 单 Agent 四大架构模式：工具型/RAG型/工作流型/自主型
+          - generic [ref=f1e475]: 锚点 2.7 · 单 Agent 架构模式
+        - generic [ref=f1e476]: 熟练
+        - generic [ref=f1e478]: S3
+        - generic [ref=f1e479]: ★★★★★
+        - generic [ref=f1e480]: 未开始
+      - link "2.7b 何时用工作流，何时用自主 Agent 锚点 2.7 · 单 Agent 架构模式 熟练 S3 ★★★★★ 未开始" [ref=f1e482] [cursor=pointer]:
+        - /url: "#/knowledge/2-7b"
+        - generic [ref=f1e483]: 2.7b
+        - generic [ref=f1e484]:
+          - generic [ref=f1e485]: 何时用工作流，何时用自主 Agent
+          - generic [ref=f1e486]: 锚点 2.7 · 单 Agent 架构模式
+        - generic [ref=f1e487]: 熟练
+        - generic [ref=f1e489]: S3
+        - generic [ref=f1e490]: ★★★★★
+        - generic [ref=f1e491]: 未开始
+      - link "2.8 多 Agent 协作：角色分工、通信与监督 锚点 2.8 · 多 Agent 协作 理解-会用 S5 ★★★★★ 未开始" [ref=f1e493] [cursor=pointer]:
+        - /url: "#/knowledge/2-8"
+        - generic [ref=f1e494]: "2.8"
+        - generic [ref=f1e495]:
+          - generic [ref=f1e496]: 多 Agent 协作：角色分工、通信与监督
+          - generic [ref=f1e497]: 锚点 2.8 · 多 Agent 协作
+        - generic [ref=f1e498]: 理解-会用
+        - generic [ref=f1e500]: S5
+        - generic [ref=f1e501]: ★★★★★
+        - generic [ref=f1e502]: 未开始
+      - link "2.8b 多 Agent 何时真的优于单 Agent 锚点 2.8 · 多 Agent 协作 理解-会用 S5 ★★★★★ 未开始" [ref=f1e504] [cursor=pointer]:
+        - /url: "#/knowledge/2-8b"
+        - generic [ref=f1e505]: 2.8b
+        - generic [ref=f1e506]:
+          - generic [ref=f1e507]: 多 Agent 何时真的优于单 Agent
+          - generic [ref=f1e508]: 锚点 2.8 · 多 Agent 协作
+        - generic [ref=f1e509]: 理解-会用
+        - generic [ref=f1e511]: S5
+        - generic [ref=f1e512]: ★★★★★
+        - generic [ref=f1e513]: 未开始
+      - link "2.9 RAG 评估体系与忠实度计算 锚点 2.9 · Agent 评估与安全 熟练 S3 ★★★★★ 未开始" [ref=f1e515] [cursor=pointer]:
+        - /url: "#/knowledge/2-9"
+        - generic [ref=f1e516]: "2.9"
+        - generic [ref=f1e517]:
+          - generic [ref=f1e518]: RAG 评估体系与忠实度计算
+          - generic [ref=f1e519]: 锚点 2.9 · Agent 评估与安全
+        - generic [ref=f1e520]: 熟练
+        - generic [ref=f1e522]: S3
+        - generic [ref=f1e523]: ★★★★★
+        - generic [ref=f1e524]: 未开始
+      - link "2.9b Agent 评测与生产治理体系 锚点 2.9 · Agent 评估与安全 熟练 S3 ★★★★★ 未开始" [ref=f1e526] [cursor=pointer]:
+        - /url: "#/knowledge/2-9b"
+        - generic [ref=f1e527]: 2.9b
+        - generic [ref=f1e528]:
+          - generic [ref=f1e529]: Agent 评测与生产治理体系
+          - generic [ref=f1e530]: 锚点 2.9 · Agent 评估与安全
+        - generic [ref=f1e531]: 熟练
+        - generic [ref=f1e533]: S3
+        - generic [ref=f1e534]: ★★★★★
+        - generic [ref=f1e535]: 未开始
+      - link "3.1 Agent 服务架构与接口设计 锚点 3.1 · 架构与接口设计 熟练 S4 ★★★★★ 未开始" [ref=f1e537] [cursor=pointer]:
+        - /url: "#/knowledge/3-1"
+        - generic [ref=f1e538]: "3.1"
+        - generic [ref=f1e539]:
+          - generic [ref=f1e540]: Agent 服务架构与接口设计
+          - generic [ref=f1e541]: 锚点 3.1 · 架构与接口设计
+        - generic [ref=f1e542]: 熟练
+        - generic [ref=f1e544]: S4
+        - generic [ref=f1e545]: ★★★★★
+        - generic [ref=f1e546]: 未开始
+      - link "3.10 人机协同与反馈闭环：审批、标注与持续学习 锚点 3.10 · 人机协同与反馈闭环 理解-会用 S4 ★★★★★ 未开始" [ref=f1e548] [cursor=pointer]:
+        - /url: "#/knowledge/3-10"
+        - generic [ref=f1e549]: "3.10"
+        - generic [ref=f1e550]:
+          - generic [ref=f1e551]: 人机协同与反馈闭环：审批、标注与持续学习
+          - generic [ref=f1e552]: 锚点 3.10 · 人机协同与反馈闭环
+        - generic [ref=f1e553]: 理解-会用
+        - generic [ref=f1e555]: S4
+        - generic [ref=f1e556]: ★★★★★
+        - generic [ref=f1e557]: 未开始
+      - link "3.2 企业级 RAG 数据管线与权限治理 锚点 3.2 · 数据与知识工程 熟练 S4 ★★★★★ 未开始" [ref=f1e559] [cursor=pointer]:
+        - /url: "#/knowledge/3-2"
+        - generic [ref=f1e560]: "3.2"
+        - generic [ref=f1e561]:
+          - generic [ref=f1e562]: 企业级 RAG 数据管线与权限治理
+          - generic [ref=f1e563]: 锚点 3.2 · 数据与知识工程
+        - generic [ref=f1e564]: 熟练
+        - generic [ref=f1e566]: S4
+        - generic [ref=f1e567]: ★★★★★
+        - generic [ref=f1e568]: 未开始
+      - link "3.2b 合成数据与模型自进化前沿 🆕 锚点 3.2 · 数据与知识工程 熟练 S4 ★★★★★ 未开始" [ref=f1e570] [cursor=pointer]:
+        - /url: "#/knowledge/3-2b"
+        - generic [ref=f1e571]: 3.2b
+        - generic [ref=f1e572]:
+          - generic [ref=f1e573]:
+            - text: 合成数据与模型自进化前沿
+            - generic [ref=f1e574]: 🆕
+          - generic [ref=f1e575]: 锚点 3.2 · 数据与知识工程
+        - generic [ref=f1e576]: 熟练
+        - generic [ref=f1e578]: S4
+        - generic [ref=f1e579]: ★★★★★
+        - generic [ref=f1e580]: 未开始
+      - link "3.3 编排框架选型：LangGraph/LlamaIndex/OpenAI SDK/MCP *选修 锚点 3.3 · 编排框架与运行时 会用 S4 ★★★★★ 未开始" [ref=f1e582] [cursor=pointer]:
+        - /url: "#/knowledge/3-3"
+        - generic [ref=f1e583]: "3.3"
+        - generic [ref=f1e584]:
+          - generic [ref=f1e585]:
+            - text: 编排框架选型：LangGraph/LlamaIndex/OpenAI SDK/MCP
+            - generic [ref=f1e586]: "*选修"
+          - generic [ref=f1e587]: 锚点 3.3 · 编排框架与运行时
+        - generic [ref=f1e588]: 会用
+        - generic [ref=f1e590]: S4
+        - generic [ref=f1e591]: ★★★★★
+        - generic [ref=f1e592]: 未开始
+      - link "3.4 LLM 应用可观测性体系 锚点 3.4 · 可观测性与追踪 熟练 S4 ★★★★★ 未开始" [ref=f1e594] [cursor=pointer]:
+        - /url: "#/knowledge/3-4"
+        - generic [ref=f1e595]: "3.4"
+        - generic [ref=f1e596]:
+          - generic [ref=f1e597]: LLM 应用可观测性体系
+          - generic [ref=f1e598]: 锚点 3.4 · 可观测性与追踪
+        - generic [ref=f1e599]: 熟练
+        - generic [ref=f1e601]: S4
+        - generic [ref=f1e602]: ★★★★★
+        - generic [ref=f1e603]: 未开始
+      - link "3.5 评估体系与实验管理：数据集、A/B 与 Judge 校准 锚点 3.5 · 评估体系与实验管理 熟练 S4 ★★★★★ 未开始" [ref=f1e605] [cursor=pointer]:
+        - /url: "#/knowledge/3-5"
+        - generic [ref=f1e606]: "3.5"
+        - generic [ref=f1e607]:
+          - generic [ref=f1e608]: 评估体系与实验管理：数据集、A/B 与 Judge 校准
+          - generic [ref=f1e609]: 锚点 3.5 · 评估体系与实验管理
+        - generic [ref=f1e610]: 熟练
+        - generic [ref=f1e612]: S4
+        - generic [ref=f1e613]: ★★★★★
+        - generic [ref=f1e614]: 未开始
+      - link "3.6 推理服务化认知：vLLM 部署一条龙 锚点 3.6 · 部署与扩展 熟练 S4 ★★★★★ 未开始" [ref=f1e616] [cursor=pointer]:
+        - /url: "#/knowledge/3-6"
+        - generic [ref=f1e617]: "3.6"
+        - generic [ref=f1e618]:
+          - generic [ref=f1e619]: 推理服务化认知：vLLM 部署一条龙
+          - generic [ref=f1e620]: 锚点 3.6 · 部署与扩展
+        - generic [ref=f1e621]: 熟练
+        - generic [ref=f1e623]: S4
+        - generic [ref=f1e624]: ★★★★★
+        - generic [ref=f1e625]: 未开始
+      - link "3.6b 显存估算原理与容量规划 锚点 3.6 · 部署与扩展 熟练 S4 ★★★★★ 未开始" [ref=f1e627] [cursor=pointer]:
+        - /url: "#/knowledge/3-6b"
+        - generic [ref=f1e628]: 3.6b
+        - generic [ref=f1e629]:
+          - generic [ref=f1e630]: 显存估算原理与容量规划
+          - generic [ref=f1e631]: 锚点 3.6 · 部署与扩展
+        - generic [ref=f1e632]: 熟练
+        - generic [ref=f1e634]: S4
+        - generic [ref=f1e635]: ★★★★★
+        - generic [ref=f1e636]: 未开始
+      - link "3.6c 端侧与边缘推理（AI PC/手机 NPU） 🆕 锚点 3.6 · 部署与扩展 熟练 S4 ★★★★★ 未开始" [ref=f1e638] [cursor=pointer]:
+        - /url: "#/knowledge/3-6c"
+        - generic [ref=f1e639]: 3.6c
+        - generic [ref=f1e640]:
+          - generic [ref=f1e641]:
+            - text: 端侧与边缘推理（AI PC/手机 NPU）
+            - generic [ref=f1e642]: 🆕
+          - generic [ref=f1e643]: 锚点 3.6 · 部署与扩展
+        - generic [ref=f1e644]: 熟练
+        - generic [ref=f1e646]: S4
+        - generic [ref=f1e647]: ★★★★★
+        - generic [ref=f1e648]: 未开始
+      - link "3.7 为什么大模型跑不快：逐字接龙的代价 锚点 3.7 · 成本、延迟与可靠性 熟练 S4 ★★★★★ 未开始" [ref=f1e650] [cursor=pointer]:
+        - /url: "#/knowledge/3-7"
+        - generic [ref=f1e651]: "3.7"
+        - generic [ref=f1e652]:
+          - generic [ref=f1e653]: 为什么大模型跑不快：逐字接龙的代价
+          - generic [ref=f1e654]: 锚点 3.7 · 成本、延迟与可靠性
+        - generic [ref=f1e655]: 熟练
+        - generic [ref=f1e657]: S4
+        - generic [ref=f1e658]: ★★★★★
+        - generic [ref=f1e659]: 未开始
+      - link "3.7b KV Cache 与 PagedAttention 原理 锚点 3.7 · 成本、延迟与可靠性 熟练 S4 ★★★★★ 未开始" [ref=f1e661] [cursor=pointer]:
+        - /url: "#/knowledge/3-7b"
+        - generic [ref=f1e662]: 3.7b
+        - generic [ref=f1e663]:
+          - generic [ref=f1e664]: KV Cache 与 PagedAttention 原理
+          - generic [ref=f1e665]: 锚点 3.7 · 成本、延迟与可靠性
+        - generic [ref=f1e666]: 熟练
+        - generic [ref=f1e668]: S4
+        - generic [ref=f1e669]: ★★★★★
+        - generic [ref=f1e670]: 未开始
+      - link "3.7c 全链路成本优化体系 锚点 3.7 · 成本、延迟与可靠性 熟练 S4 ★★★★★ 未开始" [ref=f1e672] [cursor=pointer]:
+        - /url: "#/knowledge/3-7c"
+        - generic [ref=f1e673]: 3.7c
+        - generic [ref=f1e674]:
+          - generic [ref=f1e675]: 全链路成本优化体系
+          - generic [ref=f1e676]: 锚点 3.7 · 成本、延迟与可靠性
+        - generic [ref=f1e677]: 熟练
+        - generic [ref=f1e679]: S4
+        - generic [ref=f1e680]: ★★★★★
+        - generic [ref=f1e681]: 未开始
+      - link "3.8 Agent 最小权限、合规与审计 锚点 3.8 · 安全、合规与权限 熟练 S4 ★★★★★ 未开始" [ref=f1e683] [cursor=pointer]:
+        - /url: "#/knowledge/3-8"
+        - generic [ref=f1e684]: "3.8"
+        - generic [ref=f1e685]:
+          - generic [ref=f1e686]: Agent 最小权限、合规与审计
+          - generic [ref=f1e687]: 锚点 3.8 · 安全、合规与权限
+        - generic [ref=f1e688]: 熟练
+        - generic [ref=f1e690]: S4
+        - generic [ref=f1e691]: ★★★★★
+        - generic [ref=f1e692]: 未开始
+      - link "3.9 Prompt 即代码：评估门禁与安全发布 锚点 3.9 · CI/CD、版本管理与发布 熟练 S4 ★★★★★ 未开始" [ref=f1e694] [cursor=pointer]:
+        - /url: "#/knowledge/3-9"
+        - generic [ref=f1e695]: "3.9"
+        - generic [ref=f1e696]:
+          - generic [ref=f1e697]: Prompt 即代码：评估门禁与安全发布
+          - generic [ref=f1e698]: 锚点 3.9 · CI/CD、版本管理与发布
+        - generic [ref=f1e699]: 熟练
+        - generic [ref=f1e701]: S4
+        - generic [ref=f1e702]: ★★★★★
+        - generic [ref=f1e703]: 未开始
+      - link "4.1 最小可用 Agent：从 CLI 原型到闭环 锚点 4.1 · 单 Agent 原型 会用 S6 ★★★★★ 未开始" [ref=f1e705] [cursor=pointer]:
+        - /url: "#/knowledge/4-1"
+        - generic [ref=f1e706]: "4.1"
+        - generic [ref=f1e707]:
+          - generic [ref=f1e708]: 最小可用 Agent：从 CLI 原型到闭环
+          - generic [ref=f1e709]: 锚点 4.1 · 单 Agent 原型
+        - generic [ref=f1e710]: 会用
+        - generic [ref=f1e712]: S6
+        - generic [ref=f1e713]: ★★★★★
+        - generic [ref=f1e714]: 未开始
+      - link "4.10 作品集与复盘：让别人相信你能做 锚点 4.10 · 作品集与复盘 熟练 S6 ★★★★★ 未开始" [ref=f1e716] [cursor=pointer]:
+        - /url: "#/knowledge/4-10"
+        - generic [ref=f1e717]: "4.10"
+        - generic [ref=f1e718]:
+          - generic [ref=f1e719]: 作品集与复盘：让别人相信你能做
+          - generic [ref=f1e720]: 锚点 4.10 · 作品集与复盘
+        - generic [ref=f1e721]: 熟练
+        - generic [ref=f1e723]: S6
+        - generic [ref=f1e724]: ★★★★★
+        - generic [ref=f1e725]: 未开始
+      - link "4.10b STAR 法：把项目讲成有证据链的故事 锚点 4.10 · 作品集与复盘 熟练 S6 ★★★★★ 未开始" [ref=f1e727] [cursor=pointer]:
+        - /url: "#/knowledge/4-10b"
+        - generic [ref=f1e728]: 4.10b
+        - generic [ref=f1e729]:
+          - generic [ref=f1e730]: STAR 法：把项目讲成有证据链的故事
+          - generic [ref=f1e731]: 锚点 4.10 · 作品集与复盘
+        - generic [ref=f1e732]: 熟练
+        - generic [ref=f1e734]: S6
+        - generic [ref=f1e735]: ★★★★★
+        - generic [ref=f1e736]: 未开始
+      - link "4.10c 架构师的表达：权衡论证与出题能力 锚点 4.10 · 作品集与复盘 熟练 S6 ★★★★★ 未开始" [ref=f1e738] [cursor=pointer]:
+        - /url: "#/knowledge/4-10c"
+        - generic [ref=f1e739]: 4.10c
+        - generic [ref=f1e740]:
+          - generic [ref=f1e741]: 架构师的表达：权衡论证与出题能力
+          - generic [ref=f1e742]: 锚点 4.10 · 作品集与复盘
+        - generic [ref=f1e743]: 熟练
+        - generic [ref=f1e745]: S6
+        - generic [ref=f1e746]: ★★★★★
+        - generic [ref=f1e747]: 未开始
+      - link "4.2 企业知识库设计的答题骨架 锚点 4.2 · RAG 知识库 Agent 熟练 S6 ★★★★★ 未开始" [ref=f1e749] [cursor=pointer]:
+        - /url: "#/knowledge/4-2"
+        - generic [ref=f1e750]: "4.2"
+        - generic [ref=f1e751]:
+          - generic [ref=f1e752]: 企业知识库设计的答题骨架
+          - generic [ref=f1e753]: 锚点 4.2 · RAG 知识库 Agent
+        - generic [ref=f1e754]: 熟练
+        - generic [ref=f1e756]: S6
+        - generic [ref=f1e757]: ★★★★★
+        - generic [ref=f1e758]: 未开始
+      - link "4.2b 终极架构题：企业知识库问答全案 锚点 4.2 · RAG 知识库 Agent 熟练 S6 ★★★★★ 未开始" [ref=f1e760] [cursor=pointer]:
+        - /url: "#/knowledge/4-2b"
+        - generic [ref=f1e761]: 4.2b
+        - generic [ref=f1e762]:
+          - generic [ref=f1e763]: 终极架构题：企业知识库问答全案
+          - generic [ref=f1e764]: 锚点 4.2 · RAG 知识库 Agent
+        - generic [ref=f1e765]: 熟练
+        - generic [ref=f1e767]: S6
+        - generic [ref=f1e768]: ★★★★★
+        - generic [ref=f1e769]: 未开始
+      - link "4.3 数据分析 Agent：SQL/代码沙箱与结果解释 锚点 4.3 · 数据分析 Agent 熟练 S6 ★★★★★ 未开始" [ref=f1e771] [cursor=pointer]:
+        - /url: "#/knowledge/4-3"
+        - generic [ref=f1e772]: "4.3"
+        - generic [ref=f1e773]:
+          - generic [ref=f1e774]: 数据分析 Agent：SQL/代码沙箱与结果解释
+          - generic [ref=f1e775]: 锚点 4.3 · 数据分析 Agent
+        - generic [ref=f1e776]: 熟练
+        - generic [ref=f1e778]: S6
+        - generic [ref=f1e779]: ★★★★★
+        - generic [ref=f1e780]: 未开始
+      - link "4.4 浏览器/计算机使用 Agent 入门 *选修 锚点 4.4 · 浏览器/计算机使用 Agent 了解-会用 S6 ★★★★★ 未开始" [ref=f1e782] [cursor=pointer]:
+        - /url: "#/knowledge/4-4"
+        - generic [ref=f1e783]: "4.4"
+        - generic [ref=f1e784]:
+          - generic [ref=f1e785]:
+            - text: 浏览器/计算机使用 Agent 入门
+            - generic [ref=f1e786]: "*选修"
+          - generic [ref=f1e787]: 锚点 4.4 · 浏览器/计算机使用 Agent
+        - generic [ref=f1e788]: 了解-会用
+        - generic [ref=f1e790]: S6
+        - generic [ref=f1e791]: ★★★★★
+        - generic [ref=f1e792]: 未开始
+      - link "4.5 工作流自动化 Agent：权限、幂等与审计 锚点 4.5 · 工作流自动化 Agent 熟练 S6 ★★★★★ 未开始" [ref=f1e794] [cursor=pointer]:
+        - /url: "#/knowledge/4-5"
+        - generic [ref=f1e795]: "4.5"
+        - generic [ref=f1e796]:
+          - generic [ref=f1e797]: 工作流自动化 Agent：权限、幂等与审计
+          - generic [ref=f1e798]: 锚点 4.5 · 工作流自动化 Agent
+        - generic [ref=f1e799]: 熟练
+        - generic [ref=f1e801]: S6
+        - generic [ref=f1e802]: ★★★★★
+        - generic [ref=f1e803]: 未开始
+      - link "4.6 多 Agent 协作系统实战：研究/写作团队 锚点 4.6 · 多 Agent 协作系统 理解-会用 S5 ★★★★★ 未开始" [ref=f1e805] [cursor=pointer]:
+        - /url: "#/knowledge/4-6"
+        - generic [ref=f1e806]: "4.6"
+        - generic [ref=f1e807]:
+          - generic [ref=f1e808]: 多 Agent 协作系统实战：研究/写作团队
+          - generic [ref=f1e809]: 锚点 4.6 · 多 Agent 协作系统
+        - generic [ref=f1e810]: 理解-会用
+        - generic [ref=f1e812]: S5
+        - generic [ref=f1e813]: ★★★★★
+        - generic [ref=f1e814]: 未开始
+      - link "4.7 多 Agent 平台架构 锚点 4.7 · 生产级 Agent 平台 熟练 S5 ★★★★★ 未开始" [ref=f1e816] [cursor=pointer]:
+        - /url: "#/knowledge/4-7"
+        - generic [ref=f1e817]: "4.7"
+        - generic [ref=f1e818]:
+          - generic [ref=f1e819]: 多 Agent 平台架构
+          - generic [ref=f1e820]: 锚点 4.7 · 生产级 Agent 平台
+        - generic [ref=f1e821]: 熟练
+        - generic [ref=f1e823]: S5
+        - generic [ref=f1e824]: ★★★★★
+        - generic [ref=f1e825]: 未开始
+      - link "4.7b 终极架构题：Agent 系统全案 锚点 4.7 · 生产级 Agent 平台 熟练 S5 ★★★★★ 未开始" [ref=f1e827] [cursor=pointer]:
+        - /url: "#/knowledge/4-7b"
+        - generic [ref=f1e828]: 4.7b
+        - generic [ref=f1e829]:
+          - generic [ref=f1e830]: 终极架构题：Agent 系统全案
+          - generic [ref=f1e831]: 锚点 4.7 · 生产级 Agent 平台
+        - generic [ref=f1e832]: 熟练
+        - generic [ref=f1e834]: S5
+        - generic [ref=f1e835]: ★★★★★
+        - generic [ref=f1e836]: 未开始
+      - link "4.8 评估与红队：OWASP 双 Top10 与对抗测试 锚点 4.8 · 评估与红队 熟练 S6 ★★★★★ 未开始" [ref=f1e838] [cursor=pointer]:
+        - /url: "#/knowledge/4-8"
+        - generic [ref=f1e839]: "4.8"
+        - generic [ref=f1e840]:
+          - generic [ref=f1e841]: 评估与红队：OWASP 双 Top10 与对抗测试
+          - generic [ref=f1e842]: 锚点 4.8 · 评估与红队
+        - generic [ref=f1e843]: 熟练
+        - generic [ref=f1e845]: S6
+        - generic [ref=f1e846]: ★★★★★
+        - generic [ref=f1e847]: 未开始
+      - link "4.9 Agent 部署与运维：软故障防御与告警 锚点 4.9 · 部署与运维 熟练 S6 ★★★★★ 未开始" [ref=f1e849] [cursor=pointer]:
+        - /url: "#/knowledge/4-9"
+        - generic [ref=f1e850]: "4.9"
+        - generic [ref=f1e851]:
+          - generic [ref=f1e852]: Agent 部署与运维：软故障防御与告警
+          - generic [ref=f1e853]: 锚点 4.9 · 部署与运维
+        - generic [ref=f1e854]: 熟练
+        - generic [ref=f1e856]: S6
+        - generic [ref=f1e857]: ★★★★★
+        - generic [ref=f1e858]: 未开始
+      - link "H1 推理模型与测试时扩展（R1/o 系列） 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e860] [cursor=pointer]:
+        - /url: "#/knowledge/h1-test-time-scaling"
+        - generic [ref=f1e861]: H1
+        - generic [ref=f1e862]:
+          - generic [ref=f1e863]:
+            - text: 推理模型与测试时扩展（R1/o 系列）
+            - generic [ref=f1e864]: 🆕
+          - generic [ref=f1e865]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e866]: 精通
+        - generic [ref=f1e868]: S4
+        - generic [ref=f1e869]: ★★★★★
+        - generic [ref=f1e870]: 未开始
+      - link "H2 RLVR 与 GRPO 对齐前沿 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e872] [cursor=pointer]:
+        - /url: "#/knowledge/h2-rlvr-grpo"
+        - generic [ref=f1e873]: H2
+        - generic [ref=f1e874]:
+          - generic [ref=f1e875]:
+            - text: RLVR 与 GRPO 对齐前沿
+            - generic [ref=f1e876]: 🆕
+          - generic [ref=f1e877]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e878]: 精通
+        - generic [ref=f1e880]: S4
+        - generic [ref=f1e881]: ★★★★★
+        - generic [ref=f1e882]: 未开始
+      - link "H3 Context Engineering：体系设计与前沿实践 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e884] [cursor=pointer]:
+        - /url: "#/knowledge/h3-context-engineering-practice"
+        - generic [ref=f1e885]: H3
+        - generic [ref=f1e886]:
+          - generic [ref=f1e887]:
+            - text: Context Engineering：体系设计与前沿实践
+            - generic [ref=f1e888]: 🆕
+          - generic [ref=f1e889]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e890]: 精通
+        - generic [ref=f1e892]: S4
+        - generic [ref=f1e893]: ★★★★★
+        - generic [ref=f1e894]: 未开始
+      - link "H4 Agentic RAG 与自主检索智能体 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e896] [cursor=pointer]:
+        - /url: "#/knowledge/h4-agentic-rag"
+        - generic [ref=f1e897]: H4
+        - generic [ref=f1e898]:
+          - generic [ref=f1e899]:
+            - text: Agentic RAG 与自主检索智能体
+            - generic [ref=f1e900]: 🆕
+          - generic [ref=f1e901]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e902]: 精通
+        - generic [ref=f1e904]: S4
+        - generic [ref=f1e905]: ★★★★★
+        - generic [ref=f1e906]: 未开始
+      - link "H5 A2A 协议与多 Agent 互操作 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e908] [cursor=pointer]:
+        - /url: "#/knowledge/h5-a2a-protocol"
+        - generic [ref=f1e909]: H5
+        - generic [ref=f1e910]:
+          - generic [ref=f1e911]:
+            - text: A2A 协议与多 Agent 互操作
+            - generic [ref=f1e912]: 🆕
+          - generic [ref=f1e913]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e914]: 精通
+        - generic [ref=f1e916]: S4
+        - generic [ref=f1e917]: ★★★★★
+        - generic [ref=f1e918]: 未开始
+      - link "H6 AI Coding 智能体（Claude Code/Cursor 类） 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e920] [cursor=pointer]:
+        - /url: "#/knowledge/h6-ai-coding-agents"
+        - generic [ref=f1e921]: H6
+        - generic [ref=f1e922]:
+          - generic [ref=f1e923]:
+            - text: AI Coding 智能体（Claude Code/Cursor 类）
+            - generic [ref=f1e924]: 🆕
+          - generic [ref=f1e925]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e926]: 精通
+        - generic [ref=f1e928]: S4
+        - generic [ref=f1e929]: ★★★★★
+        - generic [ref=f1e930]: 未开始
+      - link "H7 计算机使用与多模态 Agent 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e932] [cursor=pointer]:
+        - /url: "#/knowledge/h7-computer-use-agents"
+        - generic [ref=f1e933]: H7
+        - generic [ref=f1e934]:
+          - generic [ref=f1e935]:
+            - text: 计算机使用与多模态 Agent
+            - generic [ref=f1e936]: 🆕
+          - generic [ref=f1e937]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e938]: 精通
+        - generic [ref=f1e940]: S4
+        - generic [ref=f1e941]: ★★★★★
+        - generic [ref=f1e942]: 未开始
+      - link "H8 Agent 沙箱与可靠执行 🆕 锚点 H · 2026 前沿趋势 精通 S4 ★★★★★ 未开始" [ref=f1e944] [cursor=pointer]:
+        - /url: "#/knowledge/h8-agent-sandbox-reliability"
+        - generic [ref=f1e945]: H8
+        - generic [ref=f1e946]:
+          - generic [ref=f1e947]:
+            - text: Agent 沙箱与可靠执行
+            - generic [ref=f1e948]: 🆕
+          - generic [ref=f1e949]: 锚点 H · 2026 前沿趋势
+        - generic [ref=f1e950]: 精通
+        - generic [ref=f1e952]: S4
+        - generic [ref=f1e953]: ★★★★★
+        - generic [ref=f1e954]: 未开始
+  - contentinfo [ref=f1e956]:
+    - generic [ref=f1e957]:
+      - text: AI Agent 与 AI 工程化 · 七关晋升学习站 · 纯静态站点，XP/进度/错题本保存在本机浏览器 ·
+      - link "📈 我的战绩" [ref=f1e958] [cursor=pointer]:
+        - /url: "#/progress"
+    - generic [ref=f1e959]: 知识骨架：rodmap.md（43 锚点）· 考点来源：牛客网面经 / 小林coding / 卡码笔记 / OpenAI·Anthropic·DeepSeek 官方文档 / arXiv（2025-2026）· 内容仅供学习参考

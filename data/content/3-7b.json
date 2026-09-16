@@ -1,7 +1,7 @@
 {
   "id": "3-7b",
   "title": "KV Cache 与 PagedAttention",
-  "definition": "KV Cache 把历史 token 的 Key/Value 缓存下来，让每步生成不必重算注意力——以显存换速度。PagedAttention（vLLM）借鉴操作系统分页，把缓存切成小块按需分配，消灭碎片、吞吐提升数倍。推理优化必考第一名。",
+  "definition": "KV Cache 把历史 token 的 K/V 缓存下来，每步生成免重算注意力——以显存换速度；PagedAttention（vLLM）借鉴操作系统分页，切块按需分配、消灭碎片，吞吐提升数倍。",
   "analogies": [
     {
       "icon": "📓",
