@@ -581,3 +581,6 @@ html[data-theme="dark"] .demo-title { color: var(--ink); }
 html[data-theme="dark"] .docs-side { background: var(--card); }
 html[data-theme="dark"] .docs-chapter > summary:hover, html[data-theme="dark"] .docs-anchor > summary:hover,
 html[data-theme="dark"] .docs-link:hover { background: var(--tint-2); }
+html[data-theme="dark"] .interview-item { background: var(--tint-2); }
+html[data-theme="dark"] .summary-box { background: var(--tint); border-color: var(--line); }
+html[data-theme="dark"] .demo-box { background: var(--card-2); }
