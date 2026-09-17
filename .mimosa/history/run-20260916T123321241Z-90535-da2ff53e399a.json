@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "mimosa-finding-history/v1",
+  "runId": "20260916T123321241Z-90535-da2ff53e399a",
+  "runStatus": "inconclusive",
+  "errors": [
+    "baseline-read:data/index.js: baseline_snapshot_unreadable: file is missing from task baseline",
+    "scan:tools/trim-definitions.py: scanner_failed: batch scanner status 1",
+    "scan:tools/validate.js: scanner_failed: batch scanner status 1",
+    "scan:tools/build-index.js: scanner_failed: batch scanner status 1",
+    "scan:js/app.js: scanner_failed: batch scanner status 1",
+    "scan:sw.js: scanner_failed: batch scanner status 1",
+    "scan:data/index.js: scanner_failed: batch scanner status 1"
+  ],
+  "target": ".",
+  "revision": "fdc635b1063cf3416163a4f367d02e7766fd7674",
+  "diffHash": "6abbea78639f1e799095f93483f43cf8088aeabe000c0ac81cb4ef81f57bbbef",
+  "rulesVersion": "unavailable",
+  "recordedAt": "2026-09-16T12:33:21.241Z",
+  "timing": {
+    "startedAt": "2026-09-16T12:33:21.014Z",
+    "completedAt": "2026-09-16T12:33:21.241Z",
+    "durationMs": 227
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "modelCalls": 0,
+    "measurement": "known-zero"
+  },
+  "findings": {
+    "total": 0,
+    "bySeverity": {},
+    "byStatus": {}
+  },
+  "coverage": {
+    "status": "partial",
+    "reasonCounts": {
+      "baseline_snapshot_unreadable": 1,
+      "scanner_failed": 6,
+      "project_check_failed": 7,
+      "finding_ledger_read_failed": 1
+    }
+  },
+  "evidenceBoundary": "static_only",
+  "immutableReport": ".mimosa/reports/task-review-sess_6340db30-904a-4d9f-a4db-5e3031409773-20260916T123321241Z-90535-da2ff53e399a.json"
+}

@@ -204,6 +204,8 @@
     if (parts[0] === "tasks") return { page: "tasksHub" };
     if (parts[0] === "task" && parts[1]) return { page: "task", stage: parts[1].toUpperCase() };
     if (parts[0] === "review" && parts[1]) return { page: "review", layer: parts[1].toUpperCase() };
+    if (parts[0] === "docs" && parts[1]) return { page: "docs", id: parts[1] };
+    if (parts[0] === "docs") return { page: "docs", id: null };
     if (parts[0] === "knowledge" && parts[1]) return { page: "knowledge", id: parts[1] };
     if (parts[0] === "progress") return { page: "progress" };
     return { page: "map" };
@@ -218,6 +220,8 @@
     var prevT = S.titleThresholds[tIdx] || 0;
     var nextT = tIdx + 1 < S.titleThresholds.length ? S.titleThresholds[tIdx + 1] : state.xp;
     var pct = nextT > prevT ? Math.min(100, Math.round((state.xp - prevT) / (nextT - prevT) * 100)) : 100;
+    var tt = document.getElementById("theme-toggle");
+    if (tt) tt.textContent = (document.documentElement.getAttribute("data-theme") === "dark") ? "☀️" : "🌙";
     el.innerHTML =
       '<span class="hud-level" style="--lc:' + lv.color + '">' + lv.icon + " " + lv.name + "</span>" +
       '<span class="hud-title">' + esc(lv.title) + "</span>" +
@@ -225,7 +229,7 @@
       "<span>" + state.xp + " XP</span></div>";
     /* 当前 Tab 高亮 */
     var r = parseHash();
-    var tabMap = { map: "tab-map", index: "tab-index", wrongbook: "tab-mistakes", bossHub: "tab-boss", boss: "tab-boss", tasksHub: "tab-tasks", task: "tab-tasks" };
+    var tabMap = { map: "tab-map", index: "tab-index", wrongbook: "tab-mistakes", bossHub: "tab-boss", boss: "tab-boss", tasksHub: "tab-tasks", task: "tab-tasks", docs: "tab-docs" };
     $$(".top-tabs a").forEach(function (a) { a.classList.remove("active"); });
     var tid = tabMap[r.page];
     if (tid) { var t2 = $("#" + tid); if (t2) t2.classList.add("active"); }
@@ -254,6 +258,7 @@
   function render() {
     var r = parseHash();
     var app = $("#app");
+    renderTarget = null; linkBase = null;
     headerHud();
     if (r.page === "map") app.innerHTML = renderMap();
     else if (r.page === "index") renderIndex(app);
@@ -264,6 +269,7 @@
     else if (r.page === "boss") renderBoss(app, r.stage);
     else if (r.page === "task") renderTask(app, r.stage);
     else if (r.page === "review") renderReview(app, r.layer);
+    else if (r.page === "docs") renderDocs(app, r.id);
     else if (r.page === "knowledge") renderKnowledge(app, r.id);
     celebrateIfPending();
     window.scrollTo(0, 0);
@@ -308,6 +314,53 @@
       '<div class="cta-row"><a class="btn primary" href="' + resume + '">▶ ' + (state.last ? "继续上次学习" : "开始关0 之旅") + "</a>" +
       '<a class="btn" href="#/index">🔎 知识点索引</a><a class="btn" href="#/mistakes">📖 错题本</a><a class="btn" href="#/progress">📈 战绩</a></div>' +
       "</div>";
+  }
+
+  /* ---------- 主题切换（dark/light，localStorage 持久化，默认 dark） ---------- */
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("llm-quest:theme", t); } catch (e) { /* 忽略 */ }
+    var btn = document.getElementById("theme-toggle");
+    if (btn) btn.textContent = t === "dark" ? "☀️" : "🌙";
+  }
+
+  /* ---------- 文档站侧栏：章节树（关卡 → 锚点 → 知识点），无门禁直达 ---------- */
+  function docsSidebarHtml(currentId) {
+    var cur = byId[currentId];
+    var curStage = cur ? cur.p.stage : null;
+    var curAnchor = cur ? cur.m.id : null;
+    var html = '<aside class="docs-side"><div class="docs-side-head"><b>📚 内容目录</b><a href="#/index">索引页 ›</a></div>';
+    S.levels.forEach(function (lv) {
+      var unlocked = stageUnlocked(lv.id);
+      var mods = S.modules.filter(function (m) {
+        return m.points.some(function (p) { return p.stage === lv.id; });
+      });
+      var total = 0, done = 0;
+      mods.forEach(function (m) {
+        m.points.forEach(function (p) { if (p.stage === lv.id) { total++; if (state.visited[p.id]) done++; } });
+      });
+      var isCurStage = lv.id === curStage;
+      html += '<details class="docs-chapter"' + (isCurStage ? " open" : "") + '>';
+      html += '<summary' + (isCurStage ? ' class="current-stage"' : '') + '><span>' + lv.icon + '</span><span>' + lv.id + " " + lv.name + '</span>' +
+        (unlocked ? "" : '<span class="dc-lock" title="主线门禁：通过上一关 Boss 后点亮；点击阅读不受限">🔒</span>') +
+        '<span class="dim" style="font-weight:500;font-size:11px">' + done + "/" + total + '</span><span class="dc-arrow">▶</span></summary>';
+      mods.forEach(function (m) {
+        var mp = m.points.filter(function (p) { return p.stage === lv.id; });
+        var isCurAnchor = m.id === curAnchor && isCurStage;
+        html += '<details class="docs-anchor"' + (isCurAnchor ? " open" : "") + '>';
+        html += '<summary' + (isCurAnchor ? ' class="current-anchor"' : '') + '><span>' + m.icon + " " + m.id + " " + esc(m.name) + (m.optional ? " *" : "") + '</span><span class="dc-arrow">▶</span></summary>';
+        mp.forEach(function (p) {
+          var isCur = p.id === currentId;
+          html += '<a class="docs-link' + (isCur ? " current" : "") + '" href="#/docs/' + p.id + '" title="' + esc(p.title) + '">' +
+            '<span class="dl-num">' + p.num + '</span><span>' + esc(p.title) + (p.frontier ? " 🆕" : "") + '</span>' +
+            (state.visited[p.id] ? '<span class="dl-done">✓</span>' : "") + '</a>';
+        });
+        html += '</details>';
+      });
+      html += '</details>';
+    });
+    html += '</aside>';
+    return html;
   }
 
   function masteryBadge(mv) {
@@ -513,18 +566,21 @@
 
   /* ---------- 知识点页（始终无门禁） ---------- */
   var currentPoint = null, currentContent = null;
+  /* 文档阅读页（#/docs）复用知识点渲染时，把输出重定向到正文容器、翻页链接留在文档页 */
+  var renderTarget = null, linkBase = null;
 
   function renderKnowledge(app, id) {
     var entry = byId[id];
+    var host = renderTarget || app;
     if (!entry) {
-      app.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a> <a class="btn" href="#/map">返回技能树</a></div>';
+      host.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a> <a class="btn" href="#/map">返回技能树</a></div>';
       return;
     }
     var m = entry.m, p = entry.p;
     var lv = stageById(p.stage);
     getContent(id).then(function (c) {
       if (!c) {
-        app.innerHTML = '<div class="content-pending">📖 内容生成中，稍后再来～<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
+        host.innerHTML = '<div class="content-pending">📖 内容生成中，稍后再来～<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
         return;
       }
       var firstVisit = !state.visited[id];
@@ -585,7 +641,7 @@
       }
 
       var lc = S.layerColors[m.layer] || "#64748b";
-      app.innerHTML =
+      host.innerHTML =
         '<div class="breadcrumb"><a href="#/map">学习地图</a> / <a href="#/index">知识点索引</a> / ' + lv.id + " " + lv.name + " / 锚点 " + m.id + " / " + p.num + "</div>" +
         '<div class="level-strip" style="--lc:' + lv.color + '">' + lv.icon + " <b>" + lv.id + " " + lv.name + "</b> · 目标头衔 " + esc(lv.title) +
           " · <span class='dim'>完成本考点 +" + S.xp.visit + " XP</span>" +
@@ -635,13 +691,19 @@
           '<div class="summary-box">' + summaryHtml(c.summary) + "</div></section>" +
         teachback +
         '<nav class="knav">' +
-          (prev ? '<a href="#/knowledge/' + prev.p.id + '"><div class="kn-lbl">← 上一考点</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
+          (prev ? '<a href="' + (linkBase || "#/knowledge/") + prev.p.id + '"><div class="kn-lbl">← 上一考点</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
                 : '<a href="#/index"><div class="kn-lbl">←</div><div class="kn-t">返回知识点索引</div></a>') +
-          (next ? '<a class="next" href="#/knowledge/' + next.p.id + '"><div class="kn-lbl">下一考点 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
+          (next ? '<a class="next" href="' + (linkBase || "#/knowledge/") + next.p.id + '"><div class="kn-lbl">下一考点 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
                 : '<a class="next" href="#/boss/' + p.stage + '"><div class="kn-lbl">🎉 本关知识点已尽</div><div class="kn-t">⚔️ 挑战 ' + p.stage + " Boss 战 →</div></a>") +
         "</nav>";
 
       restoreExercises(p, c);
+      /* 文档阅读模式：正文内跳转链接统一留在 #/docs 内，保持翻阅不中断 */
+      if (linkBase) {
+        $$('#docs-article a[href^="#/knowledge/"]').forEach(function (a) {
+          a.setAttribute("href", a.getAttribute("href").replace("#/knowledge/", "#/docs/"));
+        });
+      }
     });
   }
 
@@ -951,6 +1013,22 @@
     });
   }
 
+  /* ---------- 文档阅读页（CSNotes 式：左侧章节树 + 右侧正文，快速翻阅，无门禁） ---------- */
+  function renderDocs(app, id) {
+    if (!id || !byId[id]) {
+      var first = id && byId[id] ? id : (ORDER[0] ? ORDER[0].p.id : null);
+      if (!id && first) { location.hash = "#/docs/" + first; return; }
+      app.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
+      return;
+    }
+    app.innerHTML = '<div class="docs-wrap">' + docsSidebarHtml(id) +
+      '<article class="docs-main" id="docs-article"><div class="content-pending">正在加载……</div></article></div>';
+    var article = $("#docs-article");
+    renderTarget = article;
+    linkBase = "#/docs/";
+    renderKnowledge(app, id);
+  }
+
   /* ---------- 模块回顾测验（自动组卷 · 纯自测 · 无门禁） ---------- */
   function renderReview(app, layerId) {
     var layer = LAYERS.filter(function (l) { return l.id === layerId; })[0];
@@ -1099,6 +1177,12 @@
     var el = e.target.closest("[data-act]");
     if (!el) return;
     var act = el.getAttribute("data-act");
+
+    if (el.id === "theme-toggle" || act === "theme-toggle") {
+      var cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+      applyTheme(cur);
+      return;
+    }
 
     if (act === "idx-due") {
       var f0 = idxFilters(); f0.status = "due"; f0.q = ""; idxSaveFilters(f0);
@@ -1314,7 +1398,7 @@
     _origK(app, id);
     getContent(id).then(function (c) {
       var r = parseHash();
-      if (r.page === "knowledge" && r.id === id) currentContent = c;
+      if ((r.page === "knowledge" || r.page === "docs") && r.id === id) currentContent = c;
     });
   };
 

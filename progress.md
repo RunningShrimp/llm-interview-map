@@ -103,3 +103,9 @@ v4 基线：commit edd5c1f（82 点 / 七关卡，已上线）——v4.1 增加�
 - 2026-09-16 [v4.1阶段2] tools/build-index.js 生成 data/index.js（82 条含 exCount，锚点平铺顺序 0层→4层→H）；validate.js 字节级同步校验；app.js v4.1 全量重写（五 Tab 路由/索引引擎 sessionStorage 状态保留/学习状态五态判定/知识点页与任务卡去门禁/Boss Hub+任务卡 Hub/#review 模块回顾测验/错题本联动/hero 并入学习地图）；game.css 新增 Tab/索引/Hub/测验样式；sw.js 预缓存清单同步 v4.1.1。
 - 2026-09-16 [v4.1阶段4] 集成自测 2 轮：第 1 轮发现 renderBossHub 字符串引号语法错误（hc-right）+ idx-row 类名被工具栏行与列表行共用（84≠82 根因）→ 列表行改名 idx-item；资源版本升 v=4.1.1。第 2 轮全绿：索引 82/82 一致、搜索（RAG→13、锚点号 2.5→4）、叠加筛选（层H×🆕=8）、星级排序、状态五态联动（答错→待复习→今日到期筛选→随机考我跳转）、筛选跨页保留、S4 知识点与 S6 任务卡无门禁直达、S6 Boss 主线门禁保留、双 Hub 各 7 卡、回顾测验组卷作答正常、全站零 JS 报错。
 - 2026-09-16 [v4.1阶段5] 推送 → Pages 重建 → 线上验证。
+
+### v4.2 日志（2026-09-17，文档阅读页）
+
+- 2026-09-17 [v4.2需求澄清] 用户展示 CSNotes 截图（深色、左侧章节树、居中正文）→ 明确：**不改原有页面结构**，仅新增一个 CSNotes 式「文档阅读」页用于快速查看学习。
+- 2026-09-17 [v4.2实现] ① styles.css 主题化：核心色改为语义变量 + `html[data-theme="dark"]` 深色色板（含 color-mix 混色、demo 组件、状态徽章、内联浅背景等 50+ 条覆盖）；② game.css 新增文档版式（.docs-wrap/.docs-side 章节树/.docs-main 正文列，sticky 侧栏、折叠分组、当前项高亮、✓ 已读标记、移动端侧栏置顶）；③ app.js：新增 #/docs[/:id] 路由与 renderDocs（侧栏 + 正文容器，复用 renderKnowledge 渲染管线，renderTarget/linkBase 重定向，翻页与内链留在 #/docs 内）；修复 docs 模式 currentContent 不设置导致判题失效；新增全站深浅色切换（header ☀️/🌙，localStorage 持久化，head 预置防闪白，默认 light 保持原样貌）；④ index.html 加第 6 个 Tab「📚 文档阅读」；sw.js 预缓存同步 v4.2.3。
+- 2026-09-17 [v4.2自测] 3 轮（缓存干扰计 1 轮）：文档页侧栏树（关卡🔒+进度/锚点/考点，当前高亮、点击树内切换不跳出）、正文判题+XP 正常（choice +15、场景 3/3）、翻页与内链全部留在 #/docs、深浅切换与持久化、原知识点页还原验证（无侧栏、9 区块）、validate ALL PASS、零控制台报错。深色截图人工核对通过。

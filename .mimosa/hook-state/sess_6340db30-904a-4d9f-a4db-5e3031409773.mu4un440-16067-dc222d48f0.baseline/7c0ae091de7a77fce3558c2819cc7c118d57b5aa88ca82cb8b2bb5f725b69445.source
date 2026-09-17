@@ -122,7 +122,7 @@ function checkContent(e) {
   if (c.id !== pid) err(`${pid}：文件内 id=${c.id} 不符`);
   if (!c.title) err(`${pid}：缺 title`);
   if (!c.definition) err(`${pid}：缺 definition`);
-  else if (c.definition.length > 120) err(`${pid}：definition ${c.definition.length} 字（≤120）`);
+  else if (c.definition.length > 100) err(`${pid}：definition ${c.definition.length} 字（≤100）`);
   if (!Array.isArray(c.analogies) || c.analogies.length < 1) err(`${pid}：analogies ≥1`);
   else c.analogies.forEach((a, i) => { if (!a.name || !a.text) err(`${pid}：analogies[${i}] 缺字段`); });
   if (!c.demo || !c.demo.title || !c.demo.description || !c.demo.html) err(`${pid}：demo 缺字段`);
@@ -220,6 +220,29 @@ function checkTask(sid) {
 }
 
 /* ---------- 5. 执行与报告 ---------- */
+/* 索引单一数据源同步校验：data/index.js 必须与最终大纲一致 */
+try {
+  const { buildRendered } = require(path.join(__dirname, "build-index.js"));
+  const idxPath = path.join(ROOT, "data", "index.js");
+  if (!fs.existsSync(idxPath)) {
+    err("索引：缺少 data/index.js（运行 node tools/build-index.js 生成）");
+  } else {
+    const disk = fs.readFileSync(idxPath, "utf8");
+    if (disk !== buildRendered()) {
+      err("索引：data/index.js 与最终大纲不一致（运行 node tools/build-index.js 重新生成）");
+    } else {
+      require(idxPath);
+      const KI = globalThis.KNOWLEDGE_INDEX;
+      const syllabusIds = ORDER.map(e => e.p.id).sort().join(",");
+      const indexIds = KI.map(e => e.id).sort().join(",");
+      if (syllabusIds !== indexIds) err("索引：data/index.js 的 id 集合与大纲不符");
+      if (KI.length !== total) err(`索引：条目数 ${KI.length} ≠ 大纲点数 ${total}`);
+    }
+  }
+} catch (e2) {
+  err("索引：校验 data/index.js 失败：" + e2.message);
+}
+
 const targets = filter ? S.modules.filter(m => filter.includes(m.id)) : S.modules;
 targets.forEach(m => m.points.forEach(p => checkContent({ m, p })));
 const checkAll = !filter;

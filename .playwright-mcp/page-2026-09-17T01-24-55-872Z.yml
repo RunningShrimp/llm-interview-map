@@ -1,0 +1,285 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "🧭 AI Agent 七关晋升" [ref=e3] [cursor=pointer]:
+      - /url: "#/map"
+    - navigation [ref=e4]:
+      - link "🗺️ 学习地图" [ref=e5] [cursor=pointer]:
+        - /url: "#/map"
+      - link "🔎 知识点索引" [ref=e6] [cursor=pointer]:
+        - /url: "#/index"
+      - link "📖 错题本与复习" [ref=e7] [cursor=pointer]:
+        - /url: "#/mistakes"
+      - link "⚔️ Boss 战" [ref=e8] [cursor=pointer]:
+        - /url: "#/boss"
+      - link "🧰 实战任务卡" [ref=e9] [cursor=pointer]:
+        - /url: "#/tasks"
+    - generic [ref=e10]:
+      - generic [ref=e11]: 🌱 基础热身
+      - generic [ref=e12]: AI 新手
+      - generic [ref=e13]: 10 XP
+    - button "切换深浅色主题" [ref=e17] [cursor=pointer]: ☀️
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - complementary [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: 📚 内容目录
+          - link "索引页 ›" [ref=e23] [cursor=pointer]:
+            - /url: "#/index"
+        - group [ref=e24]:
+          - generic "🌱 S0 基础热身 0/15 ▶" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: 🌱
+            - generic [ref=e27]: S0 基础热身
+            - generic [ref=e28]: 0/15
+            - generic [ref=e29]: ▶
+        - group [ref=e30]:
+          - generic "🛠️ S1 LLM 应用入门 🔒 0/12 ▶" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: 🛠️
+            - generic [ref=e33]: S1 LLM 应用入门
+            - generic "主线门禁：通过上一关 Boss 后点亮；点击阅读不受限" [ref=e34]: 🔒
+            - generic [ref=e35]: 0/12
+            - generic [ref=e36]: ▶
+        - group [ref=e37]:
+          - generic "🤖 S2 单 Agent 核心 🔒 1/8 ▶" [ref=e38] [cursor=pointer]:
+            - generic [ref=e39]: 🤖
+            - generic [ref=e40]: S2 单 Agent 核心
+            - generic "主线门禁：通过上一关 Boss 后点亮；点击阅读不受限" [ref=e41]: 🔒
+            - generic [ref=e42]: 1/8
+            - generic [ref=e43]: ▶
+          - group [ref=e44]:
+            - generic "🤖 2.1 Agent 定义与范式 ▶" [ref=e45] [cursor=pointer]:
+              - generic [ref=e46]: 🤖 2.1 Agent 定义与范式
+              - generic [ref=e47]: ▶
+          - group [ref=e48]:
+            - generic "🗺️ 2.2 规划 Planning ▶" [ref=e49] [cursor=pointer]:
+              - generic [ref=e50]: 🗺️ 2.2 规划 Planning
+              - generic [ref=e51]: ▶
+          - group [ref=e52]:
+            - generic "🔧 2.3 工具使用 Tool Use ▶" [ref=e53] [cursor=pointer]:
+              - generic [ref=e54]: 🔧 2.3 工具使用 Tool Use
+              - generic [ref=e55]: ▶
+          - group [ref=e56]:
+            - generic "🧷 2.4 记忆 Memory ▶" [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]: 🧷 2.4 记忆 Memory
+              - generic [ref=e59]: ▶
+          - group [ref=e60]:
+            - generic "🔄 2.5 执行循环与状态机 ▶" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62]: 🔄 2.5 执行循环与状态机
+              - generic [ref=e63]: ▶
+            - link "2.5 ReAct 循环实操：边想边做 ✓" [ref=e64] [cursor=pointer]:
+              - /url: "#/knowledge/2-5"
+              - generic [ref=e65]: "2.5"
+              - generic [ref=e66]: ReAct 循环实操：边想边做
+              - generic [ref=e67]: ✓
+            - link "2.5b ReAct 失败模式与状态机恢复" [ref=e68] [cursor=pointer]:
+              - /url: "#/knowledge/2-5b"
+              - generic [ref=e69]: 2.5b
+              - generic [ref=e70]: ReAct 失败模式与状态机恢复
+          - group [ref=e71]:
+            - generic "🪞 2.6 反思与自我修正 ▶" [ref=e72] [cursor=pointer]:
+              - generic [ref=e73]: 🪞 2.6 反思与自我修正
+              - generic [ref=e74]: ▶
+        - group [ref=e75]:
+          - generic "📚 S3 RAG 与工具增强 🔒 0/8 ▶" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: 📚
+            - generic [ref=e78]: S3 RAG 与工具增强
+            - generic "主线门禁：通过上一关 Boss 后点亮；点击阅读不受限" [ref=e79]: 🔒
+            - generic [ref=e80]: 0/8
+            - generic [ref=e81]: ▶
+        - group [ref=e82]:
+          - generic "🏗️ S4 AI 工程化 🔒 0/23 ▶" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]: 🏗️
+            - generic [ref=e85]: S4 AI 工程化
+            - generic "主线门禁：通过上一关 Boss 后点亮；点击阅读不受限" [ref=e86]: 🔒
+            - generic [ref=e87]: 0/23
+            - generic [ref=e88]: ▶
+        - group [ref=e89]:
+          - generic "🧩 S5 多 Agent 与生产 🔒 0/5 ▶" [ref=e90] [cursor=pointer]:
+            - generic [ref=e91]: 🧩
+            - generic [ref=e92]: S5 多 Agent 与生产
+            - generic "主线门禁：通过上一关 Boss 后点亮；点击阅读不受限" [ref=e93]: 🔒
+            - generic [ref=e94]: 0/5
+            - generic [ref=e95]: ▶
+        - group [ref=e96]:
+          - generic "👑 S6 综合项目与作品集 🔒 0/11 ▶" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: 👑
+            - generic [ref=e99]: S6 综合项目与作品集
+            - generic "主线门禁：通过上一关 Boss 后点亮；点击阅读不受限" [ref=e100]: 🔒
+            - generic [ref=e101]: 0/11
+            - generic [ref=e102]: ▶
+      - article [ref=e103]:
+        - generic [ref=e104]:
+          - link "学习地图" [ref=e105] [cursor=pointer]:
+            - /url: "#/map"
+          - text: /
+          - link "知识点索引" [ref=e106] [cursor=pointer]:
+            - /url: "#/index"
+          - text: / S2 单 Agent 核心 / 锚点 2.5 / 2.5
+        - generic [ref=e107]:
+          - text: 🤖
+          - generic [ref=e108]: S2 单 Agent 核心
+          - text: · 目标头衔 单 Agent 工程师 ·
+          - generic [ref=e109]: 完成本考点 +10 XP
+          - text: ·
+          - link "🧰 本关任务卡" [ref=e110] [cursor=pointer]:
+            - /url: "#/task/S2"
+        - generic [ref=e111]:
+          - heading "2.5 · ReAct 循环实操：边想边做" [level=1] [ref=e112]
+          - generic [ref=e113]:
+            - generic [ref=e114]: ★★★★★
+            - generic [ref=e115]: 锚点 2.5（执行循环与状态机）
+            - generic [ref=e116]: 建议掌握：熟练
+            - generic [ref=e117]: 来源：牛客·AI Agent Top50（第1题）
+            - generic [ref=e118]:
+              - text: 前置依赖：
+              - link "2.2 任务分解与规划：把模糊目标拆成步骤" [ref=e119] [cursor=pointer]:
+                - /url: "#/knowledge/2-2"
+              - text: ｜
+              - link "2.3 工具调用异常与死循环防护实操" [ref=e120] [cursor=pointer]:
+                - /url: "#/knowledge/2-3"
+              - text: ｜
+              - link "2.4 Agent 记忆机制原理" [ref=e121] [cursor=pointer]:
+                - /url: "#/knowledge/2-4"
+          - generic [ref=e122]: 🎯 本页学习目标（锚点关键问题）：如何防止死循环、跑偏、不可恢复？
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: 🍼
+            - text: 小白定义
+          - paragraph [ref=e126]: ReAct = Reasoning + Acting：模型先思考（该做什么）→ 行动（调工具）→ 观察结果，循环到得出答案。Agent 的基本运行节拍——提示词格式、终止条件、轨迹管理是实操三件套。
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - generic [ref=e129]: 🎯
+            - text: 生活类比
+          - generic [ref=e130]:
+            - generic [ref=e131]: 🔍
+            - generic [ref=e132]:
+              - generic [ref=e133]: 类比 1：侦探查案
+              - paragraph [ref=e134]: ReAct 是侦探的破案节奏：思考（先查访客记录）→ 行动（调出名单）→ 观察（三个可疑人员）→ 再思考（查第一个的行踪）→ 再行动……推理决定行动，行动结果修正推理。只思考是纸上谈兵，只行动是无头苍蝇——交替才破案。
+          - generic [ref=e135]:
+            - generic [ref=e136]: 🍳
+            - generic [ref=e137]:
+              - generic [ref=e138]: 类比 2：照菜谱做新菜
+              - paragraph [ref=e139]: 想一步（该焯水了）→ 做一步（真焯水）→ 看一眼（水变色了）→ 再想下一步。菜谱（提示词）给大方向，每步调整靠边看边想。让 LLM 把思考写出来再行动，就是给它装了这个节奏。
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - generic [ref=e142]: 🕹️
+            - text: 交互演示（动手把玩）
+          - generic [ref=e143]:
+            - generic [ref=e144]: 把玩：一个完整 ReAct 轨迹
+            - generic [ref=e145]: 点击『下一步』，看 AI 如何查到特斯拉最新市值。
+            - generic [ref=e147]:
+              - generic [ref=e148]: 第 1 拍：Thought
+              - generic [ref=e149]: 市值是实时数据，我的知识有截止日期——应该调用搜索工具。
+            - generic [ref=e150]:
+              - button "← 上一步" [disabled] [ref=e151]
+              - generic [ref=e152]: 1 / 4
+              - button "下一步 →" [ref=e153] [cursor=pointer]
+              - button "🔄 重播" [ref=e154] [cursor=pointer]
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - generic [ref=e157]: 📌
+            - text: 核心要点
+          - list [ref=e158]:
+            - listitem [ref=e159]:
+              - generic [ref=e160]: 🔁
+              - generic [ref=e161]: 三拍节奏：Thought→Action→Observation 循环至 Final Answer；每拍是一次 LLM 调用或工具执行。
+            - listitem [ref=e162]:
+              - generic [ref=e163]: 📝
+              - generic [ref=e164]: 格式化提示词：固定 Thought/Action/Observation 字段 + few-shot 示例 + 停止符；Observation 由系统回填。
+            - listitem [ref=e165]:
+              - generic [ref=e166]: 🛑
+              - generic [ref=e167]: 终止三条件：得出答案 / 达到最大步数 / 触发人工——没有终止条件的循环就是事故。
+            - listitem [ref=e168]:
+              - generic [ref=e169]: 🧹
+              - generic [ref=e170]: 轨迹管理：历史要裁剪、超长 Observation 要摘要、失败结果要喂回去让它换路。
+            - listitem [ref=e171]:
+              - generic [ref=e172]: 🧰
+              - generic [ref=e173]: 工具描述定成败：选错工具多半是描述烂：每个工具写清功能、参数、适用场景与返回示例。
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - generic [ref=e176]: ✍️
+            - text: 例题实战（答对得 XP）
+          - generic [ref=e177]:
+            - generic [ref=e178]: 选择题 · 第 1 题 · 答对 +15 XP
+            - generic [ref=e179]: 【应用题】ReAct 轨迹里 Observation 应该由谁填？
+            - generic [ref=e180]:
+              - button "A模型自己编一个合理的结果" [ref=e181] [cursor=pointer]
+              - button "B系统回填工具的真实执行结果" [ref=e182] [cursor=pointer]
+              - button "C用户手动输入" [ref=e183] [cursor=pointer]
+              - button "D随机" [ref=e184] [cursor=pointer]
+            - button "提交判题" [ref=e186] [cursor=pointer]
+          - generic [ref=e187]:
+            - generic [ref=e188]: 选择题 · 第 2 题 · 答对 +15 XP
+            - generic [ref=e189]: ReAct 循环没有最大步数限制会发生什么？
+            - generic [ref=e190]:
+              - button "A回答更快" [ref=e191] [cursor=pointer]
+              - button "B失败动作上无限循环，烧掉大量 token 与费用" [ref=e192] [cursor=pointer]
+              - button "C自动优化" [ref=e193] [cursor=pointer]
+              - button "D没有影响" [ref=e194] [cursor=pointer]
+            - button "提交判题" [ref=e196] [cursor=pointer]
+          - generic [ref=e197]:
+            - generic [ref=e198]: 场景分析题 · 第 3 题 · 命中 ≥80% +25 XP
+            - generic [ref=e199]: 【场景题】基于 ReAct 实现一个『差旅助手』（查航班/比价/订票）：请写出提示词的关键设计与循环控制要点。
+            - textbox "按条理写下你的分析……" [ref=e200]
+            - button "提交判题" [ref=e202] [cursor=pointer]
+        - generic [ref=e203]:
+          - generic [ref=e204]:
+            - generic [ref=e205]: 🗣️
+            - text: 费曼复述
+          - paragraph [ref=e206]: 任务：请用自己的话向室友解释：ReAct 是什么？为什么 Agent 要边想边做而不是想好全部再做？
+          - textbox "用你自己的话写下来……" [ref=e207]
+          - generic [ref=e208]: 💡 提示：提示：侦探查案；行动结果会改变下一步判断。
+          - button "对照参考表达" [ref=e210] [cursor=pointer]
+        - generic [ref=e211]:
+          - generic [ref=e212]:
+            - generic [ref=e213]: 🔗
+            - text: 知识联系（前后呼应）
+          - generic [ref=e214]:
+            - link "🔗 循环虽好失控就是事故——下一站：异常与死循环防护实操 → 2.3 工具调用异常与死循环防护实操" [ref=e215] [cursor=pointer]:
+              - /url: "#/knowledge/2-3"
+            - link "🔗 Thought 字段就是思维链——L3 拆解它为什么有效 → 1.2 进阶提示工程：少样本、CoT 与自洽性" [ref=e216] [cursor=pointer]:
+              - /url: "#/knowledge/1-2"
+            - link "🔗 循环虽强，失控就是事故——下一站：失败模式分析与状态机恢复 → 2.5b ReAct 失败模式与状态机恢复" [ref=e217] [cursor=pointer]:
+              - /url: "#/knowledge/2-5b"
+        - generic [ref=e218]:
+          - generic [ref=e219]:
+            - generic [ref=e220]: 💼
+            - text: 面试视角
+          - generic [ref=e221]:
+            - generic [ref=e222]: ❓ 什么是 ReAct？工作流程是怎样的？★★★★★
+            - generic [ref=e223]: 来源：牛客·AI Agent Top50（第 1 题）
+            - generic [ref=e224]: 💡 答题要点：定义+三拍循环+一个具体轨迹，Agent 方向敲门题。
+        - generic [ref=e225]:
+          - generic [ref=e226]:
+            - generic [ref=e227]: 🧠
+            - text: 提问式小结
+          - generic [ref=e228]:
+            - generic [ref=e229]:
+              - text: Q：三拍？
+              - group [ref=e230]:
+                - generic "展开参考回答" [ref=e231] [cursor=pointer]
+                - text: 思考→行动→观察，循环至最终答案
+            - generic [ref=e232]:
+              - text: Q：Observation 谁填？
+              - group [ref=e233]:
+                - generic "展开参考回答" [ref=e234] [cursor=pointer]
+                - text: 系统回填真实结果——防幻觉
+            - generic [ref=e235]:
+              - text: Q：终止条件？
+              - group [ref=e236]:
+                - generic "展开参考回答" [ref=e237] [cursor=pointer]
+                - text: 答案/步数上限/人工介入
+        - navigation [ref=e238]:
+          - link "← 上一考点 2.4 Agent 记忆机制原理" [ref=e239] [cursor=pointer]:
+            - /url: "#/knowledge/2-4"
+            - generic [ref=e240]: ← 上一考点
+            - generic [ref=e241]: 2.4 Agent 记忆机制原理
+          - link "下一考点 → 2.5b ReAct 失败模式与状态机恢复" [ref=e242] [cursor=pointer]:
+            - /url: "#/knowledge/2-5b"
+            - generic [ref=e243]: 下一考点 →
+            - generic [ref=e244]: 2.5b ReAct 失败模式与状态机恢复
+  - contentinfo [ref=e245]:
+    - generic [ref=e246]:
+      - text: AI Agent 与 AI 工程化 · 七关晋升学习站 · 纯静态站点，XP/进度/错题本保存在本机浏览器 ·
+      - link "📈 我的战绩" [ref=e247] [cursor=pointer]:
+        - /url: "#/progress"
+    - generic [ref=e248]: 知识骨架：rodmap.md（43 锚点）· 考点来源：牛客网面经 / 小林coding / 卡码笔记 / OpenAI·Anthropic·DeepSeek 官方文档 / arXiv（2025-2026）· 内容仅供学习参考

@@ -4,9 +4,9 @@
    2. HTML 导航一律 network-first：刷新即最新，离线才回退缓存；
    3. 同源静态资源 cache-first + 后台更新（stale-while-revalidate）。
    与标杆差异：本站无音频，省略音频分支；版本化 query 资源纳入 SWR（标杆对 query 直连）。 */
-var SHELL_CACHE = 'llm-map-shell-v3';
+var SHELL_CACHE = 'llm-map-shell-v7';
 var PAGE_CACHE = 'llm-map-pages-v1';
-var SHELL = ["./", "./index.html", "./css/styles.css?v=4.1.1", "./css/game.css?v=4.1.1", "./data/syllabus.js?v=4.1.1", "./data/index.js?v=4.1.1", "./js/judge.js?v=4.1.1", "./js/app.js?v=4.1.1"];
+var SHELL = ["./", "./index.html", "./css/styles.css?v=4.2.3", "./css/game.css?v=4.2.3", "./data/syllabus.js?v=4.2.3", "./data/index.js?v=4.2.3", "./js/judge.js?v=4.2.3", "./js/app.js?v=4.2.3"];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(SHELL_CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));

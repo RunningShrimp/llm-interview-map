@@ -335,3 +335,82 @@ details.tree-module[open] > summary .arrow { transform: rotate(90deg); }
 .review-strip h3 { font-size: 15px; margin-bottom: 10px; }
 .review-strip-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .review-q .boss-feedback { margin-top: 10px; }
+
+/* ============================================================
+ * v4.2 文档站版式（CSNotes 风格）：左侧章节树 + 居中正文 + 主题切换
+ * ============================================================ */
+
+/* 主题切换按钮 */
+.theme-toggle {
+  background: transparent; border: 1.5px solid var(--line); border-radius: 10px;
+  width: 34px; height: 34px; font-size: 16px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.theme-toggle:hover { border-color: var(--brand); }
+
+/* 文档布局骨架（仅知识点页） */
+.docs-wrap { display: flex; gap: 0; align-items: flex-start; }
+.docs-side {
+  position: sticky; top: 62px;
+  flex: 0 0 268px; width: 268px;
+  max-height: calc(100vh - 74px);
+  overflow-y: auto;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 10px 8px 14px;
+}
+.docs-main { flex: 1; min-width: 0; max-width: 880px; margin: 0 auto; padding: 6px 4px 40px 26px; }
+@media (max-width: 1080px) {
+  .docs-wrap { flex-direction: column; }
+  .docs-side { position: static; width: 100%; flex: none; max-height: none; margin-bottom: 16px; }
+  .docs-main { padding-left: 0; max-width: none; }
+}
+
+/* 侧栏目录树 */
+.docs-side-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px 10px; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+}
+.docs-side-head b { font-size: 14px; }
+.docs-side-head a { font-size: 12px; }
+.docs-chapter { margin-bottom: 2px; }
+.docs-chapter > summary {
+  list-style: none; cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; border-radius: 9px;
+  font-size: 13.5px; font-weight: 700; color: var(--ink-2);
+}
+.docs-chapter > summary::-webkit-details-marker { display: none; }
+.docs-chapter > summary:hover { background: var(--tint-2, #f8fafc); }
+.docs-chapter > summary .dc-arrow { margin-left: auto; font-size: 11px; transition: transform .15s ease; }
+.docs-chapter[open] > summary .dc-arrow { transform: rotate(90deg); }
+.docs-chapter > summary .dc-lock { font-size: 12px; }
+.docs-chapter > summary.current-stage { color: var(--brand); background: var(--tint); }
+.docs-anchor { margin: 1px 0 1px 12px; }
+.docs-anchor > summary {
+  list-style: none; cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 9px; border-radius: 8px;
+  font-size: 12.5px; color: var(--ink-3);
+}
+.docs-anchor > summary::-webkit-details-marker { display: none; }
+.docs-anchor > summary:hover { background: var(--tint-2, #f8fafc); color: var(--ink-2); }
+.docs-anchor > summary .dc-arrow { margin-left: auto; font-size: 10px; transition: transform .15s ease; }
+.docs-anchor[open] > summary .dc-arrow { transform: rotate(90deg); }
+.docs-anchor > summary.current-anchor { color: var(--brand); }
+.docs-link {
+  display: flex; align-items: center; gap: 7px;
+  margin: 1px 0 1px 22px; padding: 5px 9px; border-radius: 8px;
+  font-size: 12.5px; color: var(--ink-2); text-decoration: none;
+  border-left: 2px solid transparent; border-radius: 0 8px 8px 0;
+}
+.docs-link:hover { background: var(--tint-2, #f8fafc); text-decoration: none; color: var(--ink); }
+.docs-link.current {
+  color: var(--brand); font-weight: 700;
+  border-left-color: var(--brand); background: var(--tint);
+}
+.docs-link .dl-num { font-size: 11px; opacity: .75; white-space: nowrap; }
+.docs-link .dl-done { margin-left: auto; color: var(--ok); font-size: 11px; }
+
+/* 文档正文微调：更接近阅读态 */
+.docs-main .k-head h1 { font-size: 26px; line-height: 1.35; }
+.docs-main .breadcrumb { padding-top: 2px; }

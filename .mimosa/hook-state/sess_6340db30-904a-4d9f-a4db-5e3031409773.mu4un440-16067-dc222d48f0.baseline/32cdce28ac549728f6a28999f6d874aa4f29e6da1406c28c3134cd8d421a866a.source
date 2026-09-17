@@ -1,16 +1,20 @@
 /* ============================================================
- * app.js v4 — 七关卡晋升 + rodmap 锚点体系 + 实战任务卡
- * 路由：#/ 首页 ｜ #/map 技能树 ｜ #/knowledge/:id 知识点
- *      #/boss/:stage Boss 战 ｜ #/task/:stage 实战任务卡
- *      #/wrongbook 错题本 ｜ #/progress 战绩
- * 体系：XP → 七级头衔（AI 新手→…→准专家）；每关 Boss ≥80% 解锁下一关；
- *      锚点标注（编号/掌握程度/关键问题）；选修*不强制；错题 1/3/7 间隔重复。
+ * app.js v4.1 — 七关卡主线 + 知识点索引双通道 + 五 Tab 导航
+ * 路由：#/ 与 #/map 学习地图 ｜ #/index 知识点索引（无门禁）
+ *      #/mistakes 错题本与复习 ｜ #/boss Boss 战（Hub 与单场）
+ *      #/tasks 实战任务卡（Hub 与单张）｜ #/review/:layer 模块回顾测验
+ *      #/knowledge/:id 知识点页（始终无门禁）｜ #/progress 战绩
+ * 门禁边界：Boss 战解锁只约束技能树主线推进；索引页/知识点页/
+ *          任务卡一律放行（URL 直达与索引跳转不受限）。
+ * 数据单一来源：data/index.js（由 tools/build-index.js 从最终大纲生成），
+ *          技能树 / 索引页 / 错题本共用。
  * ============================================================ */
 (function () {
   "use strict";
 
   var S = window.SYLLABUS;
   var J = window.Judge;
+  var IDX = window.KNOWLEDGE_INDEX || [];
 
   function $(sel, el) { return (el || document).querySelector(sel); }
   function $$(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
@@ -36,10 +40,10 @@
     return d.toISOString().slice(0, 10);
   }
 
-  /* ---------- 大纲索引：学习顺序 = 关卡 → 锚点（rodmap 顺序）→ 主点/子点 ---------- */
+  /* ---------- 大纲索引：主线顺序 = 关卡 → 锚点 → 主点/子点 ---------- */
   var STAGE_INDEX = {};
   S.levels.forEach(function (lv, i) { STAGE_INDEX[lv.id] = i; });
-  var ORDER = []; /* [{m, p}] */
+  var ORDER = [];
   S.levels.forEach(function (lv) {
     S.modules.forEach(function (m) {
       m.points.forEach(function (p) { if (p.stage === lv.id) ORDER.push({ m: m, p: p }); });
@@ -49,6 +53,21 @@
   ORDER.forEach(function (e) { byId[e.p.id] = e; });
   function stageById(sid) {
     return S.levels.filter(function (l) { return l.id === String(sid).toUpperCase(); })[0];
+  }
+  var idxById = {};
+  IDX.forEach(function (e) { idxById[e.id] = e; });
+
+  var LAYERS = [
+    { id: "L0", name: "0 基础层" },
+    { id: "L1", name: "1 LLM 应用层" },
+    { id: "L2", name: "2 Agent 核心层" },
+    { id: "L3", name: "3 AI 工程化层" },
+    { id: "L4", name: "4 实战层" },
+    { id: "H", name: "H 2026 前沿层" }
+  ];
+  function layerName(lid) {
+    for (var i = 0; i < LAYERS.length; i++) if (LAYERS[i].id === lid) return LAYERS[i].name;
+    return lid;
   }
 
   /* ---------- 本地进度（localStorage） ---------- */
@@ -73,7 +92,50 @@
   })();
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 配额忽略 */ } }
 
-  /* ---------- 关卡/解锁/头衔 ---------- */
+  /* ---------- 学习状态（索引页判定口径） ----------
+   * 未开始=未访问；学习中=已读未完成例题；已通过=例题全部答对；
+   * 待复习=存在关联错题；今日到期=遗忘曲线 nextDue≤今天 */
+  function wrongEntriesFor(id) {
+    return Object.keys(state.wrongbook)
+      .map(function (k) { return state.wrongbook[k]; })
+      .filter(function (it) { return it && it.ref === id; });
+  }
+  function isDue(id) {
+    var t = today();
+    return wrongEntriesFor(id).some(function (it) { return it.nextDue <= t; });
+  }
+  function exercisesAllCorrect(id) {
+    var entry = idxById[id];
+    var total = entry ? entry.exCount || 0 : 0;
+    if (!state.visited[id]) return false;
+    if (total === 0) return true;
+    for (var i = 0; i < total; i++) {
+      var key = id + "#ex" + i;
+      var c = state.choice[key], sc = state.scenario[key];
+      var okC = !!(c && c.correct === true);
+      var okS = !!(sc && sc.total > 0 && sc.score / sc.total >= 0.8);
+      if (!okC && !okS) return false;
+    }
+    return true;
+  }
+  function pointStatus(id) {
+    if (wrongEntriesFor(id).length) return "待复习";
+    if (!state.visited[id]) return "未开始";
+    return exercisesAllCorrect(id) ? "已通过" : "学习中";
+  }
+  var STATUS_BADGE = {
+    "未开始": ["status-new", "未开始"],
+    "学习中": ["status-learning", "学习中"],
+    "已通过": ["status-passed", "已通过"],
+    "待复习": ["status-review", "待复习"],
+    "due": ["status-due", "今日到期"]
+  };
+  function statusBadgeHtml(st) {
+    var m = STATUS_BADGE[st] || ["status-new", st];
+    return '<span class="badge status-badge ' + m[0] + '">' + m[1] + "</span>";
+  }
+
+  /* ---------- 关卡解锁（仅约束技能树主线与 Boss 推进） ---------- */
   function stageUnlocked(sid) {
     var idx = STAGE_INDEX[sid];
     if (!idx) return true;
@@ -81,7 +143,6 @@
     var rec = state.boss[prev.id];
     return !!(rec && rec.passed);
   }
-  function isUnlocked(entry) { return stageUnlocked(entry.p.stage); }
   function currentTitleIdx() {
     var t = S.titleThresholds, idx = 0;
     for (var i = 0; i < t.length; i++) if (state.xp >= t[i]) idx = i;
@@ -134,14 +195,18 @@
   function parseHash() {
     var h = location.hash.replace(/^#\/?/, "");
     var parts = h.split("/").filter(Boolean);
-    if (parts.length === 0) return { page: "home" };
+    if (parts.length === 0) return { page: "map" };
     if (parts[0] === "map") return { page: "map" };
-    if (parts[0] === "knowledge" && parts[1]) return { page: "knowledge", id: parts[1] };
+    if (parts[0] === "index") return { page: "index" };
+    if (parts[0] === "mistakes" || parts[0] === "wrongbook") return { page: "wrongbook" };
     if (parts[0] === "boss" && parts[1]) return { page: "boss", stage: parts[1].toUpperCase() };
+    if (parts[0] === "boss") return { page: "bossHub" };
+    if (parts[0] === "tasks") return { page: "tasksHub" };
     if (parts[0] === "task" && parts[1]) return { page: "task", stage: parts[1].toUpperCase() };
-    if (parts[0] === "wrongbook") return { page: "wrongbook" };
+    if (parts[0] === "review" && parts[1]) return { page: "review", layer: parts[1].toUpperCase() };
+    if (parts[0] === "knowledge" && parts[1]) return { page: "knowledge", id: parts[1] };
     if (parts[0] === "progress") return { page: "progress" };
-    return { page: "home" };
+    return { page: "map" };
   }
 
   function headerHud() {
@@ -158,6 +223,13 @@
       '<span class="hud-title">' + esc(lv.title) + "</span>" +
       '<div class="hud-xp"><div class="bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
       "<span>" + state.xp + " XP</span></div>";
+    /* 当前 Tab 高亮 */
+    var r = parseHash();
+    var tabMap = { map: "tab-map", index: "tab-index", wrongbook: "tab-mistakes", bossHub: "tab-boss", boss: "tab-boss", tasksHub: "tab-tasks", task: "tab-tasks" };
+    $$(".top-tabs a").forEach(function (a) { a.classList.remove("active"); });
+    var tid = tabMap[r.page];
+    if (tid) { var t2 = $("#" + tid); if (t2) t2.classList.add("active"); }
+    else if (r.page === "knowledge") { var t3 = $("#tab-map"); if (t3) t3.classList.add("active"); }
   }
 
   function celebrateIfPending() {
@@ -183,18 +255,21 @@
     var r = parseHash();
     var app = $("#app");
     headerHud();
-    if (r.page === "home") app.innerHTML = renderHome();
-    else if (r.page === "map") renderSkillTree(app);
+    if (r.page === "map") app.innerHTML = renderMap();
+    else if (r.page === "index") renderIndex(app);
     else if (r.page === "progress") app.innerHTML = renderProgress();
     else if (r.page === "wrongbook") renderWrongbook(app);
+    else if (r.page === "bossHub") renderBossHub(app);
+    else if (r.page === "tasksHub") renderTasksHub(app);
     else if (r.page === "boss") renderBoss(app, r.stage);
     else if (r.page === "task") renderTask(app, r.stage);
+    else if (r.page === "review") renderReview(app, r.layer);
     else if (r.page === "knowledge") renderKnowledge(app, r.id);
     celebrateIfPending();
     window.scrollTo(0, 0);
   }
 
-  /* ---------- 首页 ---------- */
+  /* ---------- 学习地图（默认首页：hero + 七关卡技能树） ---------- */
   function dueCount() {
     var t = today(), n = 0;
     Object.keys(state.wrongbook).forEach(function (k) {
@@ -203,85 +278,93 @@
     });
     return n;
   }
-
   function stageStats(sid) {
     var pts = ORDER.filter(function (e) { return e.p.stage === sid; });
     var done = pts.filter(function (e) { return state.visited[e.p.id]; }).length;
     return { pts: pts, done: done };
   }
 
-  function renderHome() {
+  function heroHtml() {
     var lvIdx = currentStageProgress();
     var lv = S.levels[lvIdx];
     var resume = state.last && byId[state.last] ? "#/knowledge/" + state.last
-      : (ORDER[0] ? "#/knowledge/" + ORDER[0].p.id : "#/map");
+      : (ORDER[0] ? "#/knowledge/" + ORDER[0].p.id : "#/index");
     var nextBoss = null;
     for (var i = 0; i < S.levels.length; i++) {
       var unlocked = stageUnlocked(S.levels[i].id);
       var b = state.boss[S.levels[i].id];
       if (unlocked && !(b && b.passed)) { nextBoss = S.levels[i]; break; }
     }
-    var stageCards = S.levels.map(function (l) {
-      var st = stageStats(l.id);
-      var unlocked = stageUnlocked(l.id);
-      var boss = state.boss[l.id];
-      var pct = st.pts.length ? Math.round(st.done / st.pts.length * 100) : 0;
-      var task = state.tasks[l.id];
-      return (
-        '<div class="level-card ' + (unlocked ? "" : "locked") + '" style="--lc:' + l.color + '">' +
-          '<div class="lc-head"><span class="lc-icon">' + l.icon + "</span>" +
-          '<div><div class="lc-name">' + l.id + " " + l.name + ' <span class="badge" style="background:' + l.color + ';color:#fff">' + esc(l.title) + "</span></div>" +
-          '<div class="lc-desc">' + esc(l.desc) + " ｜ 🎯 里程碑：" + esc(l.project) + "</div></div>" +
-          (unlocked ? '<span class="lc-open">🔓</span>' : '<span class="lc-lock" title="需先通过上一关 Boss 战">🔒</span>') + "</div>" +
-          '<div class="lc-bar-row"><div class="bar"><div class="fill" style="width:' + pct + '%"></div></div><span>' + st.done + "/" + st.pts.length + "</span></div>" +
-          '<div class="lc-actions">' +
-            '<a class="btn small" href="#/map">进入关卡</a>' +
-            (unlocked
-              ? '<a class="btn small primary" href="#/boss/' + l.id + '">' + (boss && boss.passed ? "🏆 Boss 已通过（" + boss.best + " 分）" : "⚔️ 挑战 Boss 战") + "</a>" +
-                '<a class="btn small" href="#/task/' + l.id + '">🧰 ' + (task && task.done ? "任务卡已自评 ✓" : "实战任务卡") + "</a>"
-              : '<span class="dim small-note">🔒 通过上一关 Boss 战解锁</span>') +
-          "</div>" +
-        "</div>"
-      );
-    }).join("");
     var due = dueCount();
-    var doneAll = ORDER.filter(function (e) { return state.visited[e.p.id]; }).length;
-    return (
-      '<div class="hero fade-in">' +
-        "<h1>🧭 AI Agent 与 AI 工程化 · 七关晋升之路</h1>" +
-        "<p>零基础到独立交付 Agent 的系统路线：<b>关0 基础热身 → 关6 综合项目与作品集</b>，共 " + ORDER.length +
-        " 个考点（rodmap 43 锚点全覆盖 + 2026 前沿）。完成知识点与例题赚 XP，每关通过 <b>Boss 模拟面试（≥80%）</b>解锁下一关，并用 <b>实战任务卡</b>完成里程碑项目自评。</p>" +
-        '<div class="hud-row">' +
-          '<span class="badge" style="background:' + lv.color + ';color:#fff">当前头衔：' + esc(lv.title) + "</span>" +
-          "<span>" + state.xp + " XP</span>" +
-          (nextBoss ? '<a class="btn small primary" href="#/boss/' + nextBoss.id + '">⚔️ 下一场 Boss：' + nextBoss.name + "</a>" : '<span class="badge">👑 全部关卡通关！</span>') +
-          (due ? '<a class="btn small" style="border-color:#f59e0b;color:#b45309" href="#/wrongbook">📖 错题复习 ' + due + " 条到期</a>" : "") +
-        "</div>" +
-        '<div class="cta-row"><a class="btn primary" href="' + resume + '">▶ ' + (state.last ? "继续上次学习" : "开始关0 之旅") + "</a>" +
-        '<a class="btn" href="#/map">🗺️ 技能树</a><a class="btn" href="#/wrongbook">📖 错题本</a><a class="btn" href="#/progress">📈 战绩</a></div>' +
+    return '<div class="hero fade-in">' +
+      "<h1>🧭 AI Agent 与 AI 工程化 · 七关晋升之路</h1>" +
+      "<p>零基础到独立交付 Agent：主线沿<b>技能树七关</b>按节奏学（Boss 战 ≥80% 解锁下一关）；<b><a href='#/index' style='color:inherit'>知识点索引</a></b>全量平铺无门禁，随时按需查、按薄弱点复习。</p>" +
+      '<div class="hud-row">' +
+        '<span class="badge" style="background:' + lv.color + ';color:#fff">当前头衔：' + esc(lv.title) + "</span>" +
+        "<span>" + state.xp + " XP</span>" +
+        (nextBoss ? '<a class="btn small primary" href="#/boss/' + nextBoss.id + '">⚔️ 下一场 Boss：' + nextBoss.name + "</a>" : '<span class="badge">👑 全部关卡通关！</span>') +
+        (due ? '<a class="btn small" style="border-color:#f59e0b;color:#b45309" href="#/mistakes">📖 错题复习 ' + due + " 条到期</a>" : "") +
       "</div>" +
-      '<h1 class="page-title">七大关卡</h1><p class="lead">逐关推进：学考点 → 打 Boss（≥80%）→ 做里程碑任务卡 → 解锁下一关。</p>' +
-      '<div class="level-grid">' + stageCards + "</div>" +
-      '<div class="about-box fade-in">' +
-        "<h3>玩法说明</h3><ul>" +
-          "<li>读知识点 +10 XP，答对选择题 +15，场景题要点命中 ≥80% +25，Boss 战答对每题 +10、首次通关 +100，任务卡自评完成 +60。</li>" +
-          "<li>XP 对应头衔晋升（AI 新手 → 应用工程师 → 单 Agent 工程师 → RAG 工程师 → AI 工程化工程师 → 多 Agent 工程师 → 准专家）；关卡解锁由 Boss 战把守。</li>" +
-          "<li>每个考点页顶部标注 <b>rodmap 锚点编号、建议掌握程度与关键问题</b>；带 * 的锚点为进阶选修，不强制通关。</li>" +
-          "<li>答错的题自动进错题本，按 1/3/7 天间隔重复提醒复习；「精通」级考点含「出一道题考别人」费曼终极练习。</li>" +
-        "</ul>" +
-        "<h3>内容来源</h3><ul><li>考点与真题来自牛客网面经、小林coding、卡码笔记、《AI Agent 面试 Top50》及 OpenAI/Anthropic/DeepSeek 官方文档与 arXiv 论文（2025-2026），每页标注星级与来源；🆕 为 2025-09 后前沿点。仅供学习参考。</li></ul>" +
-      "</div>"
-    );
+      '<div class="cta-row"><a class="btn primary" href="' + resume + '">▶ ' + (state.last ? "继续上次学习" : "开始关0 之旅") + "</a>" +
+      '<a class="btn" href="#/index">🔎 知识点索引</a><a class="btn" href="#/mistakes">📖 错题本</a><a class="btn" href="#/progress">📈 战绩</a></div>' +
+      "</div>";
   }
 
-  /* ---------- 技能树 ---------- */
+  /* ---------- 主题切换（dark/light，localStorage 持久化，默认 dark） ---------- */
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("llm-quest:theme", t); } catch (e) { /* 忽略 */ }
+    var btn = document.getElementById("theme-toggle");
+    if (btn) btn.textContent = t === "dark" ? "☀️" : "🌙";
+  }
+
+  /* ---------- 文档站侧栏：章节树（关卡 → 锚点 → 知识点），无门禁直达 ---------- */
+  function docsSidebarHtml(currentId) {
+    var cur = byId[currentId];
+    var curStage = cur ? cur.p.stage : null;
+    var curAnchor = cur ? cur.m.id : null;
+    var html = '<aside class="docs-side"><div class="docs-side-head"><b>📚 内容目录</b><a href="#/index">索引页 ›</a></div>';
+    S.levels.forEach(function (lv) {
+      var unlocked = stageUnlocked(lv.id);
+      var mods = S.modules.filter(function (m) {
+        return m.points.some(function (p) { return p.stage === lv.id; });
+      });
+      var total = 0, done = 0;
+      mods.forEach(function (m) {
+        m.points.forEach(function (p) { if (p.stage === lv.id) { total++; if (state.visited[p.id]) done++; } });
+      });
+      var isCurStage = lv.id === curStage;
+      html += '<details class="docs-chapter"' + (isCurStage ? " open" : "") + '>';
+      html += '<summary' + (isCurStage ? ' class="current-stage"' : '') + '><span>' + lv.icon + '</span><span>' + lv.id + " " + lv.name + '</span>' +
+        (unlocked ? "" : '<span class="dc-lock" title="主线门禁：通过上一关 Boss 后点亮；点击阅读不受限">🔒</span>') +
+        '<span class="dim" style="font-weight:500;font-size:11px">' + done + "/" + total + '</span><span class="dc-arrow">▶</span></summary>';
+      mods.forEach(function (m) {
+        var mp = m.points.filter(function (p) { return p.stage === lv.id; });
+        var isCurAnchor = m.id === curAnchor && isCurStage;
+        html += '<details class="docs-anchor"' + (isCurAnchor ? " open" : "") + '>';
+        html += '<summary' + (isCurAnchor ? ' class="current-anchor"' : '') + '><span>' + m.icon + " " + m.id + " " + esc(m.name) + (m.optional ? " *" : "") + '</span><span class="dc-arrow">▶</span></summary>';
+        mp.forEach(function (p) {
+          var isCur = p.id === currentId;
+          html += '<a class="docs-link' + (isCur ? " current" : "") + '" href="#/knowledge/' + p.id + '" title="' + esc(p.title) + '">' +
+            '<span class="dl-num">' + p.num + '</span><span>' + esc(p.title) + (p.frontier ? " 🆕" : "") + '</span>' +
+            (state.visited[p.id] ? '<span class="dl-done">✓</span>' : "") + '</a>';
+        });
+        html += '</details>';
+      });
+      html += '</details>';
+    });
+    html += '</aside>';
+    return html;
+  }
+
   function masteryBadge(mv) {
     return '<span class="badge mastery-badge">' + esc(mv) + "</span>";
   }
 
-  function renderSkillTree(app) {
-    var html = '<h1 class="page-title">🗺️ 技能树 · 七关学习地图</h1>' +
-      '<p class="lead">关卡为地图区域、锚点为分组、知识点为节点；完成点亮，击败关卡 Boss 解锁下一关。带 <span class="opt-badge">*</span> 为选修锚点（不强制通关），<span class="f-badge">🆕</span> 为 2026 前沿。</p>';
+  function renderMap() {
+    var html = heroHtml();
+    html += '<h1 class="page-title">🗺️ 技能树 · 七关学习地图</h1>' +
+      '<p class="lead">关卡为地图区域、锚点为分组、知识点为节点；完成点亮，击败关卡 Boss 解锁下一关。带 <span class="opt-badge">*</span> 为选修锚点（不强制通关），<span class="f-badge">🆕</span> 为 2026 前沿。想跳过节奏直接查？去 <a href="#/index">知识点索引</a>。</p>';
     S.levels.forEach(function (lv) {
       var unlocked = stageUnlocked(lv.id);
       var st = stageStats(lv.id);
@@ -326,37 +409,169 @@
           "</div>";
         html += "</div>";
       } else {
-        html += '<div class="ls-locked">🔒 通过 <b>' + esc(lv.unlockBy) + " Boss 战</b> 后解锁本关卡全部节点</div>";
+        html += '<div class="ls-locked">🔒 通过 <b>' + esc(lv.unlockBy) + " Boss 战</b> 后解锁本关卡全部节点（也可从 <a href='#/index'>知识点索引</a> 免门禁直达任意考点）</div>";
       }
       html += "</div>";
     });
-    app.innerHTML = html;
+    /* 模块回顾测验入口（每模块末尾，纯自测无门禁） */
+    html += '<div class="review-strip fade-in"><h3>📝 模块回顾测验（自动组卷 · 纯自测 · 无门禁）</h3><div class="review-strip-btns">' +
+      LAYERS.map(function (l) {
+        var n = IDX.filter(function (e) { return e.layer === l.id; }).length;
+        return '<a class="btn small" href="#/review/' + l.id + '">' + esc(l.name) + " · " + n + " 点</a>";
+      }).join("") + "</div></div>";
+    html += '<div class="about-box fade-in">' +
+      "<h3>玩法说明</h3><ul>" +
+        "<li>读知识点 +10 XP，答对选择题 +15，场景题要点命中 ≥80% +25，Boss 战答对每题 +10、首次通关 +100，任务卡自评完成 +60。</li>" +
+        "<li>XP 对应头衔晋升（AI 新手 → 应用工程师 → 单 Agent 工程师 → RAG 工程师 → AI 工程化工程师 → 多 Agent 工程师 → 准专家）；<b>门禁只管技能树主线</b>——索引页与知识点页随时直达。</li>" +
+        "<li>每个考点页顶部标注 <b>rodmap 锚点编号、建议掌握程度与关键问题</b>；带 * 的锚点为进阶选修，不强制通关。</li>" +
+        "<li>答错的题自动进错题本，按 1/3/7 天间隔重复提醒，并与索引页「待复习」状态联动；「精通」级考点含「出一道题考别人」费曼终极练习。</li>" +
+      "</ul>" +
+      "<h3>内容来源</h3><ul><li>考点与真题来自牛客网面经、小林coding、卡码笔记、《AI Agent 面试 Top50》及 OpenAI/Anthropic/DeepSeek 官方文档与 arXiv 论文（2025-2026），每页标注星级与来源；🆕 为 2025-09 后前沿点。仅供学习参考。</li></ul>" +
+    "</div>";
+    return html;
   }
 
-  /* ---------- 知识点页 ---------- */
+  /* ---------- 知识点索引（全量平铺 · 无门禁 · 第二通道） ---------- */
+  var IDX_STATE_KEY = "llm-quest:idx-filters";
+  function idxFilters() {
+    try {
+      var raw = JSON.parse(sessionStorage.getItem(IDX_STATE_KEY));
+      if (raw && typeof raw === "object") {
+        return { q: raw.q || "", stage: raw.stage || "", layer: raw.layer || "", mastery: raw.mastery || "", star: raw.star || "", status: raw.status || "", sort: raw.sort === "stars" ? "stars" : "anchor" };
+      }
+    } catch (e) { /* 忽略 */ }
+    return { q: "", stage: "", layer: "", mastery: "", star: "", status: "", sort: "anchor" };
+  }
+  function idxSaveFilters(f) {
+    try { sessionStorage.setItem(IDX_STATE_KEY, JSON.stringify(f)); } catch (e) { /* 忽略 */ }
+  }
+
+  function matchStar(entry, star) {
+    if (star === "new") return entry.frontier;
+    if (star === "s4") return entry.stars >= 4;
+    if (star === "s5") return entry.stars >= 5;
+    return true;
+  }
+  function matchStatus(entry, status) {
+    if (!status) return true;
+    if (status === "due") return isDue(entry.id);
+    return pointStatus(entry.id) === status;
+  }
+
+  function renderIndex(app) {
+    var f = idxFilters();
+    var dueIds = IDX.filter(function (e) { return isDue(e.id); }).length;
+    app.innerHTML =
+      '<h1 class="page-title">🔎 知识点索引 · 全量平铺（无门禁）</h1>' +
+      '<p class="lead">与技能树主线并行的第二通道：全部 ' + IDX.length + " 个知识点在此平铺，含未解锁关卡内容（带关卡归属标记），点击直达。技能树管「按节奏学」，本页管「按需查、按薄弱点复习」。</p>" +
+      '<div class="idx-toolbar">' +
+        '<div class="idx-row">' +
+          '<input type="search" id="idx-q" class="idx-search" placeholder="搜索：锚点编号 / 标题 / 关键词（输入即出结果）" value="' + esc(f.q) + '" />' +
+          '<button class="btn small" data-act="idx-due">⏰ 今日待复习' + (dueIds ? "（" + dueIds + "）" : "") + "</button>" +
+          '<button class="btn small" data-act="idx-random">🎲 随机考我</button>' +
+          '<button class="btn small" data-act="idx-hot">🔥 高频考点（⭐4+）</button>' +
+          '<button class="btn small" data-act="idx-reset">↺ 重置</button>' +
+        "</div>" +
+        '<div class="idx-row idx-filters">' +
+          '<label>关卡 <select id="idx-stage"><option value="">全部</option>' +
+            S.levels.map(function (l) { return '<option value="' + l.id + '"' + (f.stage === l.id ? " selected" : "") + ">" + l.id + " " + l.name + "</option>"; }).join("") +
+          "</select></label>" +
+          '<label>模块 <select id="idx-layer"><option value="">全部</option>' +
+            LAYERS.map(function (l) { return '<option value="' + l.id + '"' + (f.layer === l.id ? " selected" : "") + ">" + l.name + "</option>"; }).join("") +
+          "</select></label>" +
+          '<label>掌握程度 <select id="idx-mastery"><option value="">全部</option>' +
+            ["了解", "理解", "会用", "熟练", "精通"].map(function (mv) { return '<option value="' + mv + '"' + (f.mastery === mv ? " selected" : "") + ">" + mv + "</option>"; }).join("") +
+          "</select></label>" +
+          '<label>星级/🆕 <select id="idx-star"><option value="">全部</option>' +
+            '<option value="s4"' + (f.star === "s4" ? " selected" : "") + ">⭐⭐⭐⭐ 以上</option>" +
+            '<option value="s5"' + (f.star === "s5" ? " selected" : "") + ">⭐⭐⭐⭐⭐</option>" +
+            '<option value="new"' + (f.star === "new" ? " selected" : "") + ">🆕 2026 前沿</option>" +
+          "</select></label>" +
+          '<label>学习状态 <select id="idx-status"><option value="">全部</option>' +
+            ["未开始", "学习中", "已通过", "待复习"].map(function (stv) { return '<option value="' + stv + '"' + (f.status === stv ? " selected" : "") + ">" + stv + "</option>"; }).join("") +
+            '<option value="due"' + (f.status === "due" ? " selected" : "") + ">今日到期</option>" +
+          "</select></label>" +
+          '<label>排序 <select id="idx-sort">' +
+            '<option value="anchor"' + (f.sort === "anchor" ? " selected" : "") + ">按锚点编号</option>" +
+            '<option value="stars"' + (f.sort === "stars" ? " selected" : "") + ">按星级降序（高频优先）</option>" +
+          "</select></label>" +
+        "</div>" +
+        '<div class="idx-count" id="idx-count"></div>' +
+        '<div class="idx-random-msg" id="idx-random-msg"></div>' +
+      "</div>" +
+      '<div id="idx-list"></div>';
+
+    function applyAndRender() {
+      var f2 = idxFilters();
+      var norm = function (s) { return String(s || "").toLowerCase().replace(/\s+/g, ""); };
+      var q = norm(f2.q);
+      var rows = IDX.filter(function (e) {
+        if (f2.stage && e.stage !== f2.stage) return false;
+        if (f2.layer && e.layer !== f2.layer) return false;
+        if (f2.mastery && String(e.mastery).indexOf(f2.mastery) < 0) return false;
+        if (!matchStar(e, f2.star)) return false;
+        if (!matchStatus(e, f2.status)) return false;
+        if (q) {
+          var hay = norm(e.num + " " + e.anchor + " " + e.title + " " + e.anchorName + " " + e.oneLiner + " " + e.stage);
+          if (hay.indexOf(q) < 0) return false;
+        }
+        return true;
+      });
+      if (f2.sort === "stars") {
+        rows = rows.slice().sort(function (a, b) { return b.stars - a.stars || (a.id < b.id ? -1 : 1); });
+      }
+      var doneCount = rows.filter(function (e) { return state.visited[e.id]; }).length;
+      $("#idx-count").innerHTML = "显示 <b>" + rows.length + "</b> / " + IDX.length + " 条（其中已读 " + doneCount + "）";
+      var stageColor = {};
+      S.levels.forEach(function (l) { stageColor[l.id] = l.color; });
+      var list = $("#idx-list");
+      if (!rows.length) {
+        list.innerHTML = '<div class="content-pending">没有匹配的知识点——试试放宽筛选或 <button class="btn small" data-act="idx-reset">重置</button></div>';
+        return;
+      }
+      list.innerHTML = '<div class="idx-table">' + rows.map(function (e) {
+        var st = f2.status === "due" ? "due" : pointStatus(e.id);
+        var lc = S.layerColors[e.layer] || "#64748b";
+        return '<a class="idx-item" href="#/knowledge/' + e.id + '">' +
+          '<span class="ix-num" style="background:' + lc + '">' + e.num + "</span>" +
+          '<span class="ix-main"><span class="ix-title">' + esc(e.title) + (e.frontier ? ' <span class="f-badge">🆕</span>' : "") + (e.optional ? ' <span class="opt-badge">*选修</span>' : "") + "</span>" +
+            '<span class="ix-anchor">锚点 ' + e.anchor + " · " + esc(e.anchorName) + "</span></span>" +
+          '<span class="ix-mastery">' + masteryBadge(e.mastery) + "</span>" +
+          '<span class="ix-stage" style="color:' + (stageColor[e.stage] || "#64748b") + '">' + e.stage + "</span>" +
+          '<span class="ix-stars">' + starHtml(e.stars) + "</span>" +
+          '<span class="ix-status">' + statusBadgeHtml(st) + "</span>" +
+        "</a>";
+      }).join("") + "</div>";
+    }
+
+    $("#idx-q").addEventListener("input", function () {
+      var f2 = idxFilters(); f2.q = this.value; idxSaveFilters(f2); applyAndRender();
+    });
+    [["idx-stage", "stage"], ["idx-layer", "layer"], ["idx-mastery", "mastery"], ["idx-star", "star"], ["idx-status", "status"], ["idx-sort", "sort"]].forEach(function (pair) {
+      $("#" + pair[0]).addEventListener("change", function () {
+        var f2 = idxFilters(); f2[pair[1]] = this.value; idxSaveFilters(f2); applyAndRender();
+      });
+    });
+
+    applyAndRender();
+  }
+
+  /* 索引页快捷动作在全局事件委托中处理：idx-due / idx-random / idx-hot / idx-reset */
+
+  /* ---------- 知识点页（始终无门禁） ---------- */
   var currentPoint = null, currentContent = null;
 
   function renderKnowledge(app, id) {
     var entry = byId[id];
     if (!entry) {
-      app.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/map">返回技能树</a></div>';
+      app.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a> <a class="btn" href="#/map">返回技能树</a></div>';
       return;
     }
     var m = entry.m, p = entry.p;
     var lv = stageById(p.stage);
-    var unlocked = stageUnlocked(p.stage);
-    if (!unlocked) {
-      app.innerHTML =
-        '<div class="content-pending lock-page" style="--lc:' + lv.color + '">' +
-          "<h2>🔒 该关卡尚未解锁</h2><p>「" + lv.id + " " + lv.name + " · " + esc(lv.title) + "」需要先通过 <b>" +
-          esc(lv.unlockBy) + " Boss 战</b>（≥80%）解锁。</p>" +
-          '<a class="btn primary" href="#/boss/' + lv.unlockBy + '">⚔️ 去挑战 ' + lv.unlockBy + " Boss 战</a> " +
-          '<a class="btn" href="#/map">返回技能树</a></div>';
-      return;
-    }
     getContent(id).then(function (c) {
       if (!c) {
-        app.innerHTML = '<div class="content-pending">📖 内容生成中，稍后再来～<br><br><a class="btn" href="#/map">返回技能树</a></div>';
+        app.innerHTML = '<div class="content-pending">📖 内容生成中，稍后再来～<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
         return;
       }
       var firstVisit = !state.visited[id];
@@ -384,7 +599,7 @@
           ' <span class="lc-target">→ ' + t.p.num + " " + esc(t.p.title) + "</span></a>";
         if (ORDER.indexOf(t) < idx) back.push(li); else fwd.push(li);
       });
-      while (back.length + fwd.length < 2) { /* 兜底：内容链接不足时以依赖补 */
+      while (back.length + fwd.length < 2) {
         if ((p.deps || []).length && back.length === 0) {
           var d0 = byId[p.deps[0]];
           if (d0) back.push('<a class="link-card" href="#/knowledge/' + d0.p.id + '">🔗 本考点建立在它的基础之上 <span class="lc-target">→ ' + d0.p.num + " " + esc(d0.p.title) + "</span></a>");
@@ -417,8 +632,9 @@
       }
 
       var lc = S.layerColors[m.layer] || "#64748b";
-      app.innerHTML =
-        '<div class="breadcrumb"><a href="#/">首页</a> / <a href="#/map">' + lv.id + " " + lv.name + "</a> / 锚点 " + m.id + " / " + p.num + "</div>" +
+      app.innerHTML = '<div class="docs-wrap">' + docsSidebarHtml(id) +
+        '<article class="docs-main">' +
+        '<div class="breadcrumb"><a href="#/map">学习地图</a> / <a href="#/index">知识点索引</a> / ' + lv.id + " " + lv.name + " / 锚点 " + m.id + " / " + p.num + "</div>" +
         '<div class="level-strip" style="--lc:' + lv.color + '">' + lv.icon + " <b>" + lv.id + " " + lv.name + "</b> · 目标头衔 " + esc(lv.title) +
           " · <span class='dim'>完成本考点 +" + S.xp.visit + " XP</span>" +
           ' · <a style="color:inherit" href="#/task/' + lv.id + '">🧰 本关任务卡</a></div>' +
@@ -468,10 +684,11 @@
         teachback +
         '<nav class="knav">' +
           (prev ? '<a href="#/knowledge/' + prev.p.id + '"><div class="kn-lbl">← 上一考点</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
-                : '<a href="#/map"><div class="kn-lbl">←</div><div class="kn-t">返回技能树</div></a>') +
+                : '<a href="#/index"><div class="kn-lbl">←</div><div class="kn-t">返回知识点索引</div></a>') +
           (next ? '<a class="next" href="#/knowledge/' + next.p.id + '"><div class="kn-lbl">下一考点 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
                 : '<a class="next" href="#/boss/' + p.stage + '"><div class="kn-lbl">🎉 本关知识点已尽</div><div class="kn-t">⚔️ 挑战 ' + p.stage + " Boss 战 →</div></a>") +
-        "</nav>";
+        "</nav>" +
+        '</article></div>';
 
       restoreExercises(p, c);
     });
@@ -578,20 +795,64 @@
     return { score: g.score, total: g.total, ratio: ratio };
   }
 
-  /* ---------- Boss 战 ---------- */
+  /* ---------- Boss 战 Hub ---------- */
+  function renderBossHub(app) {
+    var rows = S.levels.map(function (lv) {
+      var unlocked = stageUnlocked(lv.id);
+      var rec = state.boss[lv.id];
+      var st = stageStats(lv.id);
+      var status = rec && rec.passed
+        ? '<span class="badge" style="background:#10b981;color:#fff">🏆 已通过 ' + rec.best + "/" + rec.total + "</span>"
+        : unlocked
+          ? '<span class="badge" style="background:' + lv.color + ';color:#fff">可挑战</span>'
+          : '<span class="badge">🔒 需通过 ' + esc(lv.unlockBy) + " Boss</span>";
+      var action = !unlocked
+        ? '<span class="dim small-note">门禁提示：先在主线通过上一关 Boss（考点复习不受限）</span>'
+        : '<a class="btn small primary" href="#/boss/' + lv.id + '">' + (rec && rec.passed ? "再战一次" : "⚔️ 开始战斗") + "</a>";
+      return '<div class="hub-card" style="--lc:' + lv.color + '">' +
+        '<div class="hc-head"><span class="hc-icon">' + lv.icon + '</span><div><b>' + lv.id + " " + lv.name + '</b><div class="dim small-note">头衔目标：' + esc(lv.title) + " · 覆盖 " + st.pts.length + ' 个考点</div></div><span class="hc-right">' + status + "</span></div>" +
+        '<div class="hc-meta">📋 10 道本关高频真题 · 每题 60 秒 · 通过线 8/10' + (rec && !rec.passed ? " · 历史最佳 " + rec.best + "/" + rec.total : "") + "</div>" +
+        '<div class="hc-actions">' + action + '<a class="btn small" href="#/task/' + lv.id + '">🧰 任务卡</a></div>' +
+        "</div>";
+    }).join("");
+    app.innerHTML =
+      '<h1 class="page-title">⚔️ Boss 战 · 七关模拟面试</h1>' +
+      '<p class="lead">每关一场计时模拟面试（10 题，≥80% 通过解锁下一关）。<b>Boss 门禁只约束技能树主线推进</b>——考点复习请走<a href="#/index">知识点索引</a>，无门禁。</p>' +
+      '<div class="hub-grid">' + rows + "</div>";
+  }
+
+  /* ---------- 实战任务卡 Hub ---------- */
+  function renderTasksHub(app) {
+    var rows = S.levels.map(function (lv) {
+      var rec = state.tasks[lv.id];
+      var done = !!(rec && rec.done);
+      return '<div class="hub-card" style="--lc:' + lv.color + '">' +
+        '<div class="hc-head"><span class="hc-icon">🧰</span><div><b>' + lv.id + " " + lv.name + '</b><div class="dim small-note">🎯 里程碑：' + esc(lv.project) + '</div></div><span class="hc-right">' +
+          (done ? '<span class="badge" style="background:#10b981;color:#fff">✅ 已自评（+' + S.xp.task + " XP）</span>" : '<span class="badge">待完成</span>') + "</span></div>" +
+        '<div class="hc-meta">📋 步骤指引 + 自查清单 + 参考架构图 · 完成自评 +' + S.xp.task + " XP</div>" +
+        '<div class="hc-actions"><a class="btn small primary" href="#/task/' + lv.id + '">打开任务卡</a></div>' +
+        "</div>";
+    }).join("");
+    app.innerHTML =
+      '<h1 class="page-title">🧰 实战任务卡 · 七关里程碑</h1>' +
+      '<p class="lead">每关的里程碑项目（rodmap 5.x）：步骤指引 + 自查清单 + 参考架构图，完成自评得 XP。<b>任务卡无门禁</b>，任何关卡都可以先看先做。</p>' +
+      '<div class="hub-grid">' + rows + "</div>";
+  }
+
+  /* ---------- 单关 Boss 战 ---------- */
   function renderBoss(app, sid) {
     var lv = stageById(sid);
-    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该关卡。<br><br><a class="btn" href="#/map">返回技能树</a></div>'; return; }
+    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该关卡。<br><br><a class="btn" href="#/boss">返回 Boss 战</a></div>'; return; }
     if (!stageUnlocked(sid)) {
       var prevLv = S.levels[STAGE_INDEX[sid] - 1];
       app.innerHTML = '<div class="content-pending lock-page" style="--lc:' + lv.color + '"><h2>🔒 Boss 未解锁</h2>' +
-        "<p>需要先通过 <b>" + (prevLv ? prevLv.id : "") + " Boss 战</b>才能挑战本关。</p>" +
-        '<a class="btn primary" href="#/boss/' + (prevLv ? prevLv.id : "S0") + '">⚔️ 去打上一关 Boss</a></div>';
+        "<p>需要先通过 <b>" + (prevLv ? prevLv.id : "") + " Boss 战</b>（技能树主线的推进门禁）；考点复习请走<a href='#/index'>知识点索引</a>，无门禁。</p>" +
+        '<a class="btn primary" href="#/boss/' + (prevLv ? prevLv.id : "S0") + '">⚔️ 去打上一关 Boss</a> <a class="btn" href="#/boss">返回 Boss 战列表</a></div>';
       return;
     }
     getBoss(sid).then(function (boss) {
       if (!boss || !(boss.questions || []).length) {
-        app.innerHTML = '<div class="content-pending">⚔️ ' + sid + ' Boss 战题库生成中……<br><br><a class="btn" href="#/map">返回技能树</a></div>';
+        app.innerHTML = '<div class="content-pending">⚔️ ' + sid + ' Boss 战题库生成中……<br><br><a class="btn" href="#/boss">返回 Boss 战</a></div>';
         return;
       }
       var qs = boss.questions;
@@ -607,7 +868,7 @@
         "</div>" +
         '<div id="boss-arena"></div>' +
         '<div id="boss-footer" class="ex-foot"><button class="btn primary" id="boss-start">开始战斗</button>' +
-        '<a class="btn" href="#/map">返回技能树</a></div>' +
+        '<a class="btn" href="#/boss">返回 Boss 战列表</a></div>' +
         '<div data-role="boss-result"></div>';
 
       var picks = {};
@@ -679,8 +940,7 @@
             : "💪 差一点点：需答对 " + need + " 题（当前 " + score + "）。错题已收进错题本，复习后再来挑战！") + "</div>" +
           '<div class="ex-foot" style="justify-content:center">' +
           (passed ? '<a class="btn primary" href="#/map">返回技能树' + (lvNext ? "解锁下一关" : "") + " →</a>" : '<button class="btn primary" id="boss-retry">再战一次</button>') +
-          '<a class="btn" href="#/wrongbook">📖 查看错题本</a></div></div>';
-        /* 错题收录 */
+          '<a class="btn" href="#/mistakes">📖 查看错题本</a></div></div>';
         qs.forEach(function (q, i) {
           if (picks[i] !== q.answer) {
             addWrong(sid + "#boss" + i, { ref: q.ref || "", type: "boss", q: q.q });
@@ -704,17 +964,13 @@
     });
   }
 
-  /* ---------- 实战任务卡 ---------- */
+  /* ---------- 实战任务卡（无门禁） ---------- */
   function renderTask(app, sid) {
     var lv = stageById(sid);
-    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该关卡。<br><br><a class="btn" href="#/map">返回技能树</a></div>'; return; }
-    if (!stageUnlocked(sid)) {
-      app.innerHTML = '<div class="content-pending lock-page" style="--lc:' + lv.color + '"><h2>🔒 任务卡未解锁</h2><p>先通过上一关 Boss 战解锁本关。</p><a class="btn" href="#/map">返回技能树</a></div>';
-      return;
-    }
+    if (!lv) { app.innerHTML = '<div class="content-pending">未找到该关卡。<br><br><a class="btn" href="#/tasks">返回任务卡列表</a></div>'; return; }
     getTask(sid).then(function (t) {
       if (!t) {
-        app.innerHTML = '<div class="content-pending">🧰 任务卡生成中……<br><br><a class="btn" href="#/map">返回技能树</a></div>';
+        app.innerHTML = '<div class="content-pending">🧰 任务卡生成中……<br><br><a class="btn" href="#/tasks">返回任务卡列表</a></div>';
         return;
       }
       var rec = state.tasks[sid] || {};
@@ -739,12 +995,95 @@
           '<span class="ex-result-chip" data-role="task-result">' + (rec.done ? "✅ 已提交" : "") + "</span></div></section>" +
         (t.tips ? '<section class="k-section"><div class="sec-title"><span class="sec-ico">💡</span>避坑提示</div><ul class="kp-list">' +
           t.tips.map(function (x) { return "<li><span class='kp-ico'>💡</span><span>" + esc(x) + "</span></li>"; }).join("") + "</ul></section>" : "") +
-        '<nav class="knav"><a href="#/map"><div class="kn-lbl">←</div><div class="kn-t">返回技能树</div></a>' +
+        '<nav class="knav"><a href="#/tasks"><div class="kn-lbl">←</div><div class="kn-t">返回任务卡列表</div></a>' +
         '<a class="next" href="#/boss/' + sid + '"><div class="kn-lbl">挑战关底 →</div><div class="kn-t">⚔️ ' + sid + " Boss 战</div></a></nav>";
     });
   }
 
-  /* ---------- 错题本 ---------- */
+  /* ---------- 模块回顾测验（自动组卷 · 纯自测 · 无门禁） ---------- */
+  function renderReview(app, layerId) {
+    var layer = LAYERS.filter(function (l) { return l.id === layerId; })[0];
+    if (!layer) { app.innerHTML = '<div class="content-pending">未找到该模块。<br><br><a class="btn" href="#/index">返回知识点索引</a></div>'; return; }
+    var points = IDX.filter(function (e) { return e.layer === layerId; });
+    app.innerHTML =
+      '<div class="boss-head" style="--lc:#64748b">' +
+        '<div class="boss-title">📝 模块回顾测验 · ' + esc(layer.name) + "</div>" +
+        '<div class="boss-sub">从本模块 ' + points.length + " 个知识点的高频例题中自动组卷 · 纯自测（不计 XP、不进错题本、无门禁）</div>" +
+      "</div>" +
+      '<div id="review-arena"><div class="content-pending">正在从考点例题中抽题组卷……</div></div>' +
+      '<div class="ex-foot"><a class="btn" href="#/index">返回知识点索引</a> <a class="btn" href="#/map">返回学习地图</a></div>';
+
+    Promise.all(points.map(function (p) { return getContent(p.id).then(function (c) { return { e: p, c: c }; }); }))
+      .then(function (pairs) {
+        var arena = $("#review-arena");
+        if (!arena) return;
+        var pool = [];
+        pairs.forEach(function (pr) {
+          if (!pr.c || !pr.c.exercises) return;
+          pr.c.exercises.forEach(function (ex, i) {
+            if (ex.type === "choice") pool.push({ e: pr.e, ex: ex });
+          });
+        });
+        for (var i = pool.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+        var picked = [];
+        var seen = {};
+        for (var k2 = 0; k2 < pool.length && picked.length < 8; k2++) {
+          if (!seen[pool[k2].e.id]) { seen[pool[k2].e.id] = true; picked.push(pool[k2]); }
+        }
+        for (var k3 = 0; k3 < pool.length && picked.length < 8; k3++) {
+          if (picked.indexOf(pool[k3]) < 0) picked.push(pool[k3]);
+        }
+        if (!picked.length) {
+          arena.innerHTML = '<div class="content-pending">本模块暂无可组卷的选择题。</div>';
+          return;
+        }
+        var rIdx = 0, correct = 0;
+        function show() {
+          if (rIdx >= picked.length) {
+            var passLine = Math.ceil(picked.length * 0.8);
+            arena.innerHTML = '<div class="quiz-result-card"><div class="qr-score ' + (correct >= passLine ? "pass" : "fail") + '">' + correct + " / " + picked.length + "</div>" +
+              '<div class="qr-msg">' + (correct >= passLine ? "🎉 模块掌握扎实！" : "💪 再复习几课再测：可去知识点索引按「学习中 / 待复习」筛选薄弱点。") + "</div>" +
+              '<div class="ex-foot" style="justify-content:center"><button class="btn primary" id="review-again">🔄 换一套重测</button><a class="btn" href="#/index">返回知识点索引</a></div></div>';
+            $("#review-again").addEventListener("click", function () { renderReview(app, layerId); });
+            return;
+          }
+          var item = picked[rIdx];
+          var letters = ["A", "B", "C", "D", "E"];
+          arena.innerHTML = '<div class="ex-card review-q">' +
+            '<span class="ex-tag">第 ' + (rIdx + 1) + "/" + picked.length + ' 题 · 关联 ' + item.e.num + " " + esc(item.e.title) + '</span>' +
+            '<div class="ex-q">' + esc(item.ex.q) + "</div>" +
+            '<div class="ex-opts">' + (item.ex.options || []).map(function (o, j2) {
+              return '<button class="ex-opt" data-act="rpick" data-opt="' + j2 + '"><span class="opt-letter">' + (letters[j2] || j2) + "</span>" + esc(o) + "</button>";
+            }).join("") + "</div></div>";
+        }
+        show();
+        arena.addEventListener("click", function (e2) {
+          var el = e2.target.closest('[data-act="rpick"]');
+          if (!el || el.disabled) return;
+          var item = picked[rIdx];
+          var pickedIdx = +el.getAttribute("data-opt");
+          var card = $(".review-q", arena);
+          $$(".ex-opt", card).forEach(function (btn, j2) {
+            btn.disabled = true;
+            if (j2 === pickedIdx) btn.classList.add(j2 === item.ex.answer ? "correct" : "wrong", "chosen");
+            if (j2 === item.ex.answer) btn.classList.add("correct");
+          });
+          if (pickedIdx === item.ex.answer) correct++;
+          var fb = document.createElement("div");
+          fb.className = "boss-feedback " + (pickedIdx === item.ex.answer ? "ok" : "bad");
+          fb.innerHTML = (pickedIdx === item.ex.answer ? "✅ 答对　" : "❌ 正确答案：" + (["A", "B", "C", "D", "E"][item.ex.answer] || "") + "　") +
+            esc(item.ex.explain || "") +
+            '<button class="btn small primary" style="margin-left:10px" id="review-next">' + (rIdx + 1 >= picked.length ? "查看结果" : "下一题 →") + "</button>";
+          card.appendChild(fb);
+          $("#review-next").addEventListener("click", function () { rIdx++; show(); });
+        });
+      });
+  }
+
+  /* ---------- 错题本与复习 ---------- */
   function renderWrongbook(app) {
     var t = today();
     var keys = Object.keys(state.wrongbook).filter(function (k) { return state.wrongbook[k]; });
@@ -757,11 +1096,15 @@
         '<div class="wi-head"><span class="badge">' + (byId[it.ref] ? byId[it.ref].p.num : (it.type === "boss" ? "Boss" : it.ref)) + "</span>" +
         "<span class='dim'>答错 " + it.times + " 次 · 下次复习 " + it.nextDue + (dueNow ? " · <b style='color:#b45309'>今天该复习了</b>" : "") + "</span></div>" +
         '<div class="wi-q">' + esc(it.q) + "</div>" +
-        '<a class="btn small" href="' + (byId[it.ref] ? "#/knowledge/" + it.ref : "#/map") + '">回看考点</a></div>';
+        '<a class="btn small" href="' + (byId[it.ref] ? "#/knowledge/" + it.ref : "#/index") + '">回看考点</a></div>';
     }
     app.innerHTML =
-      '<h1 class="page-title">📖 错题本 · 遗忘曲线复习</h1>' +
-      '<p class="lead">答错的题自动收录，按 <b>1 天 → 3 天 → 7 天</b> 间隔重复提醒；回看考点后重新答对即移出。</p>' +
+      '<h1 class="page-title">📖 错题本与复习 · 遗忘曲线</h1>' +
+      '<p class="lead">答错的题自动收录，按 <b>1 天 → 3 天 → 7 天</b> 间隔重复提醒；回看考点后重新答对即移出。错题与知识点索引的「待复习」状态实时联动。</p>' +
+      '<div class="idx-row" style="margin-bottom:14px">' +
+        '<button class="btn small" data-act="goto-idx-review">🔎 去知识点索引 · 筛选待复习</button>' +
+        '<button class="btn small" data-act="goto-idx-due">⏰ 只看今日到期</button>' +
+      "</div>" +
       '<div class="stats-row">' +
         '<div class="stat-card"><div class="num">' + due.length + '</div><div class="lbl">今天到期</div></div>' +
         '<div class="stat-card"><div class="num">' + later.length + '</div><div class="lbl">待复习（未到期）</div></div>' +
@@ -805,6 +1148,52 @@
     var el = e.target.closest("[data-act]");
     if (!el) return;
     var act = el.getAttribute("data-act");
+
+    if (el.id === "theme-toggle" || act === "theme-toggle") {
+      var cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+      applyTheme(cur);
+      return;
+    }
+
+    if (act === "idx-due") {
+      var f0 = idxFilters(); f0.status = "due"; f0.q = ""; idxSaveFilters(f0);
+      render();
+      return;
+    }
+    if (act === "idx-hot") {
+      var f1 = idxFilters(); f1.star = "s4"; f1.q = ""; idxSaveFilters(f1);
+      render();
+      return;
+    }
+    if (act === "idx-reset") {
+      idxSaveFilters({ q: "", stage: "", layer: "", mastery: "", star: "", status: "", sort: idxFilters().sort });
+      render();
+      return;
+    }
+    if (act === "idx-random") {
+      var pool = IDX.filter(function (en) { return wrongEntriesFor(en.id).length > 0; });
+      var duePool = pool.filter(function (en) { return isDue(en.id); });
+      var cand = (duePool.length ? duePool : pool);
+      var msg = $("#idx-random-msg");
+      if (!cand.length) {
+        if (msg) msg.innerHTML = '<span class="dim">🎲 题库空的：目前没有关联错题的知识点。去考点页答错几题，或用「今日待复习」看看到期项。</span>';
+        return;
+      }
+      var pickR = cand[Math.floor(Math.random() * cand.length)];
+      if (msg) msg.innerHTML = "🎲 抽中 <b>" + esc(pickR.num + " " + pickR.title) + "</b>，正在跳转……";
+      setTimeout(function () { location.hash = "#/knowledge/" + pickR.id; }, 500);
+      return;
+    }
+    if (act === "goto-idx-review") {
+      idxSaveFilters({ q: "", stage: "", layer: "", mastery: "", star: "", status: "待复习", sort: "anchor" });
+      location.hash = "#/index";
+      return;
+    }
+    if (act === "goto-idx-due") {
+      idxSaveFilters({ q: "", stage: "", layer: "", mastery: "", star: "", status: "due", sort: "anchor" });
+      location.hash = "#/index";
+      return;
+    }
 
     if (act === "pick") {
       var card = el.closest(".ex-card");
