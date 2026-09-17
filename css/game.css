@@ -414,3 +414,44 @@ details.tree-module[open] > summary .arrow { transform: rotate(90deg); }
 /* 文档正文微调：更接近阅读态 */
 .docs-main .k-head h1 { font-size: 26px; line-height: 1.35; }
 .docs-main .breadcrumb { padding-top: 2px; }
+
+/* ============================================================
+ * v4.4 Markdown 深度文档样式（md-body）
+ * ============================================================ */
+.md-body { font-size: 15px; line-height: 1.85; color: var(--ink); }
+.md-body .md-h { font-weight: 800; line-height: 1.4; margin: 26px 0 12px; }
+.md-body h2.md-h { font-size: 21px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.md-body h3.md-h { font-size: 17.5px; }
+.md-body h4.md-h { font-size: 15.5px; }
+.md-body h1.md-h { font-size: 24px; }
+.md-body p { margin: 10px 0; }
+.md-body strong { color: var(--ink); font-weight: 700; }
+html[data-theme="dark"] .md-body strong { color: #f1f5f9; }
+.md-body .md-code {
+  font-family: var(--mono, monospace); font-size: 13px;
+  background: var(--tint); border: 1px solid var(--line); border-radius: 6px;
+  padding: 1px 6px;
+}
+.md-body .md-pre {
+  background: var(--card-2, #f8fafc); border: 1px solid var(--line);
+  border-radius: 12px; padding: 14px 16px; overflow-x: auto; margin: 14px 0;
+}
+.md-body .md-pre code {
+  font-family: var(--mono, monospace); font-size: 12.8px; line-height: 1.6;
+  color: var(--ink); white-space: pre;
+}
+.md-body .md-table-wrap { overflow-x: auto; margin: 14px 0; }
+.md-body .md-table { border-collapse: collapse; width: 100%; font-size: 13.5px; background: var(--card); }
+.md-body .md-table th, .md-body .md-table td {
+  border: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top;
+}
+.md-body .md-table th { background: var(--tint); font-weight: 700; }
+.md-body .md-quote {
+  border-left: 4px solid var(--brand); background: var(--tint);
+  border-radius: 0 10px 10px 0; padding: 10px 16px; margin: 14px 0;
+  color: var(--ink-2);
+}
+.md-body .md-quote p { margin: 4px 0; }
+.md-body ul, .md-body ol { padding-left: 24px; margin: 10px 0; }
+.md-body li { margin: 5px 0; }
+.md-body .md-hr { border: none; border-top: 1px dashed var(--line); margin: 22px 0; }

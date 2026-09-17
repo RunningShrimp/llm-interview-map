@@ -341,19 +341,7 @@
   })();
   function docsEntryFor(pointId) {
     var e = byId[pointId];
-    if (!e) {
-      /* H 层文档 id（h1..h8）不是 point id——按 num 反查 */
-      if (/^h\d+$/.test(pointId) && IDX.length) {
-        for (var k = 0; k < IDX.length; k++) {
-          if (IDX[k].num.toLowerCase() === pointId) {
-            var he = byId[IDX[k].id];
-            if (he) e = he;
-            break;
-          }
-        }
-      }
-      if (!e) return null;
-    }
+    if (!e) return null;
     var docId = e.m.id === "H" ? e.p.num.toLowerCase() : e.m.points[0].id;
     for (var i = 0; i < DOCS_LIST.length; i++) if (DOCS_LIST[i].docId === docId) return { entry: DOCS_LIST[i], idx: i };
     return null;

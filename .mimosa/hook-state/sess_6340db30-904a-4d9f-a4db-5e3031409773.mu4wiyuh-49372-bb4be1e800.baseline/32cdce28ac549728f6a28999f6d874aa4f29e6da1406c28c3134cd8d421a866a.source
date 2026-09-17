@@ -258,7 +258,6 @@
   function render() {
     var r = parseHash();
     var app = $("#app");
-    renderTarget = null; linkBase = null;
     headerHud();
     if (r.page === "map") app.innerHTML = renderMap();
     else if (r.page === "index") renderIndex(app);
@@ -324,36 +323,28 @@
     if (btn) btn.textContent = t === "dark" ? "☀️" : "🌙";
   }
 
-  /* ---------- 文档站侧栏：章节树（关卡 → 锚点 → 知识点），无门禁直达 ---------- */
+  /* ---------- 文档站侧栏：纯目录树（关卡 → 锚点 → 知识点），无进度/门禁元素 ---------- */
   function docsSidebarHtml(currentId) {
     var cur = byId[currentId];
     var curStage = cur ? cur.p.stage : null;
     var curAnchor = cur ? cur.m.id : null;
     var html = '<aside class="docs-side"><div class="docs-side-head"><b>📚 内容目录</b><a href="#/index">索引页 ›</a></div>';
     S.levels.forEach(function (lv) {
-      var unlocked = stageUnlocked(lv.id);
       var mods = S.modules.filter(function (m) {
         return m.points.some(function (p) { return p.stage === lv.id; });
       });
-      var total = 0, done = 0;
-      mods.forEach(function (m) {
-        m.points.forEach(function (p) { if (p.stage === lv.id) { total++; if (state.visited[p.id]) done++; } });
-      });
       var isCurStage = lv.id === curStage;
       html += '<details class="docs-chapter"' + (isCurStage ? " open" : "") + '>';
-      html += '<summary' + (isCurStage ? ' class="current-stage"' : '') + '><span>' + lv.icon + '</span><span>' + lv.id + " " + lv.name + '</span>' +
-        (unlocked ? "" : '<span class="dc-lock" title="主线门禁：通过上一关 Boss 后点亮；点击阅读不受限">🔒</span>') +
-        '<span class="dim" style="font-weight:500;font-size:11px">' + done + "/" + total + '</span><span class="dc-arrow">▶</span></summary>';
+      html += '<summary' + (isCurStage ? ' class="current-stage"' : '') + '><span>' + lv.id + " " + lv.name + '</span><span class="dc-arrow">▶</span></summary>';
       mods.forEach(function (m) {
         var mp = m.points.filter(function (p) { return p.stage === lv.id; });
         var isCurAnchor = m.id === curAnchor && isCurStage;
         html += '<details class="docs-anchor"' + (isCurAnchor ? " open" : "") + '>';
-        html += '<summary' + (isCurAnchor ? ' class="current-anchor"' : '') + '><span>' + m.icon + " " + m.id + " " + esc(m.name) + (m.optional ? " *" : "") + '</span><span class="dc-arrow">▶</span></summary>';
+        html += '<summary' + (isCurAnchor ? ' class="current-anchor"' : '') + '><span>' + m.id + " " + esc(m.name) + '</span><span class="dc-arrow">▶</span></summary>';
         mp.forEach(function (p) {
           var isCur = p.id === currentId;
           html += '<a class="docs-link' + (isCur ? " current" : "") + '" href="#/docs/' + p.id + '" title="' + esc(p.title) + '">' +
-            '<span class="dl-num">' + p.num + '</span><span>' + esc(p.title) + (p.frontier ? " 🆕" : "") + '</span>' +
-            (state.visited[p.id] ? '<span class="dl-done">✓</span>' : "") + '</a>';
+            '<span class="dl-num">' + p.num + '</span><span>' + esc(p.title) + '</span></a>';
         });
         html += '</details>';
       });
@@ -566,21 +557,18 @@
 
   /* ---------- 知识点页（始终无门禁） ---------- */
   var currentPoint = null, currentContent = null;
-  /* 文档阅读页（#/docs）复用知识点渲染时，把输出重定向到正文容器、翻页链接留在文档页 */
-  var renderTarget = null, linkBase = null;
 
   function renderKnowledge(app, id) {
     var entry = byId[id];
-    var host = renderTarget || app;
     if (!entry) {
-      host.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a> <a class="btn" href="#/map">返回技能树</a></div>';
+      app.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a> <a class="btn" href="#/map">返回技能树</a></div>';
       return;
     }
     var m = entry.m, p = entry.p;
     var lv = stageById(p.stage);
     getContent(id).then(function (c) {
       if (!c) {
-        host.innerHTML = '<div class="content-pending">📖 内容生成中，稍后再来～<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
+        app.innerHTML = '<div class="content-pending">📖 内容生成中，稍后再来～<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
         return;
       }
       var firstVisit = !state.visited[id];
@@ -641,7 +629,7 @@
       }
 
       var lc = S.layerColors[m.layer] || "#64748b";
-      host.innerHTML =
+      app.innerHTML =
         '<div class="breadcrumb"><a href="#/map">学习地图</a> / <a href="#/index">知识点索引</a> / ' + lv.id + " " + lv.name + " / 锚点 " + m.id + " / " + p.num + "</div>" +
         '<div class="level-strip" style="--lc:' + lv.color + '">' + lv.icon + " <b>" + lv.id + " " + lv.name + "</b> · 目标头衔 " + esc(lv.title) +
           " · <span class='dim'>完成本考点 +" + S.xp.visit + " XP</span>" +
@@ -691,19 +679,13 @@
           '<div class="summary-box">' + summaryHtml(c.summary) + "</div></section>" +
         teachback +
         '<nav class="knav">' +
-          (prev ? '<a href="' + (linkBase || "#/knowledge/") + prev.p.id + '"><div class="kn-lbl">← 上一考点</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
+          (prev ? '<a href="#/knowledge/' + prev.p.id + '"><div class="kn-lbl">← 上一考点</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
                 : '<a href="#/index"><div class="kn-lbl">←</div><div class="kn-t">返回知识点索引</div></a>') +
-          (next ? '<a class="next" href="' + (linkBase || "#/knowledge/") + next.p.id + '"><div class="kn-lbl">下一考点 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
+          (next ? '<a class="next" href="#/knowledge/' + next.p.id + '"><div class="kn-lbl">下一考点 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
                 : '<a class="next" href="#/boss/' + p.stage + '"><div class="kn-lbl">🎉 本关知识点已尽</div><div class="kn-t">⚔️ 挑战 ' + p.stage + " Boss 战 →</div></a>") +
         "</nav>";
 
       restoreExercises(p, c);
-      /* 文档阅读模式：正文内跳转链接统一留在 #/docs 内，保持翻阅不中断 */
-      if (linkBase) {
-        $$('#docs-article a[href^="#/knowledge/"]').forEach(function (a) {
-          a.setAttribute("href", a.getAttribute("href").replace("#/knowledge/", "#/docs/"));
-        });
-      }
     });
   }
 
@@ -1013,7 +995,50 @@
     });
   }
 
-  /* ---------- 文档阅读页（CSNotes 式：左侧章节树 + 右侧正文，快速翻阅，无门禁） ---------- */
+  /* ---------- 文档阅读页（纯知识速查：左侧目录树 + 右侧知识本体，无趣味/引导元素，不写进度） ---------- */
+  function docsArticleHtml(entry, c) {
+    var m = entry.m, p = entry.p;
+    var lv = stageById(p.stage);
+    var idx = -1;
+    ORDER.forEach(function (e, i) { if (e.p.id === p.id) idx = i; });
+    var prev = idx > 0 ? ORDER[idx - 1] : null;
+    var next = idx < ORDER.length - 1 ? ORDER[idx + 1] : null;
+    var lc = S.layerColors[m.layer] || "#64748b";
+
+    var head =
+      '<div class="breadcrumb">文档阅读 / ' + lv.id + " " + lv.name + " / " + p.num + "</div>" +
+      '<header class="k-head" style="--mod:' + lc + '">' +
+        "<h1>" + p.num + " · " + esc(p.title) + "</h1>" +
+        '<div class="k-meta"><span class="badge">锚点 ' + m.id + "（" + esc(m.name) + "）</span>" +
+          "<span>来源：" + esc(p.source) + "</span></div>" +
+      "</header>";
+
+    var body =
+      '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">📖</span>定义</div><p>' + esc(c.definition) + "</p></section>" +
+      ((c.keyPoints || []).length ? '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">📌</span>要点</div><ul class="kp-list">' +
+        c.keyPoints.map(function (k2) {
+          return '<li><span class="kp-ico">' + (k2.icon || "📌") + '</span><span><b>' + esc(k2.name) + "</b>：" + esc(k2.text) + "</span></li>";
+        }).join("") + "</ul></section>" : "") +
+      '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">💼</span>面试问法</div>' +
+        (c.interview || []).map(function (q) {
+          return '<div class="interview-item"><div class="iq">❓ ' + esc(q.q) + "</div>" +
+            (q.tip ? '<div class="itip">答题要点：' + esc(q.tip) + "</div>" : "") + "</div>";
+        }).join("") +
+      "</section>" +
+      '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🧾</span>小结</div>' +
+        '<div class="summary-box">' + summaryHtml(c.summary) + "</div></section>";
+
+    var nav =
+      '<nav class="knav">' +
+        (prev ? '<a href="#/docs/' + prev.p.id + '"><div class="kn-lbl">← 上一篇</div><div class="kn-t">' + prev.p.num + " " + esc(prev.p.title) + "</div></a>"
+              : '<a href="#/docs"><div class="kn-lbl">←</div><div class="kn-t">回到目录</div></a>') +
+        (next ? '<a class="next" href="#/docs/' + next.p.id + '"><div class="kn-lbl">下一篇 →</div><div class="kn-t">' + next.p.num + " " + esc(next.p.title) + "</div></a>"
+              : '<a class="next" href="#/docs"><div class="kn-lbl">→</div><div class="kn-t">回到目录</div></a>') +
+      "</nav>";
+
+    return head + body + nav;
+  }
+
   function renderDocs(app, id) {
     if (!id || !byId[id]) {
       var first = id && byId[id] ? id : (ORDER[0] ? ORDER[0].p.id : null);
@@ -1021,12 +1046,17 @@
       app.innerHTML = '<div class="content-pending">未找到该知识点。<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
       return;
     }
+    var entry = byId[id];
     app.innerHTML = '<div class="docs-wrap">' + docsSidebarHtml(id) +
       '<article class="docs-main" id="docs-article"><div class="content-pending">正在加载……</div></article></div>';
     var article = $("#docs-article");
-    renderTarget = article;
-    linkBase = "#/docs/";
-    renderKnowledge(app, id);
+    getContent(id).then(function (c) {
+      if (!c) {
+        article.innerHTML = '<div class="content-pending">内容加载失败，请稍后重试。</div>';
+        return;
+      }
+      article.innerHTML = docsArticleHtml(entry, c);
+    });
   }
 
   /* ---------- 模块回顾测验（自动组卷 · 纯自测 · 无门禁） ---------- */
@@ -1398,7 +1428,7 @@
     _origK(app, id);
     getContent(id).then(function (c) {
       var r = parseHash();
-      if ((r.page === "knowledge" || r.page === "docs") && r.id === id) currentContent = c;
+      if (r.page === "knowledge" && r.id === id) currentContent = c;
     });
   };
 

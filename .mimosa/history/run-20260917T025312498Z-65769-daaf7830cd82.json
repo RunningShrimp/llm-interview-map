@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "mimosa-finding-history/v1",
+  "runId": "20260917T025312498Z-65769-daaf7830cd82",
+  "runStatus": "inconclusive",
+  "errors": [
+    "scan:js/md.js: scanner_failed: batch scanner status 1",
+    "scan:js/app.js: scanner_failed: batch scanner status 1",
+    "scan:sw.js: scanner_failed: batch scanner status 1"
+  ],
+  "target": ".",
+  "revision": "089fda6ee6df75b24d552e755cebbef04e9ce235",
+  "diffHash": "d1a6ab7d6895a7e292ba36473ec4b5c279163c3ba7c3ad231c66b06665bac245",
+  "rulesVersion": "unavailable",
+  "recordedAt": "2026-09-17T02:53:12.498Z",
+  "timing": {
+    "startedAt": "2026-09-17T02:53:12.291Z",
+    "completedAt": "2026-09-17T02:53:12.498Z",
+    "durationMs": 207
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "modelCalls": 0,
+    "measurement": "known-zero"
+  },
+  "findings": {
+    "total": 0,
+    "bySeverity": {},
+    "byStatus": {}
+  },
+  "coverage": {
+    "status": "partial",
+    "reasonCounts": {
+      "scanner_failed": 3,
+      "project_check_failed": 3,
+      "finding_ledger_read_failed": 1
+    }
+  },
+  "evidenceBoundary": "static_only",
+  "immutableReport": ".mimosa/reports/task-review-sess_6340db30-904a-4d9f-a4db-5e3031409773-20260917T025312498Z-65769-daaf7830cd82.json"
+}

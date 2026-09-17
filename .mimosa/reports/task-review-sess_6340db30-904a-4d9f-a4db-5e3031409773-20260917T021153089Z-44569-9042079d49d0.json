@@ -1,0 +1,239 @@
+{
+  "schema_version": "mimosa-task-review/v2",
+  "run_id": "20260917T021153089Z-44569-9042079d49d0",
+  "run_status": "inconclusive",
+  "errors": [
+    {
+      "stage": "scan",
+      "target": "js/app.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    },
+    {
+      "stage": "scan",
+      "target": "sw.js",
+      "reason": "scanner_failed: batch scanner status 1"
+    }
+  ],
+  "coverage": {
+    "schema_version": "mimosa-hook-coverage/v1",
+    "status": "partial",
+    "scope": "hook_observed_diff",
+    "baseline": {
+      "complete": true,
+      "captured_files": 11,
+      "candidate_limit": 5000,
+      "truncated": false,
+      "enumeration_error_count": 0,
+      "snapshot_error_count": 0,
+      "compensated_target_count": 2
+    },
+    "change_tracking": {
+      "touched_observed": 1,
+      "touched_retained": 1,
+      "truncated": false,
+      "bash_mutation": true,
+      "bash_discovered": 2,
+      "bash_discovery_limit": 80,
+      "bash_discovery_truncated": false
+    },
+    "candidates": {
+      "eligible_files": 2,
+      "selected_files": 2,
+      "limit": 20,
+      "truncated": false
+    },
+    "scanning": {
+      "required_files": 2,
+      "scanned_files": 0,
+      "skipped_files": 0,
+      "failed_files": 2,
+      "project_checks_required": 0,
+      "project_checks_completed": 0
+    },
+    "notification": {
+      "eligible_findings": 0,
+      "detailed_findings": 0,
+      "detail_limit": 3,
+      "truncated": false
+    },
+    "reason_counts": {
+      "scanner_failed": 2,
+      "project_check_failed": 2,
+      "finding_ledger_read_failed": 1
+    },
+    "reasons": [
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "scanner_failed",
+        "stage": "scan",
+        "target": "sw.js",
+        "detail": "batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "js/app.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "scan",
+        "target": "sw.js",
+        "detail": "scanner_failed: batch scanner status 1",
+        "affects_completion": true
+      },
+      {
+        "code": "finding_ledger_read_failed",
+        "stage": "finding-ledger",
+        "target": ".",
+        "detail": "file:///Users/didi/.zcode/cli/plugins/cache/zcode-plugins-official/mimosa/1.0.3/payload/dist/cli.js:3 const path = require(\"node:path\"); ^ ReferenceError: require is not defined in ES module scope, you can use import instead This file is being treated as an ES module because it has a '.js' file exte",
+        "affects_completion": false
+      }
+    ],
+    "reasons_truncated": false
+  },
+  "generated_at": "2026-09-17T02:11:53.089Z",
+  "session_id": "sess_6340db30-904a-4d9f-a4db-5e3031409773",
+  "target": ".",
+  "revision": "089fda6ee6df75b24d552e755cebbef04e9ce235",
+  "rules_version": "unavailable",
+  "diff_hash": "3f5f6c5fcc0b729af195e594c2e53271bedb46598e51d889d7fd37a3bcb5f2cb",
+  "diff": {
+    "algorithm": "sha256",
+    "changed_file_count": 2,
+    "changed_files": [
+      {
+        "file": "js/app.js",
+        "ranges": [
+          {
+            "start": 326,
+            "end": 326
+          },
+          {
+            "start": 338,
+            "end": 338
+          },
+          {
+            "start": 343,
+            "end": 343
+          },
+          {
+            "start": 347,
+            "end": 347
+          },
+          {
+            "start": 564,
+            "end": 564
+          },
+          {
+            "start": 571,
+            "end": 571
+          },
+          {
+            "start": 632,
+            "end": 632
+          },
+          {
+            "start": 682,
+            "end": 682
+          },
+          {
+            "start": 684,
+            "end": 684
+          },
+          {
+            "start": 998,
+            "end": 1041
+          },
+          {
+            "start": 1049,
+            "end": 1049
+          },
+          {
+            "start": 1053,
+            "end": 1059
+          },
+          {
+            "start": 1431,
+            "end": 1431
+          }
+        ],
+        "before_hash": "bea017580039f8ed7f313faf1ebd4d6ee876491868a2c20ba306e4d43225ef99",
+        "after_hash": "3e325e7e904d2032254ee5dae95bc1d5754af5b1915ff43f77bfd8dcb5878cbd"
+      },
+      {
+        "file": "sw.js",
+        "ranges": [
+          {
+            "start": 7,
+            "end": 7
+          },
+          {
+            "start": 9,
+            "end": 9
+          }
+        ],
+        "before_hash": "469ea65b30b57b7d4da7e54dbb76e50a0910c69364269ca95926e56ddcee9d42",
+        "after_hash": "f6f2575740e39a7f0ce8cd101d155d561332fd7b795af50dc7cc45d41fa695b7"
+      }
+    ]
+  },
+  "timing": {
+    "started_at": "2026-09-17T02:11:52.917Z",
+    "completed_at": "2026-09-17T02:11:53.089Z",
+    "duration_ms": 172,
+    "measurement": "hook_wall_clock"
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "model_calls": 0,
+    "measurement": "known-zero"
+  },
+  "telemetry": {
+    "schemaVersion": "mimosa-gate-telemetry/v1",
+    "profile": "gate",
+    "operation": "Stop",
+    "outcome": "partial/INCONCLUSIVE",
+    "latencyMs": 172,
+    "peakMemoryBytes": 114753536,
+    "memoryMeasurement": "max-observed-process-rss",
+    "scannedFiles": 0,
+    "cache": {
+      "hits": 0,
+      "misses": 0,
+      "measurement": "not-applicable"
+    },
+    "denyCount": 0,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0,
+      "modelCalls": 0,
+      "measurement": "known-zero"
+    }
+  },
+  "finding_count": 0,
+  "rewake_finding_count": 0,
+  "evidence_boundary": {
+    "scan": "candidate",
+    "static_fix_verification": "observed_static_only",
+    "runtime_verification": "not_performed"
+  },
+  "finding_events": [],
+  "findings": [],
+  "artifacts": {
+    "immutable_report": ".mimosa/reports/task-review-sess_6340db30-904a-4d9f-a4db-5e3031409773-20260917T021153089Z-44569-9042079d49d0.json",
+    "latest_report": ".mimosa/reports/task-review-sess_6340db30-904a-4d9f-a4db-5e3031409773.json",
+    "history_summary": ".mimosa/history/run-20260917T021153089Z-44569-9042079d49d0.json"
+  }
+}
