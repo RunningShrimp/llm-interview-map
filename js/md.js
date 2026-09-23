@@ -40,7 +40,7 @@
     var codes = [];
     /* 1. 摘出代码块 */
     var text = String(mdText || "").replace(/\r\n/g, "\n").replace(/```(\w*)\n([\s\S]*?)```/g, function (m, lang, code) {
-      codes.push('<pre class="md-pre"><code>' + esc(code.replace(/\n$/, "")) + "</code></pre>");
+      codes.push('<div class="md-pre-wrap"><button type="button" class="md-copy" aria-label="复制代码">复制</button><pre class="md-pre"><code>' + esc(code.replace(/\n$/, "")) + "</code></pre></div>");
       return "\u0000C" + (codes.length - 1) + "\u0000";
     });
 
@@ -51,6 +51,7 @@
     var lines = text.split("\n");
     var out = [];
     var i = 0;
+    var hSeq = 0;
     function flushPara(buf) {
       if (buf.length) out.push("<p>" + inline(buf.join("<br>")) + "</p>");
     }
@@ -65,9 +66,9 @@
 
       if (!t) { flushPara(para); para = []; i++; continue; }
 
-      /* 标题：# → h1，## → h2 …… */
+      /* 标题：# → h1，## → h2 ……（v4.5：顺序锚点 id，供目录/滚动定位） */
       var h = t.match(/^(#{1,4})\s+(.*)$/);
-      if (h) { flushPara(para); para = []; var lv = h[1].length; out.push("<h" + lv + ' class="md-h">' + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
+      if (h) { flushPara(para); para = []; var lv = h[1].length; hSeq++; out.push('<h' + lv + ' id="md-h-' + hSeq + '" class="md-h">' + inline(h[2]) + "</h" + lv + ">"); i++; continue; }
 
       /* 分隔线 */
       if (/^(-{3,}|\*{3,})$/.test(t)) { flushPara(para); para = []; out.push('<hr class="md-hr">'); i++; continue; }

@@ -28,7 +28,7 @@
     {
       "icon": "📦",
       "name": "技术档位",
-      "text": "进程级（快但弱）→ 容器（Docker，均衡）→ 微 VM（Firecracker，秒级启动+强隔离）——按风险选档。"
+      "text": "进程级（快但弱）→ 容器（Docker，均衡）→ gVisor → 微 VM（Firecracker，百毫秒级启动+强隔离）——按风险选档。"
     },
     {
       "icon": "🧊",

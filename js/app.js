@@ -376,6 +376,7 @@
         var isCur = d.href === currentDocHref;
         html += '<a class="docs-link' + (isCur ? " current" : "") + '" href="' + d.href + '" title="' + esc(d.label) + '">' +
           '<span>' + esc(d.label) + '</span></a>';
+        if (isCur) html += '<div class="docs-toc" id="docs-toc"></div>';
       });
       html += '</details>';
     });
@@ -673,6 +674,10 @@
             "<span>来源：" + esc(p.source) + "</span>" +
             "<span>前置依赖：" + depsHtml + "</span></div>" +
           '<div class="key-question">🎯 本页学习目标（锚点关键问题）：<b>' + esc(m.keyQuestion) + "</b></div>" +
+          (function () {
+            var de = docsEntryFor(id);
+            return de ? '<div class="k-doc-link">📖 深度讲解：<a href="' + de.entry.href + '">阅读本锚点完整文档（10 节 · ' + esc(de.entry.label) + "）→</a></div>" : "";
+          })() +
         "</header>" +
         '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🍼</span>小白定义</div><p>' + esc(c.definition) + "</p></section>" +
         '<section class="k-section" style="--mod:' + lc + '"><div class="sec-title"><span class="sec-ico">🎯</span>生活类比</div>' +
@@ -1025,6 +1030,18 @@
   }
 
   /* ---------- 文档阅读页（纯知识速查：左侧目录树 + 右侧 Markdown 深度讲解，无趣味/引导元素，不写进度） ---------- */
+  /* v4.5 关联知识点条：文档 ↔ 知识点体系互跳（知识点内容全保留，双向结合） */
+  function docsPointsBar(entry) {
+    var m = null;
+    S.modules.forEach(function (x) { if (x.id === entry.anchor) m = x; });
+    if (!m) return "";
+    var pts = m.id === "H" ? m.points.filter(function (p) { return p.num.toLowerCase() === entry.docId; }) : m.points;
+    if (!pts.length) return "";
+    return '<div class="docs-kbar"><span class="dk-label">关联知识点：</span>' +
+      pts.map(function (p) { return '<a class="dk-link" href="#/knowledge/' + p.id + '">' + p.num + " " + esc(p.title) + "</a>"; }).join("") +
+      "</div>";
+  }
+
   function docsNavHtml(entry) {
     var nav = '<nav class="knav">';
     if (entry.idx > 0) {
@@ -1059,14 +1076,82 @@
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(function (mdText) {
         if (location.hash.indexOf("#/docs") !== 0) return;
-        article.innerHTML = '<div class="md-body">' + MD.render(mdText) + "</div>" + docsNavHtml(entry);
+        article.innerHTML = docsPointsBar(entry.entry) + '<div class="md-body">' + MD.render(mdText) + "</div>" + docsNavHtml(entry);
         window.scrollTo(0, 0);
+        bindDocsRead(article);
       })
       .catch(function () {
         article.innerHTML =
           '<div class="content-pending">📝 本篇深度文档编写中……<br><br>' +
           '可先阅读主线版本：<a class="btn" href="#/knowledge/' + entry.entry.docId + '">打开「' + esc(entry.entry.label) + '」知识点页</a></div>';
       });
+  }
+
+  /* ---------- v4.5 阅读增强（渐进增强：本函数整体 try/catch，任一环节失败不影响正文渲染） ---------- */
+  var docsScrollHandler = null;
+  function bindDocsRead(article) {
+    try {
+      /* 1. 侧栏本篇目录（TOC）：由已渲染 h2 生成，点击平滑滚动 + 当前节高亮 */
+      var toc = $("#docs-toc");
+      var hs = article.querySelectorAll("h2.md-h");
+      if (toc && hs.length) {
+        var items = "";
+        for (var i = 0; i < hs.length; i++) {
+          var t = hs[i].textContent.replace(/^\d+\.\s*/, "");
+          items += '<a href="#' + hs[i].id + '" data-target="' + hs[i].id + '"><span class="toc-num">' + (i + 1) + "</span><span>" + esc(t) + "</span></a>";
+        }
+        toc.innerHTML = '<div class="toc-cap">本篇目录</div>' + items;
+        toc.addEventListener("click", function (e) {
+          var a = e.target.closest ? e.target.closest("a[data-target]") : null;
+          if (!a) return;
+          e.preventDefault();
+          var el = document.getElementById(a.getAttribute("data-target"));
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      /* 2. 阅读进度条 + 返回顶部 */
+      var bar = document.createElement("div"); bar.id = "docs-progress";
+      var topBtn = document.createElement("button"); topBtn.id = "docs-top-btn"; topBtn.type = "button"; topBtn.textContent = "↑ 顶部";
+      article.appendChild(bar); article.appendChild(topBtn);
+      topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+      function onScroll() {
+        if (!bar.isConnected) { window.removeEventListener("scroll", docsScrollHandler); return; }
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (max > 0 ? Math.min(100, Math.round(window.scrollY / max * 100)) : 0) + "%";
+        if (window.scrollY > 600) topBtn.classList.add("show"); else topBtn.classList.remove("show");
+        if (toc && hs.length && hs[0].isConnected) {
+          var cur = 0, y = window.scrollY + 96;
+          for (var k = 0; k < hs.length; k++) {
+            if (hs[k].getBoundingClientRect().top + window.scrollY <= y) cur = k;
+          }
+          var links = toc.querySelectorAll("a[data-target]");
+          for (var k = 0; k < links.length; k++) links[k].classList.toggle("current", k === cur);
+        }
+      }
+      if (docsScrollHandler) window.removeEventListener("scroll", docsScrollHandler);
+      docsScrollHandler = onScroll;
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+
+      /* 3. 代码块一键复制（事件委托，clipboard API + execCommand 兜底） */
+      article.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest(".md-copy") : null;
+        if (!btn) return;
+        var pre = btn.parentElement ? btn.parentElement.querySelector("pre") : null;
+        if (!pre) return;
+        function done(ok) { btn.textContent = ok ? "已复制 ✓" : "复制失败"; setTimeout(function () { btn.textContent = "复制"; }, 1600); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pre.innerText).then(function () { done(true); }, function () { done(false); });
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = pre.innerText; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.select();
+          var ok = false; try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+          document.body.removeChild(ta); done(ok);
+        }
+      });
+    } catch (err) { /* 增强失败不影响正文阅读 */ }
   }
 
   /* ---------- 模块回顾测验（自动组卷 · 纯自测 · 无门禁） ---------- */

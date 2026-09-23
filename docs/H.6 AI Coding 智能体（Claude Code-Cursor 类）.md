@@ -1,4 +1,4 @@
-# 讲解 H6 AI Coding 智能体（Claude Code/Cursor 类）
+# 讲解 H.6 AI Coding 智能体（Claude Code/Cursor 类）
 
 > 说明：前置 2.5（执行循环与状态机：ReAct、终止与恢复）与 2.7（单 Agent 架构模式：自主型架构）是本篇的机制底座——Claude Code/Cursor 这类编码 Agent 就是这些机制在真实产品里的集大成形态：它的自主循环是 2.5 的 ReAct，它的产品骨架是 2.7 的自主型。
 > 本篇聚焦编码 Agent 的工程化全貌：形态谱系、代码库上下文构建与索引（Indexing）、工具集、agentic loop、Harness Engineering（规则文件与权限体系）、规划与 diff 应用、多文件重构与测试驱动循环、SWE-bench 类评估，以及对普通开发工作流的影响；上下文压缩的体系化深化见 H.3。

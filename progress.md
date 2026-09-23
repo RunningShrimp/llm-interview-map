@@ -130,6 +130,23 @@ v4 基线：commit edd5c1f（82 点 / 七关卡，已上线）——v4.1 增加�
 
 终检补充记录：0.0 roadmap 221→233（加引言+「如何使用本库」节，正文与 rodmap.md 逐字一致）。全库行数 33,630 → 36,820（51 篇）；行数口径以 .polish-work/{baseline,final}-lines.txt 为准。回滚兜底：docs-backup-20260923/（3.6 已替换为源头原文版本）。工作产物留存 .polish-work/（DeepSeek 源头对话 JSON、4+1 篇原文提取、校验脚本、行数基线）。
 
+## 七、站点同步任务（2026-09-23，根 docs → 学习站，状态列）
+
+| 任务 | 产出 | 状态 |
+|---|---|---|
+| 阶段0 备份+映射 | backup-site-20260923/（docs/content/js/css 四目录 diff 一致；index.html/sw.js 依赖 git 兜底）+ docs-sync-map.md | ✅ |
+| 阶段1 H×8 并入根 docs | docs/H.1-H.8（data/docs 版基底+root 深度补强） | ⏳ |
+| 阶段2 同步 51 篇 | data/docs 全量更新（首行 syllabus 标题，余字节一致）+ validate-docs 全绿 | ⏳ |
+| 阶段3 内容对齐 | data/content 82 知识点 JSON **全保留**（用户明确：知识点不放弃、与文档结合），仅做事实性冲突修订 + Boss ref 核对 + build-index 重建 | ⏳ |
+| 阶段4 阅读体验+结合 | v4.5.0：侧栏本篇 TOC（滚动高亮+平滑定位）、顶部进度条、返回顶部、代码一键复制（clipboard+execCommand 兜底）、md.js 标题锚点、文档页「关联知识点」条 × 知识点页「深度讲解」互跳（知识体系全保留双向结合）、移动端横向溢出修复（docs-wrap flex-start 根因）；版本 bump 4.5.0 + shell v14 | ✅ |
+| 阶段5 验证部署 | validate.js ALL PASS · validate-docs 51/51 · judge.test ALL PASS；本地冒烟（地图门禁/索引82+搜索/知识点判题+15XP/文档页全增强/H 篇/深浅色/移动端 390px/零控制台报错）；提交推送 → Pages | ⏳ |
+
+站点同步日志（2026-09-23）：
+- 阶段1 H×8 并入根 docs（550-605 行/篇，站点版基底+root 深度）；根 docs 现为 59 篇完整语料
+- 阶段2 脚本化同步 51 篇（sync_docs.py：首行 syllabus 标题+余字节一致）；唯一校验失败 4-10（fence 内模板编号 ## 被裸计数）→ 根稿模板去编号修复后 ALL PASS
+- 阶段3 内容对齐：82 知识点 JSON 全保留（用户口径），修订 3 文件 8 处（0-5c GRPO 表述/0-5d 乱码/h5 A2A 口径×3/4-9 黄金信号×2/h8 Firecracker 启动档）；Boss ref 70 题全有效；build-index 重建；待人工复核 4 项
+- 冒烟坑：本地 8765 端口被「nightwalker 控制台」占用致首测空页；Playwright 会缓存 ?v=4.5.0 CSS 需换端口复测
+
 勘察结论（与任务书差异如实记录）：①「缺 3.7」不成立——3.7 已存在（766 行，质量达标，仅尾行残留「。」与 ✅❌ emoji 待清理）；②实际硬伤为 4 篇 0 字节空文件（0.6/1.2/1.3/4.3）；③12 篇含 emoji；4.8/4.9/4.10/5.7 存在模板片段泄漏为 `##` 二级标题；12 篇缺 `> 说明` 衔接段。用户提供 DeepSeek 分享链接（本套文档源头对话），已提取全部 43 篇原文（.polish-work/deepseek-share-content.json），4 篇缺失文档原文单存为 .polish-work/deepseek-{0.6,1.2,1.3,4.3}.md。
 
 逐篇完成日志（阶段2，格式：篇目 旧行数→新行数｜要点）：

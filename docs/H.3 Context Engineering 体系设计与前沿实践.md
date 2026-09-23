@@ -1,4 +1,4 @@
-# 讲解 H3 Context Engineering：体系设计与前沿实践
+# 讲解 H.3 Context Engineering 体系设计与前沿实践
 
 > 说明：前置 1.5（记忆与上下文管理：多轮对话的窗口策略、摘要压缩、检索式记忆）与 2.4（记忆 Memory：Agent 记忆的分层原理）是本篇的两块地基——1.5 管「单轮怎么排布、多轮怎么带历史」，2.4 管「记忆系统怎么设计」。
 > 本篇把两者升级为体系化学科：Context Engineering（上下文工程）——系统性管理长任务 Agent 每一步「看见什么」，核心模式是压缩（Compaction）、记忆工具（Memory Tool）、子代理（Subagent）隔离、即时取回（Just-in-time Retrieval）。

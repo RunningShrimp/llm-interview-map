@@ -1,7 +1,7 @@
 {
   "id": "h5-a2a-protocol",
   "title": "A2A 协议与多 Agent 互操作",
-  "definition": "A2A 是 Google 发起、捐入 Linux Foundation 的开放协议：让不同框架的 Agent 互相发现、委托任务、回报状态——MCP 连工具，A2A 连 Agent（趋势观察）。",
+  "definition": "A2A 是 Google 发起、捐入 Linux Foundation 的开放协议：让不同框架的 Agent 互相发现、委托任务、回报状态——MCP 连工具，A2A 连 Agent（面试出现中）。",
   "analogies": [
     {
       "icon": "🌐",
@@ -42,8 +42,8 @@
     },
     {
       "icon": "🔮",
-      "name": "状态：趋势观察",
-      "text": "协议已进入 Linux Foundation、主流框架开始支持，但面试真题尚少——关注生态落地速度。"
+      "name": "状态：面试出现中",
+      "text": "截至 2026 年，4 个中文题库已设 A2A 专项题（卡码原题「MCP 和 A2A 有什么区别」）；考点以垂直/水平分工概念与选型判断为主。"
     },
     {
       "icon": "📜",
@@ -140,8 +140,8 @@
     {
       "q": "了解 A2A 协议吗？它和 MCP 怎么分工？",
       "stars": 3,
-      "source": "A2A 官方文档（Linux Foundation）/知乎面经（趋势观察）",
-      "tip": "HTTP 类比+垂直/水平分工+诚实标注协议成熟度。"
+      "source": "A2A 官方 v1.0 文档（Linux Foundation 2026-03 定稿）/卡码 Agent 题库第 8 题（面试出现中，2025-2026）",
+      "tip": "HTTP 类比+垂直/水平分工+签名名片等 v1.0 事实口径（150+ 组织、Linux Foundation 治理）。"
     }
   ],
   "summary": "Q：A2A 是什么？（答：Agent 互联开放标准——能力名片+任务生命周期）\nQ：与 MCP 分工？（答：MCP 连工具（垂直），A2A 连 Agent（水平））\nQ：成熟度？（答：趋势观察——多厂商异构接入时收益最大）"
