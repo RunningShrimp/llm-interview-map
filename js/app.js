@@ -261,7 +261,9 @@
     headerHud();
     if (r.page !== "docs") {
       document.body.classList.remove("docs-reading");
+      document.body.classList.remove("tts-on");
       app.classList.remove("wrap-docs");
+      if (window.TTS) TTS.stop();
     }
     if (r.page === "map") app.innerHTML = renderMap();
     else if (r.page === "index") renderIndex(app);
@@ -1044,7 +1046,10 @@
       links = pts.map(function (p) { return '<a class="dk-link" href="#/knowledge/' + p.id + '">' + p.num + " " + esc(p.title) + "</a>"; }).join("");
     }
     return '<div class="docs-kbar"><span class="dk-label">关联知识点：</span>' + links +
-      '<button type="button" class="dk-readmode" data-act="readmode-toggle" title="隐藏侧栏 · 居中限宽 · 沉浸阅读（ESC 退出）">⛶ 阅读模式</button></div>';
+      '<span class="dk-actions">' +
+      '<button type="button" class="dk-tts" data-act="tts-toggle" title="端侧语音朗读本篇（自动跳过代码与表格，从当前节开始）">🔊 朗读</button>' +
+      '<button type="button" class="dk-readmode" data-act="readmode-toggle" title="隐藏侧栏 · 居中限宽 · 沉浸阅读（ESC 退出）">⛶ 阅读模式</button>' +
+      '</span></div>';
   }
 
   function docsNavHtml(entry) {
@@ -1065,6 +1070,8 @@
   }
 
   function renderDocs(app, id) {
+    if (window.TTS) TTS.stop();
+    document.body.classList.remove("tts-on");
     var entry = id ? docsEntryFor(id) : null;
     if (!id) {
       location.hash = DOCS_LIST.length ? DOCS_LIST[0].href : "#/index";
@@ -1209,6 +1216,111 @@
       };
       document.addEventListener("keydown", docsKeyHandler);
       try { if (sessionStorage.getItem("llm-quest:readmode") === "1") setReading(true); } catch (e2) { }
+      /* 5. SLM 朗读（v4.5.3）：端侧 speechSynthesis + 结构感知管线（跳过代码/表格，从当前节起播）；不支持则隐藏入口 */
+      var ttsBtn = article.querySelector('[data-act="tts-toggle"]');
+      if (ttsBtn && !window.TTS) ttsBtn.style.display = "none";
+      if (ttsBtn && window.TTS && TTS.supported) {
+        var ttsUnits = null;
+        var prefRate = "1", prefVoice = "";
+        try { prefRate = localStorage.getItem("llm-quest:tts-rate") || "1"; prefVoice = localStorage.getItem("llm-quest:tts-voice") || ""; } catch (e3) { }
+
+        var ttsBar = document.createElement("div");
+        ttsBar.id = "docs-ttsbar";
+        ttsBar.innerHTML =
+          '<button type="button" class="tb-btn primary" data-tts="toggle">⏸ 暂停</button>' +
+          '<button type="button" class="tb-btn" data-tts="stop" title="停止朗读">⏹ 停止</button>' +
+          '<span class="tb-now" data-role="tts-now">准备朗读…</span>' +
+          '<label class="tb-opt">语速<select data-tts="rate">' +
+            ["0.8", "1", "1.2", "1.5"].map(function (v) { return '<option value="' + v + '"' + (v === prefRate ? " selected" : "") + ">" + v + "x</option>"; }).join("") +
+          "</select></label>" +
+          '<label class="tb-opt">音色<select data-tts="voice"><option value="">自动（本地中文）</option></select></label>';
+        article.appendChild(ttsBar);
+
+        var nowEl = ttsBar.querySelector('[data-role="tts-now"]');
+        var rateSel = ttsBar.querySelector('[data-tts="rate"]');
+        var voiceSel = ttsBar.querySelector('[data-tts="voice"]');
+        var toggleEl = ttsBar.querySelector('[data-tts="toggle"]');
+
+        TTS.onVoicesReady(function (vs) {
+          var zh = vs.filter(function (v) { return /^zh/i.test(v.lang || ""); });
+          (zh.length ? zh : vs).forEach(function (v) {
+            var o = document.createElement("option");
+            o.value = v.name;
+            o.textContent = (v.localService ? "" : "[网络] ") + v.name + "（" + v.lang + "）";
+            if (v.name === prefVoice) o.selected = true;
+            voiceSel.appendChild(o);
+          });
+        });
+
+        function chosenVoice() {
+          var n = voiceSel.value;
+          if (!n) return TTS.bestVoice();
+          var vs = TTS.voices();
+          for (var i = 0; i < vs.length; i++) if (vs[i].name === n) return vs[i];
+          return null;
+        }
+        function ttsOpts() {
+          return { rate: parseFloat(rateSel.value) || 1, voice: chosenVoice(), onUnit: ttsOnUnit, onEnd: ttsStop };
+        }
+        function ttsOnUnit(i, u) {
+          nowEl.textContent = (u.sec ? "第" + u.sec + "节 · " : "") + (u.text.length > 46 ? u.text.slice(0, 46) + "…" : u.text);
+          var h2s = article.querySelectorAll("h2.md-h");
+          for (var i2 = 0; i2 < h2s.length; i2++) h2s[i2].classList.toggle("tts-sec", !!u.secId && h2s[i2].id === u.secId);
+          var links = document.querySelectorAll("#docs-toc a[data-target], #docs-rail a[data-target]");
+          for (var k = 0; k < links.length; k++) links[k].classList.toggle("current", !!u.secId && links[k].getAttribute("data-target") === u.secId);
+          var h = u.secId ? document.getElementById(u.secId) : null;
+          if (h) {
+            var top = h.getBoundingClientRect().top;
+            if (top < -80 || top > window.innerHeight - 160) h.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+        function ttsStop() {
+          TTS.stop();
+          document.body.classList.remove("tts-on");
+          ttsBtn.textContent = "🔊 朗读";
+          toggleEl.textContent = "⏸ 暂停";
+          var marked = article.querySelectorAll("h2.md-h.tts-sec");
+          for (var i = 0; i < marked.length; i++) marked[i].classList.remove("tts-sec");
+        }
+        function ttsStart(fromCurrentSec) {
+          if (!ttsUnits) ttsUnits = TTS.units(article);
+          if (!ttsUnits.length) { nowEl.textContent = "本篇无可朗读文本"; return; }
+          var start = 0;
+          if (fromCurrentSec) {
+            var y = window.scrollY + 96, curSecId = null;
+            var h2s = article.querySelectorAll("h2.md-h");
+            for (var i = 0; i < h2s.length; i++) {
+              if (h2s[i].getBoundingClientRect().top + window.scrollY <= y) curSecId = h2s[i].id;
+            }
+            if (curSecId) {
+              for (var j = 0; j < ttsUnits.length; j++) if (ttsUnits[j].secId === curSecId) { start = j; break; }
+            }
+          }
+          document.body.classList.add("tts-on");
+          ttsBtn.textContent = "⏸ 暂停";
+          TTS.play(ttsUnits.slice(start), ttsOpts());
+        }
+        ttsBtn.addEventListener("click", function () {
+          var st = TTS.state();
+          if (st === "playing") { TTS.pause(); ttsBtn.textContent = "▶ 继续"; toggleEl.textContent = "▶ 继续"; }
+          else if (st === "paused") { TTS.resume(); ttsBtn.textContent = "⏸ 暂停"; toggleEl.textContent = "⏸ 暂停"; }
+          else ttsStart(true);
+        });
+        toggleEl.addEventListener("click", function () { ttsBtn.click(); });
+        ttsBar.querySelector('[data-tts="stop"]').addEventListener("click", ttsStop);
+        function ttsRestartCurrent() {
+          var st = TTS.state();
+          if (st === "playing" || st === "paused") {
+            var i = TTS.speakingUnit();
+            TTS.stop();
+            document.body.classList.add("tts-on");
+            ttsBtn.textContent = "⏸ 暂停";
+            TTS.play(ttsUnits.slice(Math.max(0, i)), ttsOpts());
+          }
+        }
+        rateSel.addEventListener("change", function () { try { localStorage.setItem("llm-quest:tts-rate", rateSel.value); } catch (e3) { } ttsRestartCurrent(); });
+        voiceSel.addEventListener("change", function () { try { localStorage.setItem("llm-quest:tts-voice", voiceSel.value); } catch (e3) { } ttsRestartCurrent(); });
+      }
     } catch (err) { /* 增强失败不影响正文阅读 */ }
   }
 

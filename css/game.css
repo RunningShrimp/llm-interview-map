@@ -535,7 +535,7 @@ body.docs-reading .md-body blockquote.md-quote { font-size: 15.5px; }
 body.docs-reading .docs-kbar { border-bottom: 1px solid var(--line); padding-bottom: 10px; }
 
 .dk-readmode {
-  margin-left: auto; flex: none; padding: 4px 13px; border-radius: 999px;
+  flex: none; padding: 4px 13px; border-radius: 999px;
   border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
   font-size: 12.5px; cursor: pointer; transition: color .15s ease, border-color .15s ease;
 }
@@ -609,4 +609,50 @@ body.docs-reading #docs-drawer-fab { display: block; }
   .docs-rail { width: 300px; }
   body.docs-reading .docs-main { max-width: 1040px; }
   body.docs-reading .md-body { font-size: 17.5px; }
+}
+
+/* ============================================================
+ * v4.5.3 SLM 朗读（端侧 speechSynthesis + 结构感知管线）
+ * 入口按钮组 / 悬浮控制条 / 当前朗读节标记 / 朗读中底部元素避让
+ * ============================================================ */
+.docs-kbar .dk-actions { margin-left: auto; display: flex; gap: 6px; flex: none; }
+.dk-tts, .dk-readmode {
+  flex: none; padding: 4px 13px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
+  font-size: 12.5px; cursor: pointer; transition: color .15s ease, border-color .15s ease;
+}
+.dk-tts:hover, .dk-readmode:hover { color: var(--brand); border-color: var(--brand); }
+
+#docs-ttsbar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 72;
+  display: none; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+  max-width: min(92vw, 760px);
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: var(--shadow-lg); padding: 8px 14px; font-size: 13px;
+}
+body.tts-on #docs-ttsbar { display: flex; }
+.tb-btn {
+  border: 1px solid var(--line); background: var(--tint-2); color: var(--ink-2);
+  border-radius: 999px; padding: 5px 12px; font-size: 12.5px; cursor: pointer; flex: none;
+}
+.tb-btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.tb-btn:hover { color: var(--ink); }
+.tb-btn.primary:hover { color: #fff; opacity: .92; }
+.tb-now {
+  color: var(--ink-2); max-width: 320px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; min-width: 120px; text-align: center;
+}
+.tb-opt { display: flex; align-items: center; gap: 4px; color: var(--ink-3); font-size: 12px; flex: none; }
+.tb-opt select {
+  border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 7px; padding: 3px 4px; font-size: 12px; max-width: 150px;
+}
+.md-body h2.md-h.tts-sec::before { content: "🔊"; margin-right: 7px; font-size: .62em; color: var(--brand); vertical-align: middle; }
+
+body.tts-on #docs-drawer-fab, body.tts-on #docs-top-btn { bottom: 84px; }
+@media (max-width: 760px) {
+  #docs-ttsbar { bottom: 12px; padding: 6px 10px; gap: 6px; border-radius: 18px; }
+  .tb-now { max-width: 150px; min-width: 80px; }
+  .tb-opt select { max-width: 104px; }
+  body.tts-on #docs-drawer-fab, body.tts-on #docs-top-btn { bottom: 72px; }
 }
