@@ -580,3 +580,33 @@ body.docs-reading #docs-drawer-fab { display: block; }
   #docs-top-btn { z-index: 71; }
   body.docs-reading .md-body { font-size: 16px; line-height: 1.95; }
 }
+
+/* ============================================================
+ * v4.5.2 2K+ 超大屏响应式（文档阅读页，仅 docs 路由经 wrap-docs 类放宽容器）
+ * ≥2200px：右栏「本篇目录」常驻轨 + 版式加宽；≥3000px：再加宽一档
+ * ============================================================ */
+.docs-rail {
+  display: none; position: sticky; top: 62px; flex: none;
+  width: 264px; max-height: calc(100vh - 74px); overflow-y: auto;
+  margin: 0 0 0 28px; padding: 12px 4px 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+}
+@media (min-width: 2200px) {
+  main.wrap.wrap-docs { max-width: 1780px; }
+  .docs-side { flex-basis: 300px; width: 300px; }
+  .docs-main { max-width: 1000px; }
+  .md-body { font-size: 16px; line-height: 1.95; }
+  .docs-rail { display: block; }
+  body.docs-reading .docs-main { max-width: 920px; }
+  body.docs-reading .md-body { font-size: 17px; }
+  body.docs-reading #docs-drawer-fab { display: none; } /* 目录轨常驻，FAB 冗余 */
+}
+@media (min-width: 3000px) {
+  main.wrap.wrap-docs { max-width: 2240px; }
+  .docs-side { flex-basis: 340px; width: 340px; }
+  .docs-main { max-width: 1120px; }
+  .md-body { font-size: 17px; line-height: 2; }
+  .docs-rail { width: 300px; }
+  body.docs-reading .docs-main { max-width: 1040px; }
+  body.docs-reading .md-body { font-size: 17.5px; }
+}

@@ -259,7 +259,10 @@
     var r = parseHash();
     var app = $("#app");
     headerHud();
-    if (r.page !== "docs") document.body.classList.remove("docs-reading");
+    if (r.page !== "docs") {
+      document.body.classList.remove("docs-reading");
+      app.classList.remove("wrap-docs");
+    }
     if (r.page === "map") app.innerHTML = renderMap();
     else if (r.page === "index") renderIndex(app);
     else if (r.page === "progress") app.innerHTML = renderProgress();
@@ -1071,8 +1074,10 @@
       app.innerHTML = '<div class="content-pending">未找到该文档。<br><br><a class="btn" href="#/index">返回知识点索引</a></div>';
       return;
     }
+    app.classList.add("wrap-docs");
     app.innerHTML = '<div class="docs-wrap">' + docsSidebarHtml(entry.entry.href) +
-      '<article class="docs-main" id="docs-article"><div class="content-pending">正在加载……</div></article></div>';
+      '<article class="docs-main" id="docs-article"><div class="content-pending">正在加载……</div></article>' +
+      '<aside class="docs-rail docs-toc" id="docs-rail" aria-label="本篇目录"></aside></div>';
     var article = $("#docs-article");
     fetch("./data/docs/" + entry.entry.docId + ".md")
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
@@ -1094,7 +1099,7 @@
   var docsKeyHandler = null;
   function bindDocsRead(article) {
     try {
-      /* 1. 侧栏本篇目录（TOC）：由已渲染 h2 生成，点击平滑滚动 + 当前节高亮 */
+      /* 1. 侧栏本篇目录（TOC）：由已渲染 h2 生成，点击平滑滚动 + 当前节高亮（2K+ 同步右侧目录轨） */
       var toc = $("#docs-toc");
       var hs = article.querySelectorAll("h2.md-h");
       if (toc && hs.length) {
@@ -1104,13 +1109,17 @@
           items += '<a href="#' + hs[i].id + '" data-target="' + hs[i].id + '"><span class="toc-num">' + (i + 1) + "</span><span>" + esc(t) + "</span></a>";
         }
         toc.innerHTML = '<div class="toc-cap">本篇目录</div>' + items;
-        toc.addEventListener("click", function (e) {
+        var rail = $("#docs-rail");
+        if (rail) rail.innerHTML = toc.innerHTML;
+        var tocGo = function (e) {
           var a = e.target.closest ? e.target.closest("a[data-target]") : null;
           if (!a) return;
           e.preventDefault();
           var el = document.getElementById(a.getAttribute("data-target"));
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+        };
+        toc.addEventListener("click", tocGo);
+        if (rail) rail.addEventListener("click", tocGo);
       }
       /* 2. 阅读进度条 + 返回顶部 */
       var bar = document.createElement("div"); bar.id = "docs-progress";
@@ -1128,8 +1137,9 @@
           for (var k = 0; k < hs.length; k++) {
             if (hs[k].getBoundingClientRect().top + window.scrollY <= y) cur = k;
           }
-          var links = toc.querySelectorAll("a[data-target]");
-          for (var k = 0; k < links.length; k++) links[k].classList.toggle("current", k === cur);
+          var curId = hs[cur].id;
+          var links = document.querySelectorAll("#docs-toc a[data-target], #docs-rail a[data-target]");
+          for (var k = 0; k < links.length; k++) links[k].classList.toggle("current", links[k].getAttribute("data-target") === curId);
         }
       }
       if (docsScrollHandler) window.removeEventListener("scroll", docsScrollHandler);
