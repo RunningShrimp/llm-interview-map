@@ -259,6 +259,7 @@
     var r = parseHash();
     var app = $("#app");
     headerHud();
+    if (r.page !== "docs") document.body.classList.remove("docs-reading");
     if (r.page === "map") app.innerHTML = renderMap();
     else if (r.page === "index") renderIndex(app);
     else if (r.page === "progress") app.innerHTML = renderProgress();
@@ -1030,16 +1031,17 @@
   }
 
   /* ---------- 文档阅读页（纯知识速查：左侧目录树 + 右侧 Markdown 深度讲解，无趣味/引导元素，不写进度） ---------- */
-  /* v4.5 关联知识点条：文档 ↔ 知识点体系互跳（知识点内容全保留，双向结合） */
+  /* v4.5 关联知识点条：文档 ↔ 知识点体系互跳（知识点内容全保留，双向结合）；右端挂阅读模式开关 */
   function docsPointsBar(entry) {
     var m = null;
     S.modules.forEach(function (x) { if (x.id === entry.anchor) m = x; });
-    if (!m) return "";
-    var pts = m.id === "H" ? m.points.filter(function (p) { return p.num.toLowerCase() === entry.docId; }) : m.points;
-    if (!pts.length) return "";
-    return '<div class="docs-kbar"><span class="dk-label">关联知识点：</span>' +
-      pts.map(function (p) { return '<a class="dk-link" href="#/knowledge/' + p.id + '">' + p.num + " " + esc(p.title) + "</a>"; }).join("") +
-      "</div>";
+    var links = "";
+    if (m) {
+      var pts = m.id === "H" ? m.points.filter(function (p) { return p.num.toLowerCase() === entry.docId; }) : m.points;
+      links = pts.map(function (p) { return '<a class="dk-link" href="#/knowledge/' + p.id + '">' + p.num + " " + esc(p.title) + "</a>"; }).join("");
+    }
+    return '<div class="docs-kbar"><span class="dk-label">关联知识点：</span>' + links +
+      '<button type="button" class="dk-readmode" data-act="readmode-toggle" title="隐藏侧栏 · 居中限宽 · 沉浸阅读（ESC 退出）">⛶ 阅读模式</button></div>';
   }
 
   function docsNavHtml(entry) {
@@ -1089,6 +1091,7 @@
 
   /* ---------- v4.5 阅读增强（渐进增强：本函数整体 try/catch，任一环节失败不影响正文渲染） ---------- */
   var docsScrollHandler = null;
+  var docsKeyHandler = null;
   function bindDocsRead(article) {
     try {
       /* 1. 侧栏本篇目录（TOC）：由已渲染 h2 生成，点击平滑滚动 + 当前节高亮 */
@@ -1151,6 +1154,51 @@
           document.body.removeChild(ta); done(ok);
         }
       });
+      /* 4. 沉浸阅读模式（v4.5.1）：隐藏侧栏 / 居中限宽 / 悬浮目录抽屉 / ESC 退出 / 会话记忆，桌面与移动端响应式 */
+      var rmBtn = article.querySelector('[data-act="readmode-toggle"]');
+      function setReading(on) {
+        document.body.classList.toggle("docs-reading", !!on);
+        try { sessionStorage.setItem("llm-quest:readmode", on ? "1" : "0"); } catch (e2) { }
+        if (rmBtn) rmBtn.textContent = on ? "⛶ 退出阅读" : "⛶ 阅读模式";
+      }
+      if (rmBtn) rmBtn.addEventListener("click", function () {
+        setReading(!document.body.classList.contains("docs-reading"));
+      });
+
+      var drawer = document.createElement("div");
+      drawer.id = "docs-drawer";
+      drawer.innerHTML = '<div class="dd-panel"><div class="dd-head"><b>本篇目录</b>' +
+        '<button type="button" class="dd-close" aria-label="关闭目录">✕</button></div>' +
+        '<div class="dd-body docs-toc"></div></div>';
+      article.appendChild(drawer);
+      drawer.querySelector(".dd-close").addEventListener("click", function () { drawer.classList.remove("open"); });
+      drawer.addEventListener("click", function (e2) {
+        if (e2.target === drawer) drawer.classList.remove("open");
+        var a = e2.target.closest ? e2.target.closest("a[data-target]") : null;
+        if (!a) return;
+        e2.preventDefault();
+        drawer.classList.remove("open");
+        var el = document.getElementById(a.getAttribute("data-target"));
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      var fab = document.createElement("button");
+      fab.id = "docs-drawer-fab"; fab.type = "button"; fab.textContent = "☰ 目录";
+      article.appendChild(fab);
+      fab.addEventListener("click", function () {
+        var body = drawer.querySelector(".dd-body");
+        if (body && !body.children.length && toc && hs.length) body.innerHTML = toc.innerHTML;
+        drawer.classList.add("open");
+      });
+
+      if (docsKeyHandler) document.removeEventListener("keydown", docsKeyHandler);
+      docsKeyHandler = function (e2) {
+        if (e2.key !== "Escape" || !fab.isConnected) return;
+        if (drawer.classList.contains("open")) { drawer.classList.remove("open"); return; }
+        if (document.body.classList.contains("docs-reading")) setReading(false);
+      };
+      document.addEventListener("keydown", docsKeyHandler);
+      try { if (sessionStorage.getItem("llm-quest:readmode") === "1") setReading(true); } catch (e2) { }
     } catch (err) { /* 增强失败不影响正文阅读 */ }
   }
 

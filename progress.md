@@ -142,6 +142,8 @@ v4 基线：commit edd5c1f（82 点 / 七关卡，已上线）——v4.1 增加�
 | 阶段5 验证部署 | validate.js ALL PASS · validate-docs 51/51 · judge.test ALL PASS；本地冒烟（地图门禁/索引82+搜索/知识点判题+15XP/文档页全增强/H 篇/深浅色/移动端 390px/零控制台报错）；commit 380b884 推送 → Pages 重建 → 线上验证 v4.5.0 ✅ https://runningshrimp.github.io/llm-interview-map/ | ✅ |
 
 站点同步日志（2026-09-23）：
+
+- v4.5.1 增量（用户追加）：文档阅读页**沉浸阅读模式**——关联知识点行右端「⛶ 阅读模式」开关：隐藏侧栏 + 正文居中限宽 820px + 字号 15→16.5px/行高 2.0；左下「☰ 目录」FAB 呼出抽屉（10 节跳转后自关，面板 min(320px,84vw)）；ESC/按钮退出；sessionStorage 会话记忆（切回 docs 恢复、切其他页自动清除）；响应式：桌面 1440/移动 390 双端验证零溢出，FAB 与回顶按钮分居两侧不重叠；版本 v=4.5.1 / shell v15；冒烟零控制台报错。
 - 阶段1 H×8 并入根 docs（550-605 行/篇，站点版基底+root 深度）；根 docs 现为 59 篇完整语料
 - 阶段2 脚本化同步 51 篇（sync_docs.py：首行 syllabus 标题+余字节一致）；唯一校验失败 4-10（fence 内模板编号 ## 被裸计数）→ 根稿模板去编号修复后 ALL PASS
 - 阶段3 内容对齐：82 知识点 JSON 全保留（用户口径），修订 3 文件 8 处（0-5c GRPO 表述/0-5d 乱码/h5 A2A 口径×3/4-9 黄金信号×2/h8 Firecracker 启动档）；Boss ref 70 题全有效；build-index 重建；待人工复核 4 项
