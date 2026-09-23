@@ -139,7 +139,7 @@ v4 基线：commit edd5c1f（82 点 / 七关卡，已上线）——v4.1 增加�
 | 阶段2 同步 51 篇 | data/docs 全量更新（首行 syllabus 标题，余字节一致）+ validate-docs 全绿 | ⏳ |
 | 阶段3 内容对齐 | data/content 82 知识点 JSON **全保留**（用户明确：知识点不放弃、与文档结合），仅做事实性冲突修订 + Boss ref 核对 + build-index 重建 | ⏳ |
 | 阶段4 阅读体验+结合 | v4.5.0：侧栏本篇 TOC（滚动高亮+平滑定位）、顶部进度条、返回顶部、代码一键复制（clipboard+execCommand 兜底）、md.js 标题锚点、文档页「关联知识点」条 × 知识点页「深度讲解」互跳（知识体系全保留双向结合）、移动端横向溢出修复（docs-wrap flex-start 根因）；版本 bump 4.5.0 + shell v14 | ✅ |
-| 阶段5 验证部署 | validate.js ALL PASS · validate-docs 51/51 · judge.test ALL PASS；本地冒烟（地图门禁/索引82+搜索/知识点判题+15XP/文档页全增强/H 篇/深浅色/移动端 390px/零控制台报错）；提交推送 → Pages | ⏳ |
+| 阶段5 验证部署 | validate.js ALL PASS · validate-docs 51/51 · judge.test ALL PASS；本地冒烟（地图门禁/索引82+搜索/知识点判题+15XP/文档页全增强/H 篇/深浅色/移动端 390px/零控制台报错）；commit 380b884 推送 → Pages 重建 → 线上验证 v4.5.0 ✅ https://runningshrimp.github.io/llm-interview-map/ | ✅ |
 
 站点同步日志（2026-09-23）：
 - 阶段1 H×8 并入根 docs（550-605 行/篇，站点版基底+root 深度）；根 docs 现为 59 篇完整语料
