@@ -40,12 +40,19 @@ function buildIndex() {
       });
     });
   });
-  /* 索引默认排序：0 层 → 4 层 → H（锚点编号平铺顺序） */
+  /* 索引默认排序：0 层 → 4 层 → H（编号数值序：3.9 在 3.10 前，字母后缀跟随基号） */
   const layerOrder = { L0: 0, L1: 1, L2: 2, L3: 3, L4: 4, H: 5 };
+  const numKey = (num) => {
+    const m = /^(\d+)(?:\.(\d+))?([a-z]*)$/i.exec(String(num));
+    return m ? [Number(m[1]), m[2] !== undefined ? Number(m[2]) : -1, m[3] || ""] : [99, -1, ""];
+  };
   entries.sort((a, b) => {
     const la = layerOrder[a.layer] ?? 9, lb = layerOrder[b.layer] ?? 9;
     if (la !== lb) return la - lb;
-    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+    const ka = numKey(a.num), kb = numKey(b.num);
+    return ka[0] - kb[0] || ka[1] - kb[1]
+      || (ka[2] < kb[2] ? -1 : ka[2] > kb[2] ? 1 : 0)
+      || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
   });
   return entries;
 }

@@ -330,18 +330,39 @@
   }
 
   /* ---------- 文档阅读：锚点粒度文档（51 篇深度讲解，data/docs/*.md 单一来源） ---------- */
-  /* 文档列表：0 层→4 层→H 的平铺顺序（与 data/index.js 排序一致） */
+  /* 文档列表：忠实 docs/ 的章节编号顺序（0→1→2→3→4→H，编号数值序），不按关卡重排 */
+  function docNumKey(num) {
+    var m4 = /^(\d+)(?:\.(\d+))?([a-z]*)$/i.exec(String(num));
+    return m4 ? [Number(m4[1]), m4[2] !== undefined ? Number(m4[2]) : -1, m4[3] || ""] : [99, -1, ""];
+  }
+  function docNumCompare(x, y) {
+    var kx = docNumKey(x), ky = docNumKey(y);
+    return kx[0] - ky[0] || kx[1] - ky[1] || (kx[2] < ky[2] ? -1 : kx[2] > ky[2] ? 1 : 0);
+  }
+  /* 分组标题与 rodmap 层命名一致（0 基础层 / 1 LLM 应用层 / 2 Agent 核心层 / 3 AI 工程化层 / 4 实战层 / H 前沿） */
+  var DOCS_CHAPTERS = [
+    { id: "0", name: "0 基础层" },
+    { id: "1", name: "1 LLM 应用层" },
+    { id: "2", name: "2 Agent 核心层" },
+    { id: "3", name: "3 AI 工程化层" },
+    { id: "4", name: "4 实战层" },
+    { id: "H", name: "H 2026 前沿趋势" }
+  ];
   var DOCS_LIST = (function () {
     var list = [];
     S.modules.forEach(function (m) {
-      var primary = m.points[0];
       if (m.id === "H") {
         m.points.forEach(function (p) {
-          list.push({ docId: p.num.toLowerCase(), href: "#/docs/" + p.num.toLowerCase(), label: p.num + " " + p.title, stage: p.stage, anchor: "H" });
+          list.push({ docId: p.num.toLowerCase(), href: "#/docs/" + p.num.toLowerCase(), label: p.num + " " + p.title, chapter: "H", sort: [5, Number(String(p.num).slice(1)), ""], anchor: "H" });
         });
       } else {
-        list.push({ docId: primary.id, href: "#/docs/" + primary.id, label: m.id + " " + m.name, stage: primary.stage, anchor: m.id });
+        var primary = m.points[0];
+        var k = docNumKey(m.id);
+        list.push({ docId: primary.id, href: "#/docs/" + primary.id, label: m.id + " " + m.name, chapter: String(k[0]), sort: [k[0], k[1], k[2]], anchor: m.id });
       }
+    });
+    list.sort(function (a, b) {
+      return a.sort[0] - b.sort[0] || a.sort[1] - b.sort[1] || (a.sort[2] < b.sort[2] ? -1 : a.sort[2] > b.sort[2] ? 1 : 0);
     });
     return list;
   })();
@@ -365,19 +386,19 @@
     return null;
   }
 
-  /* ---------- 文档站侧栏：纯目录树（关卡 → 锚点文档），无进度/门禁元素 ---------- */
+  /* ---------- 文档站侧栏：纯目录树（章节 → 锚点文档，与 docs/ 编号体系一致），无进度/门禁元素 ---------- */
   function docsSidebarHtml(currentDocHref) {
-    var curStage = null;
+    var curChapter = null;
     for (var i = 0; i < DOCS_LIST.length; i++) {
-      if (DOCS_LIST[i].href === currentDocHref) { curStage = DOCS_LIST[i].stage; break; }
+      if (DOCS_LIST[i].href === currentDocHref) { curChapter = DOCS_LIST[i].chapter; break; }
     }
     var html = '<aside class="docs-side"><div class="docs-side-head"><b>📚 内容目录</b><a href="#/index">索引页 ›</a></div>';
-    S.levels.forEach(function (lv) {
-      var docs = DOCS_LIST.filter(function (d) { return d.stage === lv.id; });
+    DOCS_CHAPTERS.forEach(function (ch) {
+      var docs = DOCS_LIST.filter(function (d) { return d.chapter === ch.id; });
       if (!docs.length) return;
-      var isCurStage = lv.id === curStage;
-      html += '<details class="docs-chapter"' + (isCurStage ? " open" : "") + '>';
-      html += '<summary' + (isCurStage ? ' class="current-stage"' : '') + '><span>' + lv.id + " " + lv.name + '</span><span class="dc-arrow">▶</span></summary>';
+      var isCurChapter = ch.id === curChapter;
+      html += '<details class="docs-chapter"' + (isCurChapter ? " open" : "") + '>';
+      html += '<summary' + (isCurChapter ? ' class="current-stage"' : '') + '><span>' + esc(ch.name) + '</span><span class="dc-arrow">▶</span></summary>';
       docs.forEach(function (d) {
         var isCur = d.href === currentDocHref;
         html += '<a class="docs-link' + (isCur ? " current" : "") + '" href="' + d.href + '" title="' + esc(d.label) + '">' +
@@ -551,7 +572,7 @@
         return true;
       });
       if (f2.sort === "stars") {
-        rows = rows.slice().sort(function (a, b) { return b.stars - a.stars || (a.id < b.id ? -1 : 1); });
+        rows = rows.slice().sort(function (a, b) { return b.stars - a.stars || docNumCompare(a.num, b.num); });
       }
       var doneCount = rows.filter(function (e) { return state.visited[e.id]; }).length;
       $("#idx-count").innerHTML = "显示 <b>" + rows.length + "</b> / " + IDX.length + " 条（其中已读 " + doneCount + "）";
